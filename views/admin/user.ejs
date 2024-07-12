@@ -1,0 +1,183 @@
+<%- include('./header', {adminName: adminName}) %>
+
+<!-- partial -->
+<div class="container-fluid page-body-wrapper">
+  <!-- partial:partials/_sidebar.html -->
+  <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+
+      <!-- <li class="nav-item nav-profile">
+        <a href="#" class="nav-link">
+          <div class="nav-profile-image">
+            <img src="assets/images/faces/face1.jpg" alt="profile">
+            <span class="login-status online"></span>
+
+          </div>
+          <div class="nav-profile-text d-flex flex-column">
+            <span class="font-weight-bold mb-2">David Grey. H</span>
+            <span class="text-secondary text-small">Project Manager</span>
+          </div> 
+          <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+        </a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+          <span class="menu-title">DASHBOARD</span>
+          <i class="mdi mdi-home menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="collapse" href="#ui-products" aria-expanded="false" aria-controls="ui-basic">
+          <span class="menu-title">PRODUCTS</span>
+          <i class="menu-arrow"></i>
+          <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px;"></i>
+        </a>
+        <div class="collapse" id="ui-products">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item"> <a class="nav-link" href="/admin/products">LISTED</a></li>
+            <li class="nav-item"> <a class="nav-link" href="">UNLISTED</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/users">
+          <span class="menu-title text-dark">USERS</span>
+          <i class="mdi menu-icon mdi-account-multiple text-dark"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="collapse" href="#ui-categories" aria-expanded="false" aria-controls="ui-basic">
+          <span class="menu-title">CATEGORIES</span>
+          <i class="menu-arrow"></i>
+          <i class="mdi mdi-cube-outline menu-icon"></i>
+        </a>
+        <div class="collapse" id="ui-categories">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item"> <a class="nav-link" href="/admin/category">LISTED</a></li>
+            <li class="nav-item"> <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/order">
+          <span class="menu-title">ORDERS</span>
+          <i class="mdi mdi-cart menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/coupon">
+          <span class="menu-title">COUPON</span>
+          <i class="mdi mdi-tag menu-icon"></i>
+        </a>
+      </li>
+
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/salesReport">
+          <span class="menu-title">SALES REPORT</span>
+
+          <i class="mdi menu-icon mdi-chart-line"></i>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+  <!-- partial -->
+  <div class="main-panel">
+    <div class="content-wrapper">
+
+      <div class="page-header">
+        <h3 class="page-title">
+          <span class="page-title-icon bg-dark  text-white mr-2">
+            <i class="mdi menu-icon mdi-account-multiple"></i>
+          </span> USERS
+        </h3>
+        <nav aria-label="breadcrumb">
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+              <!-- <span></span> <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i> -->
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+             
+                
+               
+                <table class="table table-hover ">
+                  <thead>
+                    <tr>
+                      <th>FIRST NAME</th>
+                      <th>LAST NAME</th>
+                      <th>EMAIL</th>
+                      <th>PHONE NUMBER</th>
+                      <th>DATE JOINED</th>
+                      <th>STATUS</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-container">
+                    <% users.forEach((user) => { %>
+
+                      <tr>
+                        <td><%= user.firstName %></td>
+                        <td><%= user.lastName %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.phone ? user.phone : "Not available" %></td>
+                        <td><%= user.dateJoined.toISOString().slice(0, 10) %></td>
+                        <% if(user.isBlocked){ %>
+                        <td><label class="badge badge-danger" id="label<%= user._id %>">Blocked</label></td>
+                        <td>                   
+                        <button data-user-id="<%= user._id %>" id="<%= user._id %>" type="button" class="btn btn-outline-dark btn-sm statusBtn">Unblock</button>                   
+                      </td>
+                      <% }else{ %>
+
+                      <td><label class="badge badge-danger" id="label<%= user._id %>">Active</label></td>
+                      <td>                   
+                      <button data-user-id="<%= user._id %>" id="<%= user._id %>" type="button" class="btn btn-outline-dark btn-sm statusBtn">Block</button>                   
+                      </td>
+                      <% } %>
+
+                      </tr>
+
+                    <%  }) %>
+                   
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination">
+                <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
+                <% for(let i=1; i<= totalPages; i++){ %>
+                <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+                <% } %>
+    
+                <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
+              </ul>
+            </nav>
+          </div>
+
+    </div>
+    <!-- content-wrapper ends -->
+  </div>
+</div>
+
+<%- include('./loader') %>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/static/custom/js/admin/user.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/SujithVSuresh/pagenation@master/pagenation.js"></script>
+
+<%- include('./footer') %>

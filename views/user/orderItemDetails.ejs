@@ -1,0 +1,395 @@
+<%- include('./header', {isLogin: isLogin, cartCount: cartCount}) %>
+
+  <div class="breadcrumbs">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <p class="bread">
+            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
+            <span>
+              <%= orderShowId %>
+            </span> /
+            <span>Item</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colorlib-product">
+    <div class="container">
+      <div class="row row-pb-lg">
+        <div class="col-md-12">
+          <div class="row row-pb-lg">
+            <div class="col-md-12">
+              <!-- <div class="product-name d-flex">
+                <div class="one-forth text-left px-4">
+                  <span>Order Details</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>Amount</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>Status</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>PAYMENT</span>
+                </div>
+  
+                <div class="one-eight text-center px-4">
+                  <span></span>
+                </div>
+              </div> -->
+
+              <div id="orderItemsContainer">
+                <div class="product-cart d-flex" id="cartItemContainer${item._id}"
+                  style="background-color: #f0faff; padding: 20px;">
+                  <div class="one-forth">
+                    <div class="product-img" style="
+                      background-image: url('/static/images/<%= orderedItem.image %>');
+                    "></div>
+                    <div class="display-tc">
+                      <span style="margin-left: 30px; color: black">
+                        <%= orderedItem.modelName %> for <%= orderedItem.gender %>
+                      </span><br />
+                      <span style="margin-left: 30px" class="price">Color: <%= orderedItem.color %></span><br />
+                      <span style="margin-left: 30px" class="price">Size: <%= orderedItem.size %></span><br />
+                    </div>
+                  </div>
+                  <div class="one-forth text-center">
+                    <div class="display-tc">
+                      <span class="price">Quantity: <%= orderedItem.quantity %></span><br />
+                      <span class="price">Price: ₹ <%= orderedItem.price %></span>
+                    </div>
+                  </div>
+                  <div class="one-forth text-center">
+                    <div class="display-tc" id="orderStatusContainer">
+                      <% if (orderedItem.orderStatus==="Pending" ) { %>
+                        <div id="pendingStatusShow">
+                          <span class="price" style="color: rgb(252, 134, 0)">
+                            <%= orderedItem.orderStatus %>
+                          </span><br />
+                          <span class="price">Your order for this item is pending</span>
+                        </div>
+                        <% } else if (orderedItem.orderStatus==="Cancelled" ) { %>
+                          <div id="cancelledStatusShow">
+                            <span class="price" style="color: red">
+                              <%= orderedItem.orderStatus %>
+                            </span><br />
+                            <span class="price">Your order for this item has been cancelled</span>
+                          </div>
+                          <% } else if (orderedItem.orderStatus==="Ordered" ) { %>
+                            <div id="orderedStatusShow">
+                              <span class="price" style="color: blue">
+                                <%= orderedItem.orderStatus %>
+                              </span><br />
+                              <span class="price">Your order for this item has been placed</span>
+                            </div>
+                            <% } else if (orderedItem.orderStatus==="Delivered" ) { %>
+
+                              <div id="orderedStatusShow">
+                                <span class="price" style="color: green">
+                                  <%= orderedItem.orderStatus %>
+                                </span><br />
+                                <span class="price">Your item has been delivered</span><br>
+                                <span class="price"><%- new Date(orderedItem.deliveredDate).toLocaleDateString()
+                                    %></span>
+                              </div>
+                              <% } else if (orderedItem.orderStatus==="Shipped" ) { %>
+                                <div id="orderedStatusShow">
+                                  <span class="price" style="color: rgb(128, 109, 0)">
+                                    <%= orderedItem.orderStatus %>
+                                  </span><br />
+                                  <span class="price">Your item has been shipped</span>
+                                </div>
+                                <% } else if (orderedItem.orderStatus==="Returned" ) { %>
+                                  <div id="orderedStatusShow">
+                                    <span class="price" style="color: red">
+                                      <%= orderedItem.orderStatus %>
+                                    </span><br />
+                                    <span class="price">Your item has been returned</span>
+                                  </div>
+                                  <% } else if (orderedItem.orderStatus==="REQUESTED_FOR_RETURN" ) { %>
+                                    <div id="orderedStatusShow">
+                                      <span class="price" style="color: rgb(255, 187, 0)">
+                                        Return requested </span><br />
+                                      <span class="price">Your item return request is in process</span>
+                                    </div>
+                                    <% } else if (orderedItem.orderStatus==="RETURN_APPROVED" ) { %>
+                                      <div id="orderedStatusShow">
+                                        <span class="price" style="color: rgb(255, 187, 0)">
+                                          Return approved </span><br />
+                                        <span class="price">Your item return request has been approved</span>
+                                      </div>
+                                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="orderItemsContainer">
+                <div class="product-cart d-flex" id="cartItemContainer${item._id}"
+                  style="background-color: #f0faff; padding: 20px;">
+                  <div class="one-forth">
+                    <div>
+                      <div class="display-tc" style="padding: 0">
+
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="one-forth text-center">
+                    <div class="display-tc">
+                      <!-- <span class="price">Quantity: 4</span><br>
+                      <span class="price">Price: ₹ 2000</span> -->
+                    </div>
+                  </div>
+                  <div class="one-forth text-center">
+                    <div class="display-tc" id="returnCancelBtnContainer">
+                      <% if (orderedItem.orderStatus !=="Cancelled" && orderedItem.orderStatus !=="Pending" &&
+                        orderedItem.orderStatus !=="Delivered" && orderedItem.orderStatus !="REQUESTED_FOR_RETURN" &&
+                        orderedItem.orderStatus !="RETURN_APPROVED" && orderedItem.orderStatus !="Returned" ) { %>
+                        <span id="cancelQuestion">Do you want to cancel the order ?</span><br>
+                        <!-- <a id="cancelBtn" class="btn" order-id="<%= orderId %>" order-item-id="<%= itemId %>"
+                          class="" style="
+                        color: red;
+                      "><u>Cancel order</u></a> -->
+                        <u style="color: red;"><a id="cancelBtn" order-id="<%= orderId %>"
+                            order-item-id="<%= itemId %>">Cancel order</a></u>
+                        <% } else if(orderedItem.orderStatus=="Delivered" ){ %>
+                          <% const givenDate=new Date(orderedItem.deliveredDate); const currentDate=new Date(); const
+                            sevenDaysFromGivenDate=new Date(givenDate.getTime() + 7 * 24 * 60 * 60 * 1000); const
+                            isExceedingSevenDays=currentDate> sevenDaysFromGivenDate;
+                            %>
+
+                            <% if(!isExceedingSevenDays && !orderedItem.requestedDate){ %>
+                              <span>Returns must be initiated within <br />7 days after
+                                delivery</span><br />
+                              <a href="" id="returnBtn" order-id="<%= orderId %>" order-item-id="<%= itemId %>"
+                                class="button editDltBtn" data-toggle="modal" data-target="#orderReturnReasonModal"
+                                style="
+                        border-color: white;
+                        padding: 5px;
+                        color: blue;
+                        background-color: white;
+                      "><u>Return</u></a>
+                              <% } %>
+
+                                <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- <div class="row row-pb-lg">
+            <div class="container">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                  <div class="card card-stepper" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                          <span class="lead fw-normal">Your order has been delivered</span>
+                          <span class="text-muted small">by DHFL on 21 Jan, 2020</span>
+                        </div>
+                        <div>
+                          <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary"
+                            type="button">Track order details</button>
+                        </div>
+                      </div>
+                      <hr class="my-4">
+
+                      <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+                        <span class="dot"></span>
+                        <hr class="flex-fill track-line"><span class="dot"></span>
+                        <hr class="flex-fill track-line"><span class="dot"></span>
+                        <hr class="flex-fill track-line"><span class="dot"></span>
+                        <hr class="flex-fill track-line"><span
+                          class="d-flex justify-content-center align-items-center big-dot dot">
+                          <i class="fa fa-check text-white"></i></span>
+                      </div>
+
+                      <div class="d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-column align-items-start"><span>15 Mar</span><span>Order placed</span>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center"><span>15 Mar</span><span>Order
+                            placed</span></div>
+                        <div class="d-flex flex-column justify-content-center align-items-center"><span>15
+                            Mar</span><span>Order Dispatched</span></div>
+                        <div class="d-flex flex-column align-items-center"><span>15 Mar</span><span>Out for
+                            delivery</span></div>
+                        <div class="d-flex flex-column align-items-end"><span>15 Mar</span><span>Delivered</span></div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- Order items Modal -->
+  <div class="modal fade" id="orderReturnReasonModal" tabindex="-1" role="dialog"
+    aria-labelledby="orderReturnReasonLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 30%; margin: auto">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="billingModalLabel">
+            REQUEST RETURN <span id="showOrderId"></span>
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="orderItemContainer">
+          <form method="post" class="colorlib-form" id="orderReturnRequestForm">
+            <!-- <h2>Billing Details</h2> -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="">
+                  <label for="fullName">Reason for Return</label>
+                  <input type="text" id="reasonForReturnText" class="form-control" placeholder="Enter Reason" />
+                  <span id="nameEditError" style="color: red; margin-left: 20px"></span>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+            <button type="button" id="returnRequestFormButton" class="btn btn-primary" order-id="<%= orderId %>"
+              order-item-id="<%= itemId %>">
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+      document.addEventListener("click", (event) => {
+        const orderStatusContainer = document.getElementById(
+          "orderStatusContainer"
+        );
+
+        if (event.target && event.target.id == "cancelBtn") {
+          event.preventDefault();
+
+          const orderId = event.target.getAttribute("order-id");
+          const itemId = event.target.getAttribute("order-item-id");
+
+          let n = new Noty({
+            text: "Are you sure you want to cancel the order of this item?",
+            type: "confirm",
+            theme: "metroui",
+            layout: "center",
+            modal: true,
+            timeout: false,
+            progressBar: true,
+            animation: {
+              open: "animated bounceInLeft",
+              close: "animated bounceOutRight",
+            },
+            buttons: [
+              Noty.button("Yes", "btn btn-success btn-yes", function () {
+                axios
+                  .post(`/shop/cancelOrder`, {
+                    orderId: orderId,
+                    orderItemId: itemId,
+                  })
+                  .then((response) => {
+                    if (response.status == 200) {
+                      event.target.style.display = "none";
+                      document.getElementById('cancelQuestion').style.display = "none"
+
+                      orderStatusContainer.innerHTML = "";
+
+                      orderStatusContainer.innerHTML = `
+               <span class="price" style="color: red;">Cancelled</span><br>
+                <span class="price">Your order for this item has been cancelled</span>
+              
+              `;
+                      n.close();
+                    }
+                  })
+                  .catch((error) => {
+                    console.log("it is an error", error);
+                  });
+              }),
+              Noty.button("No", "btn btn-danger btn-no", function () {
+                // Handle the cancel action here
+                console.log("Delete canceled");
+                n.close();
+              }),
+            ],
+          }).show();
+        }
+
+
+
+        if (event.target.id == "returnRequestFormButton") {
+          console.log(event.target);
+
+          const reasonForReturnText = document.getElementById(
+            "reasonForReturnText"
+          ).value;
+
+          console.log("event.target", reasonForReturnText);
+
+          const orderId = event.target.getAttribute("order-id");
+          const orderItemId = event.target.getAttribute("order-item-id");
+
+          console.log("moi", orderId, orderItemId);
+
+          axios
+            .post("/shop/requestForReturn", {
+              orderId: orderId,
+              orderItemId: orderItemId,
+              reason: reasonForReturnText,
+            })
+            .then((response) => {
+              if (response.status == 200) {
+                document.querySelector("#orderReturnReasonModal .close").click();
+                orderStatusContainer.innerHTML = "";
+
+                orderStatusContainer.innerHTML = `
+
+                   <span class="price" style="color: rgb(255, 187, 0)">Return requested </span><br />
+                  <span class="price">Your item return request is in process</span>
+
+                     `;
+
+
+                document.getElementById('returnCancelBtnContainer').style.display = "none";
+              }
+            })
+            .catch((error) => {
+              console.log("it is an error", error);
+            });
+        }
+      });
+
+    })
+  </script>
+
+  <%- include('./footer') %>

@@ -1,0 +1,43 @@
+<%- include('./header', {isLogin: isLogin}) %>
+    <div class="container-scroller">
+      <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="content-wrapper d-flex align-items-center auth">
+          
+          <div class="row flex-grow">
+            <div class="col-lg-4 mx-auto">
+              
+              <div class="auth-form-light text-left p-5">
+                <!-- <div class="brand-logo">
+                  <img src="/static/admin/images/logo.svg">
+                </div> -->
+                <h5 style="font-size: 20px;" class="text-center">ADMIN LOGIN</h5>
+
+                <form class="pt-3" id="login-form">
+                  <div class="form-group">
+                    <input type="email" value="sujithforcoding@gmail.com" class="form-control form-control-lg" id="email" placeholder="Email Address">
+                    <span id="emailError" style="color: red"></span>
+                  </div>
+                  <div class="form-group">
+                    <input type="password" value="sujith@123" class="form-control form-control-lg" id="password" placeholder="Password">
+                    <span id="passwordError" style="color: red"></span>
+                  </div>
+
+                  <input type="submit" class="btn btn-block btn-outline-dark btn-lg font-weight-medium auth-form-btn">
+              
+                </form>
+          
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- content-wrapper ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+   
+    <script src="/static/custom/js/admin/login.js"></script>
+    
+    <%- include('./footer') %>

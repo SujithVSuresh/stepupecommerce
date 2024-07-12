@@ -1,0 +1,407 @@
+
+
+.form-button {
+    background-color: #1DA1F2; /* Green background */
+    border: none; /* Remove default border */
+    color: white; /* White text */
+    padding: 10px 32px; /* Some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Display as inline-block */
+    font-size: 16px; /* Set font size */
+    margin: 4px 20px; /* Some margin */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 12px; /* Rounded corners */
+    width: 100%; /* Set width to 100% */
+
+}
+
+
+.google-signin-button {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ddd; /* Light grey border */
+    color: #555; /* Dark grey text */
+    padding: 10px 15px; /* Some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: flex; /* Flex display for aligning items */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    font-size: 16px; /* Set font size */
+    margin-top: 10px; /* Space above the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width button */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+}
+
+.google-signin-button img {
+    width: 20px; /* Width of the Google logo */
+    height: 20px; /* Height of the Google logo */
+    margin-right: 10px; /* Space between logo and text */
+}
+
+.google-signin-button:hover {
+    background-color: #f7f7f7; /* Slightly darker background on hover */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow on hover */
+}
+
+
+.form-heading {
+    font-size: 25px; /* Larger font size */
+    font-weight:lighter; /* Bold text */
+    color: #333; /* Dark grey color */
+    text-align: center; /* Center the heading */
+}
+
+
+.separator {
+    text-align: center; /* Center the separator text */
+    margin: 20px 0; /* Margin for spacing */
+    position: relative; /* Position relative for line positioning */
+}
+
+.separator span {
+    background: #ffffff; /* Background color for the span */
+    padding: 0 10px; /* Padding around the text */
+    position: relative; /* Position relative for z-index */
+    z-index: 1; /* Ensure text is above the lines */
+}
+
+.separator:before, .separator:after {
+    content: ''; /* Empty content for the lines */
+    display: block; /* Display as block element */
+    width: 100%; /* Full width lines */
+    height: 1px; /* Line height */
+    background: #ccc; /* Line color */
+    position: absolute; /* Absolute position */
+    top: 50%; /* Vertically center the lines */
+    z-index: 0; /* Ensure lines are below the text */
+}
+
+.separator:before {
+    left: 0; /* Position left line */
+}
+
+.separator:after {
+    right: 0; /* Position right line */
+}
+
+/* Create Account Button */
+.create-account-button {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ddd; /* Light grey border */
+    color: #555; /* Dark grey text */
+    padding: 10px 15px; /* Some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: flex; /* Flex display for aligning items */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    font-size: 16px; /* Set font size */
+    margin-top: 10px; /* Space above the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width button */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+}
+
+
+  
+
+ .product-details{
+    position: relative;
+}
+
+
+
+
+/* Address selecting checkout */
+
+.address-selection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.address-selection-checkout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.address-card {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    padding-left: 40px;
+}
+
+.address-card-checkout{
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    padding-left: 45px;
+
+}
+
+
+.address-card-two {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 49%;
+}
+
+
+
+.address-card label, .address-card-checkout label {
+    cursor: pointer;
+}
+
+.address-radio {
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.address-card p, .address-card-two p, .address-card-checkout p {
+    margin: 0px;
+    padding: 2px 0;
+}
+
+
+/* Profile */
+.breadcrumbs, .colorlib-product {
+    margin: 20px 0;
+}
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.button {
+    background-color: #F0F0F0;
+    color: black;
+    padding: 10px 20px;
+    text-align: center;
+    margin: 10px 5px;
+    border-radius: 5px;
+    flex: 1 1 calc(33.333% - 20px);
+}
+
+.button:hover{
+    cursor: pointer;
+    background-color: #C2C2C2;
+
+}
+
+.button-red {
+    border: 1px solid red;
+    width: 50px;
+}
+.button-orange {
+    border: 1px solid orange;
+
+}
+.profile-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.profile-info p {
+    margin: 5px 0;
+}
+
+
+/* Address */
+
+.editDltBtn{
+    border: 1px solid orange;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.editDltBtn:hover{
+    cursor: pointer;
+}
+
+.editDltBtn:focus {
+    outline: none;
+  }
+
+
+  /* #proceedToBuy {
+    pointer-events: none;
+  } */
+
+
+
+
+  /* NOTY  Confirm*/
+
+  /* Custom styles for the Noty confirm box */
+.noty_layout__center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .noty_type__confirm {
+    background-color: #f8f9fa; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Box shadow for depth */
+    color: #333; /* Text color */
+  }
+  
+  .noty_type__confirm .noty_body {
+    font-size: 16px; /* Larger font size */
+    padding: 20px; /* Padding for better spacing */
+  }
+  
+  .noty_type__confirm .btn-yes {
+    background-color: #28a745; /* Green background for Yes button */
+    color: white; /* White text color */
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for better spacing */
+    margin-right: 10px; /* Margin between buttons */
+  }
+  
+  .noty_type__confirm .btn-no {
+    background-color: #dc3545; /* Red background for No button */
+    color: white; /* White text color */
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for better spacing */
+  }
+  
+
+
+/* Sort input field */
+
+.sort-by-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+    /* font-size: 16px; */
+}
+
+.sort-by-container label {
+    margin-right: 10px;
+    font-weight: 400;
+    color: #333;
+}
+
+.sort-by-container select {
+    /* padding: 50px 50px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    color: gray;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.3s ease; */
+
+    padding: 3px 10px 3px 10px; /* Add padding to the right for the arrow */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    /* font-size: 16px; */
+    color: gray;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.3s ease;
+    -webkit-appearance: none; /* Remove default arrow in Webkit browsers */
+    -moz-appearance: none; /* Remove default arrow in Firefox */
+    appearance: none; /* Remove default arrow in other browsers */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"><path fill="none" stroke="%23333" stroke-width="2" d="M7 10l5 5 5-5"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Position the arrow */
+    background-size: 10px;
+}
+
+
+
+
+.img-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+}
+
+#showImg {
+    width: 100%;
+    height: auto;
+}
+
+#zoomLens {
+    position: absolute;
+    border: 1px solid #000;
+    width: 100px;
+    height: 100px;
+    display: none; /* Hidden by default */
+    cursor: crosshair;
+}
+
+#zoomResult {
+    width: 600px;
+    height: 600px;
+    background: url('') no-repeat;
+    background-size: 800px 800px;
+    /* border: 1px solid #000; */
+    display: none; /* Hidden by default */
+    /* margin-top: 20px; */
+    position: absolute;
+    top:0;
+    left: 600px;
+    z-index: 1;
+
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Timeline */
+.track-line {
+    height: 2px !important;
+    background-color: #488978;
+    opacity: 1;
+    }
+    
+    .dot {
+    height: 10px;
+    width: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 0px;
+    background-color: #488978;
+    border-radius: 50%;
+    display: inline-block
+    }
+    
+    .big-dot {
+    height: 25px;
+    width: 25px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    background-color: #488978;
+    border-radius: 50%;
+    display: inline-block;
+    }
+    
+    .big-dot i {
+    font-size: 12px;
+    }
+    
+    .card-stepper {
+    z-index: 0
+    }
+
+
+
+

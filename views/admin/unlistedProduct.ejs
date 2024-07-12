@@ -1,0 +1,174 @@
+<%- include('./header', {adminName: adminName}) %>
+
+<!-- partial -->
+<div class="container-fluid page-body-wrapper">
+  <!-- partial:partials/_sidebar.html -->
+  <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+      <!-- <li class="nav-item nav-profile">
+        <a href="#" class="nav-link">
+          <div class="nav-profile-image">
+            <img src="assets/images/faces/face1.jpg" alt="profile">
+            <span class="login-status online"></span>
+
+          </div>
+          <div class="nav-profile-text d-flex flex-column">
+            <span class="font-weight-bold mb-2">David Grey. H</span>
+            <span class="text-secondary text-small">Project Manager</span>
+          </div> 
+          <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+        </a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/dashboard">
+          <span class="menu-title">DASHBOARD</span>
+          <i class="mdi mdi-home menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-toggle="collapse"
+          href="#ui-products"
+          aria-expanded="false"
+          aria-controls="ui-basic"
+        >
+          <span class="menu-title">PRODUCTS</span>
+          <i class="menu-arrow"></i>
+          <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px"></i>
+        </a>
+        <div class="collapse" id="ui-products">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/products">LISTED</a>
+            </li>
+            <li class="nav-item text-dark"><a class="nav-link  text-dark" href="">UNLISTED</a></li>
+  
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/users">
+          <span class="menu-title">USERS</span>
+          <i class="mdi menu-icon mdi-account-multiple"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-toggle="collapse"
+          href="#ui-categories"
+          aria-expanded="false"
+          aria-controls="ui-basic"
+        >
+          <span class="menu-title">CATEGORIES</span>
+          <i class="menu-arrow"></i>
+          <i class="mdi mdi-cube-outline menu-icon"></i>
+        </a>
+        <div class="collapse" id="ui-categories">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/category">LISTED</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="">
+          <span class="menu-title">ORDERS</span>
+          <i class="mdi mdi-cart menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/coupon">
+          <span class="menu-title">COUPON</span>
+          <i class="mdi mdi-tag menu-icon"></i>
+        </a>
+      </li>
+
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/salesReport">
+          <span class="menu-title">SALES REPORT</span>
+
+          <i class="mdi menu-icon mdi-chart-line"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- partial -->
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <div class="page-header">
+        <h3 class="page-title">
+          <span class="page-title-icon bg-dark text-white mr-2">
+            <i
+              class="mdi menu-icon mdi-shoe-formal"
+              style="font-size: 24px"
+            ></i>
+          </span>
+          UNLISTED PRODUCTS
+        </h3>
+        <nav aria-label="breadcrumb">
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+
+  
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div style="overflow-x: auto">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>MODEL</th>
+                    <th>BRAND</th>
+                    <th>CATEGORY</th>
+                    <th>USER TYPE</th>
+                    <th>OUTER MATERIAL</th>
+                    <th>SOLE MATERIAL</th>
+                    <th>STATUS</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="unlisted-product-table-container">
+                  <!-- Your table data goes here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+   
+    </div>
+    <!-- content-wrapper ends -->
+  </div>
+</div>
+
+<%- include('./loader') %>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- SweetAlert JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="/static/custom/js/admin/unlistedProduct.js"></script>
+
+
+
+<%- include('./footer') %>

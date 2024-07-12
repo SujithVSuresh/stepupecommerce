@@ -1,0 +1,660 @@
+<%- include('./header', {adminName: adminName}) %>
+
+
+
+  <!-- partial -->
+  <div class="container-fluid page-body-wrapper">
+    <!-- partial:partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <!-- <li class="nav-item nav-profile">
+        <a href="#" class="nav-link">
+          <div class="nav-profile-image">
+            <img src="assets/images/faces/face1.jpg" alt="profile">
+            <span class="login-status online"></span>
+
+          </div>
+          <div class="nav-profile-text d-flex flex-column">
+            <span class="font-weight-bold mb-2">David Grey. H</span>
+            <span class="text-secondary text-small">Project Manager</span>
+          </div> 
+          <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+        </a>
+      </li> -->
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/dashboard">
+            <span class="menu-title">DASHBOARD</span>
+            <i class="mdi mdi-home menu-icon"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="collapse" href="#ui-products" aria-expanded="false" aria-controls="ui-basic">
+            <span class="menu-title text-dark">PRODUCTS</span>
+            <i class="menu-arrow text-dark"></i>
+            <i class="mdi menu-icon mdi-shoe-formal text-dark" style="font-size: 24px"></i>
+          </a>
+          <div class="collapse" id="ui-products">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <a class="nav-link text-dark" href="/admin/products">LISTED</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/unlistedProducts">UNLISTED</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/users">
+            <span class="menu-title">USERS</span>
+            <i class="mdi menu-icon mdi-account-multiple"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="collapse" href="#ui-categories" aria-expanded="false"
+            aria-controls="ui-basic">
+            <span class="menu-title">CATEGORIES</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-cube-outline menu-icon"></i>
+          </a>
+          <div class="collapse" id="ui-categories">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/category">LISTED</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/order">
+            <span class="menu-title">ORDERS</span>
+            <i class="mdi mdi-cart menu-icon"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/coupon">
+            <span class="menu-title">COUPON</span>
+            <i class="mdi mdi-tag menu-icon"></i>
+          </a>
+        </li>
+
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/salesReport">
+            <span class="menu-title">SALES REPORT</span>
+
+            <i class="mdi menu-icon mdi-chart-line"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- partial -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-header">
+          <h3 class="page-title">
+            <span class="page-title-icon bg-dark text-white mr-2">
+              <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px"></i>
+            </span>
+            PRODUCTS
+          </h3>
+          <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item active" aria-current="page">
+                <button type="button" class="btn btn-outline-dark " data-toggle="modal" data-target="#productModal"
+                  id="add-product-btn">
+                  ADD PRODUCT
+                </button>
+
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <div class="col-lg-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+              <div style="overflow-x: auto">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>MODEL</th>
+                      <th>BRAND</th>
+                      <th>CATEGORY</th>
+                      <th>USER TYPE</th>
+                      <th>OUTER MATERIAL</th>
+                      <th>SOLE MATERIAL</th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="product-table-container">
+                    <!-- Your table data goes here -->
+                     <% products.forEach((item) => { %>
+                    <tr id="row<%= item._id %>">
+                      <td><%= item.modelName %></td>
+                      <td><%= item.brand.name %></td>
+                      <td><%= item.category.categoryName %></td>
+                      <td> <%= item.gender == "men" ? "Men" : item.gender == "women" ? "Women" : "Men & Women" %></td>
+                      <td><%= item.outerMaterial %></td>
+                      <td><%= item.soleMaterial %></td>
+  
+                      <td><button data-product-id="<%= item._id %>" id="varient<%= item._id %>" data-toggle="modal" data-target="#varientModal" type="button" class="productVarientBtn varientBtnClr btn btn-gradient-info btn-rounded btn-sm statusBtn">Varient</button></td>
+                      <td><button data-product-id="<%= item._id %>" id="edit<%= item._id %>" data-toggle="modal" data-target="#productEditModal" type="button" class="productEditBtn btn-sm btn btn-outline-dark statusBtn">Edit</button></td>
+                     <td><button data-product-id="<%= item._id %>" id="delete<%= item._id %>" type="button" class="productUnlistBtn btn btn-outline-danger btn-sm statusBtn">Unlist</button></td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              
+              <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#"><i class="mdi menu-icon mdi mdi-chevron-left"></i></a></li>
+              <% for(let i=1; i<= totalPages; i++){ %>
+              <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+              <% } %>
+  
+              <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#"> <i class="mdi menu-icon mdi mdi-chevron-right"></i></a></li>
+
+             
+            </li> 
+
+            </ul>
+          </nav>
+        </div>
+
+        <!---------------------------------------------- ADD FORM MODAL START ----------------------------------->
+
+        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content" style="padding: 15px">
+              <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">ADD PRODUCT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form class="forms-sample" id="product-form" action="" method="POST">
+                  <div class="form-group">
+                    <label for="model">Model</label>
+                    <input type="text" class="form-control" id="model" placeholder="model name" />
+                    <span id="modelNameError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="brand">Brand</label>
+                    <select class="form-control" id="brand">
+                      <!-- Add category options here -->
+                    </select>
+                    <span id="brandNameError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select class="form-control" id="gender">
+                      <option value="">Select Gender</option>
+                      <option value="men">Men</option>
+                      <option value="women">Women</option>
+                      <option value="unisex">Unsex</option>
+                    </select>
+                    <span id="genderError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category">
+                      <!-- Add category options here -->
+                    </select>
+                    <span id="categoryError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="outer-material">Outer material</label>
+                    <input type="text" class="form-control" id="outer-material" placeholder="outer material" />
+                    <span id="outerMaterialError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sole-material">Sole material</label>
+                    <input type="text" class="form-control" id="sole-material" placeholder="sole material" />
+                    <span id="soleMaterialError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Write description"></textarea>
+                  </div>
+
+                  <input type="submit" class="btn btn-dark mr-2" value="Submit" />
+                  <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!---------------------------------------------- ADD FORM MODAL END----------------------------------->
+
+        <!---------------------------------------------- EDIT FORM MODAL START ----------------------------------->
+        <div class="modal fade" id="productEditModal" tabindex="-1" aria-labelledby="productModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content" style="padding: 15px">
+              <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">EDIT PRODUCT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form class="forms-sample" id="product-edit-form" action="" method="POST">
+                  <div class="form-group">
+                    <label for="model">Model</label>
+                    <input type="text" class="form-control" id="edit-model" placeholder="model name" />
+                    <span id="modelNameEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="brand">Brand</label>
+                    <select class="form-control" id="edit-brand">
+                      <!-- Add category options here -->
+                    </select>
+                    <span id="brandEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select class="form-control" id="edit-gender">
+                      <option value="men">Men</option>
+                      <option value="women">Women</option>
+                      <option value="unisex">Unsex</option>
+                    </select>
+                    <span id="genderEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="edit-category">
+                      <!-- Add category options here -->
+                    </select>
+                    <span id="categoryEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="outer-material">Outer material</label>
+                    <input type="text" class="form-control" id="edit-outer-material" placeholder="outer material" />
+                    <span id="outerMaterialEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sole-material">Sole material</label>
+                    <input type="text" class="form-control" id="edit-sole-material" placeholder="sole material" />
+                    <span id="soleMaterialEditError" style="color: red; font-size: 12px"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="edit-description" rows="3"
+                      placeholder="Write description"></textarea>
+                  </div>
+
+                  <input type="submit" class="btn btn-dark mr-2" value="Submit" />
+                  <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!---------------------------------------------- EDIT FORM MODAL END----------------------------------->
+
+        <!----------------------------------------------- VARIENT MODAL START ---------------------------------->
+        <div class="modal fade" id="varientModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-custom">
+            <div class="modal-content" style="padding: 15px">
+              <div class="modal-header">
+                <!-- <h5 class="modal-title" id="productModalLabel">VARIENTS</h5>-->
+                <h4><span id="colorNameTag"></span></h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="container">
+                  <div class="heading-container">
+                    <h4 style="color: gray">COLORS</h4>
+                    <div>
+                      <button data-user-id="" id="" type="button" class="btn btn-outline-dark  btn-sm"
+                        data-toggle="modal" data-target="#addColorVarientModal">
+                        Add
+                      </button>
+                      <button data-user-id="" id="" type="button"
+                        class="varientEditBtn btn btn-outline-dark btn-sm" data-toggle="modal"
+                        data-target="#editColorVarientModal">
+                        Edit
+                      </button>
+                      <button data-user-id="" id="" type="button"
+                        class="varientDltBtn btn btn-outline-danger btn-sm">
+                        Delete
+                      </button>
+
+
+                    </div>
+                  </div>
+                  <div class="color-selection" id="colorSelection"></div>
+                </div>
+
+                <div class="container mt-1">
+                  <h4 style="color: gray">IMAGES</h4>
+                  <div class="image-selection" id="imageGroup"></div>
+                </div>
+
+                <div class="container mt-3">
+                  <div class="heading-container">
+                    <h4 style="color: gray">SIZE VARIANTS</h4>
+
+                    <button id="sub-varient-add-btn" type="button" class="btn btn-outline-dark btn-sm statusBtn">
+                      Add
+                    </button>
+                  </div>
+
+                  <!-- SUB-VARIENT ADD FORM -->
+                  <div style="display: none" id="subVarientAddformContainer">
+                    <form action="" id="sub-varient-add-form" class="d-flex justify-content-between forms-sample">
+                      <div>
+                        <input type="text" class="form-control" id="size" placeholder="Enter size" />
+                        <span id="sizeError" style="color: red; font-size: 12px"></span>
+                      </div>
+
+                      <div>
+                        <input type="text" class="form-control" id="quantity" placeholder="Enter quantity" />
+                        <span id="quantityError" style="color: red; font-size: 12px"></span>
+                      </div>
+
+                      <div>
+                        <input type="text" class="form-control" id="price" placeholder="Enter price" />
+                        <span id="priceError" style="color: red; font-size: 12px"></span>
+                      </div>
+
+                      <div>
+                        <input type="submit" class="btn btn-dark" id="model" placeholder="model name" />
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- SUB-VARIENT EDIT FORM -->
+                  <div style="display: none" id="subVarientEditformContainer">
+                    <form action="" id="sub-varient-edit-form" class="d-flex justify-content-between forms-sample">
+                      <div>
+                        <input type="text" class="form-control" id="edit-size" placeholder="Enter size" />
+                        <span id="sizeEditError" style="color: red; font-size: 12px"></span>
+                      </div>
+                      <div>
+                        <input type="text" class="form-control" id="edit-quantity" placeholder="Enter quantity" />
+                        <span id="quantityEditError" style="color: red; font-size: 12px"></span>
+                      </div>
+                      <div>
+                        <input type="text" class="form-control" id="edit-price" placeholder="Enter price" />
+                        <span id="priceEditError" style="color: red; font-size: 12px"></span>
+                      </div>
+                      <div>
+                        <input type="submit" class="btn btn-dark" id="model" placeholder="model name" />
+                      </div>
+                    </form>
+                  </div>
+           
+
+                  <div class="grid-margin stretch-card mt-3">
+                    <div class="card">
+                      <div class="card-body">
+                  <table class="table table-hover ">
+                    <thead>
+                      <tr>
+                        <th scope="col">Size</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Price</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="sizeVariantTable">
+                        <tr>
+                        </tr>
+                    </tbody>
+                  </table>
+                  </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Varient modal end -->
+
+        <!-- Add Color Varient Modal start -->
+        <div class="modal fade" id="addColorVarientModal" tabindex="-1" aria-labelledby="productModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog color-varient-modal-dialog-custom">
+            <div class="modal-content" style="padding: 15px">
+              <div class="modal-header">
+                <!-- <h5 class="modal-title" id="productModalLabel">VARIENTS</h5>-->
+                <h4>ADD COLOR VARIANTS</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form class="forms-sample" id="product-color-varient-form" action="" method="POST">
+                  <div class="row" style="padding-left: 0px; padding-right: 0px">
+                    <div class="form-group col-md-6">
+                      <label for="model">Color name</label>
+                      <input type="text" class="form-control" id="colorName" placeholder="color name" />
+                      <span id="colorNameError" style="color: red; font-size: 12px"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="model">Color code</label>
+                      <input type="text" class="form-control" id="colorCode" placeholder="color code" />
+                      <span id="colorCodeError" style="color: red; font-size: 12px"></span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 style="color: gray">ADD IMAGES</h4>
+                    <div class="image-add-selection d-flex flex-wrap">
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productImageOne" name="file-upload-one" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imagePreviewOne"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productImageTwo" name="file-upload-two" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imagePreviewTwo"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productImageThree" name="file-upload-three" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imagePreviewThree"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productImageFour" name="file-upload-four" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imagePreviewFour"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <input type="submit" class="btn btn-gradient-primary mr-2" value="Submit" />
+                  <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Add Color Varient Modal end -->
+        
+        <!-- EDIT Color Varient Modal start -->
+        <div class="modal fade" id="editColorVarientModal" tabindex="-1" aria-labelledby="productModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog color-varient-modal-dialog-custom">
+            <div class="modal-content" style="padding: 15px">
+              <div class="modal-header">
+                <!-- <h5 class="modal-title" id="productModalLabel">VARIENTS</h5>-->
+                <h4>EDIT COLOR VARIANTS</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form class="forms-sample" id="product-color-varient-edit-form" action="" method="POST">
+                  <div class="row" style="padding-left: 0px; padding-right: 0px">
+                    <div class="form-group col-md-6">
+                      <label for="model">Color name</label>
+                      <input type="text" class="form-control" id="colorEditName" placeholder="color name" />
+                      <span id="colorNameEditError" style="color: red; font-size: 12px"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="model">Color code</label>
+                      <input type="text" class="form-control" id="colorEditCode" placeholder="color code" />
+                      <span id="colorCodeEditError" style="color: red; font-size: 12px"></span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 style="color: gray">ADD IMAGES</h4>
+                    <div class="image-add-selection d-flex flex-wrap">
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productEditImageOne" name="file-upload-one" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imageEditPreviewOne"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productEditImageTwo" name="file-upload-two" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imageEditPreviewTwo"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productEditImageThree" name="file-upload-three" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imageEditPreviewThree"></div>
+                      </div>
+
+                      <div class="project-preview-box-container">
+                        <div style="height: 10%">
+                          <div class="file-input-box">
+                            <label for="file-upload" style="cursor: pointer">
+                              <span>UPLOAD IMAGE</span>
+                              <input type="file" id="productEditImageFour" name="file-upload-four" accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                        <div style="height: 90%" id="imageEditPreviewFour"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <input type="submit" class="btn btn-gradient-primary mr-2" value="Submit" />
+                  <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- EDIT Color Varient Modal end -->
+      </div>
+      <!-- content-wrapper ends -->
+    </div>
+  </div>
+
+  <%- include('./loader') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- SweetAlert JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  
+  <script src="/static/custom/js/admin/product.js"></script>
+  <script src="/static/custom/js/admin/pagenation.js"></script>
+
+    <%- include('./footer') %>

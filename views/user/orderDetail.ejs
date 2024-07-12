@@ -1,0 +1,259 @@
+<%- include('./header', {isLogin: isLogin, cartCount: cartCount}) %>
+
+  <div class="breadcrumbs">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <p class="bread">
+            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
+            <span>Order</span> /
+            <span>
+              <%= order.orderId %>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colorlib-product">
+    <div class="container">
+      <div class="row row-pb-lg">
+        <div class="col-md-12">
+
+          <div style="display: flex;">
+            <div
+              style="background-color: #f0faff; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px; display: flex; flex-direction: row; justify-content: space-between;">
+              <div>
+                Order id: <span id="showOrderId"><%= order.orderId %></span> <br>
+                <span>Total amount: ₹<%= order.totalAmount %></span> <br>
+                <span>Order status: <%= order.orderStatus %></span> <br>
+                <span>Payment status: <%= order.paymentStatus %></span> <br>
+              </div>
+              <div>
+                <a id="downloadInvoice" class="button editDltBtn"
+                  style="border-color: black; padding: 5px; color: black; background-color: #f0faff;"><i
+                    class="icon-download"> </i>Invoice</a>
+
+              <table id="invoiceTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                       <th>Price</th>
+                       <th>Quantity</th>
+                       <th>Total Price</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <% order.orderedItems.forEach((item)=> { %>
+                          <tr>
+                              <td><%= item.modelName %></td>
+                              <td><%= item.price %></td>
+                              <td><%= item.quantity %></td>
+                              <td><%= item.quantity * item.price %></td>
+                          </tr>
+                          <% }) %>
+                      </tbody>
+              </table>
+              <div style="display: none;">
+                <span id="totalAmount"><%= order.totalAmount %></span>
+                <span></span>
+
+              </div>
+              </div>
+            </div>
+
+            <div style="background-color: #f0faff; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px;">
+              Delivery address:<br>
+              <span id="deliveryNameShow">
+                <%= order.address.name %>
+              </span><br>
+              <span id="deliveryAddressShow">
+                <%= order.address.landmark %>, <%= order.address.localityAreaStreet %>, <%=
+                      order.address.cityDistrictTown %>, <%= order.address.pincode %>
+              </span><br>
+              Phone: <span id="deliveryPhoneShow"><%= order.address.phoneNumber %></span><br>
+
+            </div>
+
+            <% if(order.paymentMethod!="COD" && order.paymentStatus=="Pending" ){ %>
+
+              <div style="flex: 1; text-align: center; padding-top: 20px;">
+                <p>Your order has not been completed. Please complete the payment</p>
+                <a id="payAmountNow" order-id="<%= order._id %>" class="button editDltBtn"
+                  style="border-color: blue; padding: 5px; color: blue; background-color: white;">Pay now</a>
+              </div>
+              <% } %>
+
+          </div>
+
+          <div class="row row-pb-lg mt-3">
+            <div class="col-md-12">
+              <div class="product-name d-flex" style="background-color: #f0faff;">
+                <div class="one-forth text-left px-4">
+                  <span>Product Details</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>Price</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>Quantity</span>
+                </div>
+                <div class="one-eight text-center">
+                  <span>Total</span>
+                </div>
+                <div class="one-eight text-center px-4">
+                  <span></span>
+                </div>
+              </div>
+
+              <div>
+                <% order.orderedItems.forEach((item)=> { %>
+                  <div class="product-cart d-flex" id="orderItemContainer">
+                    <div class="one-forth">
+                      <div class="product-img" style="background-image: url('/static/images/<%= item.image %>');">
+                      </div>
+                      <div class="display-tc">
+                        <span style="margin-left: 30px; color: black">
+                          <%= item.modelName %> for <%= item.gender %>
+                        </span><br>
+                        <span style="margin-left: 30px;" class="price">Size: <%= item.size %>, Color: <%= item.color %>
+                              </span><br>
+
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <span class="price">₹ <%= item.price %></span>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center"
+                      style="display: flex; justify-content: center; align-items: center;">
+                      <div class="quantity-wrapper" style="display: flex; flex-direction: row;">
+                        <div type="text" style="width: 30px;" id="quantity${item._id}">
+                          <%= item.quantity %>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <span class="price" id="total<%= item._id %>">₹ <%= item.quantity * item.price %></span>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <a address-id="" href="/profile/order/itemDetail?oid=<%= order._id %>&itid=<%= item._id %>"
+                          class="button editDltBtn"
+                          style="border-color: black; padding: 5px; color: black; background-color: white;">View
+                          more</a>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.22/jspdf.plugin.autotable.min.js"></script>
+
+
+  <script>
+    document.addEventListener('click', (event) => {
+
+      if (event.target && event.target.id == "downloadInvoice") {
+          const totalAmount = document.getElementById('totalAmount').innerText
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          let content = "Total revenue: ";
+
+          doc.text("INVOICE", 90, 15);
+
+          let todayDate = new Date();
+          doc.text("STEPUP ECOMMERCE", 15, 30);
+
+          doc.setFontSize(12)
+          doc.text(String(`Date: ${todayDate.toISOString().slice(0, 10)}`), 15, 40); // Positioning "Total sales" on the same row
+          doc.text(String(`Order id: ${document.getElementById('showOrderId').innerText}`), 15, 50); // Positioning "Total sales" on the same row
+          doc.text(String(`Ordered date: ${todayDate.toISOString().slice(0, 10)}`), 15, 60); // Positioning "Total sales" on the same row
+
+          
+          doc.text("Delivery address:", 15, 80);
+          doc.text(document.getElementById('deliveryNameShow').innerText, 15, 90);
+          doc.text(document.getElementById('deliveryAddressShow').innerText, 15, 100); // Positioning "Total sales" on the same row
+          doc.text(`Phone: ${document.getElementById('deliveryPhoneShow').innerText}`, 15, 110); 
+
+          doc.autoTable({ html: "#invoiceTable", startY: 120 });
+
+          // doc.text("Total price: 4352", 150, 200);
+          // doc.text("Discount: 10%", 150, 210);
+          // doc.text("Delivery charge: 50", 150, 220); // Positioning "Total sales" on the same row
+          doc.text(`Total amount: Rs ${totalAmount}`, 150, 200); 
+
+
+          doc.save("invoice.pdf");
+      
+      }
+      if (event.target && event.target.id == "payAmountNow") {
+        const orderId = event.target.getAttribute('order-id')
+
+        axios
+          .post(`/profile/order/payNowOrder`, { orderId: orderId })
+          .then((response) => {
+            if (response.status == 200) {
+              const data = response.data
+              var options = {
+                "key": "rzp_test_3v8uE4x50656nf",
+                "amount": data.razOrder.amount,
+                "currency": "INR",
+                "name": "STEPUP",
+                "order_id": data.razOrder.id,
+                "handler": function (response) {
+                  // Payment success handler
+                  window.location.href = `/shop/orderComplete?oid=${data.order._id}`
+
+                },
+                "theme": {
+                  "color": "#66BCEE"
+                },
+                "modal": {
+                  "ondismiss": function () {
+                    // Payment dismiss handler
+                    console.log("payment dismissed.")
+                  }
+                }
+              };
+              var razorpayObject = new Razorpay(options);
+              razorpayObject.on('payment.failed', function (response) {
+                // Payment failure handler
+                new Noty({
+                  type: 'error',
+                  text: "Payment failed",
+                  timeout: 3000,
+                  layout: 'bottomCenter',
+                  theme: 'metroui',
+                }).show();
+              });
+              razorpayObject.open();
+            }
+          })
+          .catch((error) => {
+            console.log("it is an error", error);
+          });
+
+      }
+    })
+  </script>
+
+
+  <%- include('./footer') %>

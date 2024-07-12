@@ -1,0 +1,233 @@
+<%- include('./header', {adminName: adminName}) %>
+
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/dashboard">
+                        <span class="menu-title">DASHBOARD</span>
+                        <i class="mdi mdi-home menu-icon"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#ui-products" aria-expanded="false"
+                        aria-controls="ui-basic">
+                        <span class="menu-title">PRODUCTS</span>
+                        <i class="menu-arrow"></i>
+                        <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px;"></i>
+                    </a>
+                    <div class="collapse" id="ui-products">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item"> <a class="nav-link" href="/admin/products">LISTED</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="">UNLISTED</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/users">
+                        <span class="menu-title">USERS</span>
+                        <i class="mdi menu-icon mdi-account-multiple"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#ui-categories" aria-expanded="false"
+                        aria-controls="ui-basic">
+                        <span class="menu-title">CATEGORIES</span>
+                        <i class="menu-arrow"></i>
+                        <i class="mdi mdi-cube-outline menu-icon"></i>
+                    </a>
+                    <div class="collapse" id="ui-categories">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item"> <a class="nav-link" href="/admin/category">LISTED</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/order">
+                        <span class="menu-title">ORDERS</span>
+                        <i class="mdi mdi-cart menu-icon"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/coupon">
+                        <span class="menu-title text-dark">COUPON</span>
+                        <i class="mdi mdi-tag menu-icon text-dark"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/salesReport">
+                        <span class="menu-title">SALES REPORT</span>
+
+                        <i class="mdi menu-icon mdi-chart-line"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <div class="page-header">
+                    <h3 class="page-title">
+                        <span class="page-title-icon bg-dark text-white mr-2">
+                            <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px"></i>
+                        </span>
+                        COUPONS
+                    </h3>
+                    <nav aria-label="breadcrumb">
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <button type="button" class="btn btn-outline-dark " data-toggle="modal"
+                                    data-target="#couponAddModal" id="add-product-btn">
+                                    ADD COUPON
+                                </button>
+
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+
+
+
+                            <table class="table table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>COUPON CODE</th>
+                                        <th>DISCOUNT %</th>
+                                        <th>MAX OFFER LIMIT</th>
+                                        <th>MIN ORDER LIMIT</th>
+                                        <th>EXPIRY DATE</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-container">
+                                    <% coupons.forEach((item)=> { %>
+                                        <tr id="tr<%= item._id %>">
+                                            <td>
+                                                <%= item.couponCode %>
+                                            </td>
+                                            <td>
+                                                <%= item.discountPercentage %> %
+                                            </td>
+                                            <td>₹ <%= item.maxOfferLimit %>
+                                            </td>
+                                            <td>₹ <%= item.minOrderAmount %>
+                                            </td>
+                                            <td>
+                                                <%= item.expiryDate.toISOString().slice(0, 10) %>
+                                            </td>
+                                            <td>
+                                                <button data-coupon-id="<%= item._id %>" id="coupon<%= item._id %>"
+                                                    type="button"
+                                                    class="btn btn-outline-dark btn-sm couponDltBtn">Delete</button>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <nav aria-label="Page navigation example">
+                      <ul class="pagination">
+                        <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
+                        <% for(let i=1; i<= totalPages; i++){ %>
+                        <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+                        <% } %>
+            
+                        <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
+                      </ul>
+                    </nav>
+                  </div>
+
+
+
+            </div>
+            <!-- content-wrapper ends -->
+
+
+        </div>
+    </div>
+
+    <!---------------------------------------------- ADD FORM MODAL START ----------------------------------->
+
+    <div class="modal fade" id="couponAddModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="padding: 15px">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">ADD COUPON</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="forms-sample" id="coupon-form">
+                        <div class="form-group">
+                            <label for="couponCode">Coupon code</label>
+                            <input type="text" class="form-control" id="couponCode" placeholder="Enter code" />
+                            <span id="couponCodeError" style="color: red; font-size: 12px"></span>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="discountPercentage">Discount %</label>
+                            <input type="text" class="form-control" id="discountPercentage"
+                                placeholder="Enter percentage" />
+                            <span id="discountError" style="color: red; font-size: 12px"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxOfferLimit">Max offer limit</label>
+                            <input type="text" class="form-control" id="maxOfferLimit" placeholder="Enter limit" />
+                            <span id="maxOfferLimitError" style="color: red; font-size: 12px"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="minOrderAmount">Min order amount</label>
+                            <input class="form-control" id="minOrderAmount" placeholder="Enter amount">
+                            <span id="minOrderAmountError" style="color: red; font-size: 12px"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expiryDate">Enter expiry date</label>
+                            <input class="form-control" type="date" id="expiryDate" placeholder="Expiry date">
+                            <span id="expiryDateError" style="color: red; font-size: 12px"></span>
+
+                        </div>
+
+                        <a type="submit" id="cuponAddBtnSubmit" class="btn btn-dark mr-2">Submit</a>
+                        <button type="button" class="btn btn-light" data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./loader') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/static/custom/js/admin/coupon.js"></script>
+    <script src="/static/custom/js/admin/pagenation.js"></script>
+
+
+        <%- include('./footer') %>
