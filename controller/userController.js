@@ -111,9 +111,8 @@ function calculateOffer(item, percentage) {
   return;
 }
 
-
-async function applyOfferForCart(userId){
-  try{
+async function applyOfferForCart(userId) {
+  try {
     const categoryOffers = await Categoryoffer.find({});
     const productOffers = await Productoffer.find({});
 
@@ -129,142 +128,160 @@ async function applyOfferForCart(userId){
     ]);
 
     let cartItems = cart.items.map((item) => {
-      let categoryOffer = checkCategoryOffer(categoryOffers, item.productId.product)
-      let productOffer = checkProductOffer(productOffers, item.productId.product)
-      let offer = selectOffer(categoryOffer, productOffer)
-      let offerAmount = calculateOffer(item.productId, offer)
+      let categoryOffer = checkCategoryOffer(
+        categoryOffers,
+        item.productId.product
+      );
+      let productOffer = checkProductOffer(
+        productOffers,
+        item.productId.product
+      );
+      let offer = selectOffer(categoryOffer, productOffer);
+      let offerAmount = calculateOffer(item.productId, offer);
 
-      return {...item._doc, productId: {...item.productId._doc, price: offerAmount ? offerAmount : item.productId.price}}
+      return {
+        ...item._doc,
+        productId: {
+          ...item.productId._doc,
+          price: offerAmount ? offerAmount : item.productId.price,
+        },
+      };
     });
 
-    return {...cart._doc, items: [...cartItems]}
-
-  }catch(error){
-    console.log(error)
+    return { ...cart._doc, items: [...cartItems] };
+  } catch (error) {
+    console.log(error);
   }
 }
 
 const home = async (req, res) => {
-
   // const categoryOffers = await Categoryoffer.find({}).populate('categoryId')
 
-  const productsWithOffers = await Product.aggregate([
-    {
-      $match: {
-        $expr: {
-          $and: [
-            { $gt: [{ $size: "$varient" }, 0]},
-            { $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0] } 
-          ]
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: 'productoffers', 
-        localField: '_id', 
-        foreignField: 'productId', 
-        as: 'prooffers' 
-      }
-    },
-    {
-      $lookup: {
-        from: 'categoryoffers',
-        localField: 'category',
-        foreignField: 'categoryId', 
-        as: 'catoffers' 
-      }
-    },
-    {
-      $addFields: {
-        coff: { $arrayElemAt: ['$catoffers', 0] },
-        poff: { $arrayElemAt: ['$prooffers', 0] }
-      }
-    },
-    {
-      $addFields: {
-        maxOffer: {
-          $max: [
-            { $ifNull: [{ $max: "$poff.percentage" }, 0] },
-            { $ifNull: [{ $max: "$coff.percentage" }, 0] }
-          ]
-        }
-      }
-    },
-    {
-      $addFields: {
-        discountPrice: {
-          $multiply: [
-            { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
-            5000
-          ]
-        }
-      }
-    },
-    {
-      $sort: {
-        date: -1
-      }
-    },
-    {
-      $limit: 10
-    }
-  ]);
-
-  console.log(productsWithOffers, "product Offer");
+  // const productsWithOffers = await Product.aggregate([
+  //   {
+  //     $match: {
+  //       $expr: {
+  //         $and: [
+  //           { $gt: [{ $size: "$varient" }, 0]},
+  //           { $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0] }
+  //         ]
+  //       }
+  //     }
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'categories',
+  //       localField: 'category',
+  //       foreignField: '_id',
+  //       as: 'category'
+  //     }
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'productoffers',
+  //       localField: '_id',
+  //       foreignField: 'productId',
+  //       as: 'prooffers'
+  //     }
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'categoryoffers',
+  //       localField: 'category',
+  //       foreignField: 'categoryId',
+  //       as: 'catoffers'
+  //     }
+  //   },
+  //   {
+  //     $addFields: {
+  //       coff: { $arrayElemAt: ['$catoffers', 0] },
+  //       poff: { $arrayElemAt: ['$prooffers', 0] },
+  //       category: { $arrayElemAt: ['$category', 0] }
+  //     }
+  //   },
+  //   {
+  //     $addFields: {
+  //       maxOffer: {
+  //         $max: [
+  //           { $ifNull: [{ $max: "$poff.percentage" }, 0] },
+  //           { $ifNull: [{ $max: "$coff.percentage" }, 0] }
+  //         ]
+  //       }
+  //     }
+  //   },
+  //   {
+  //     $addFields: {
+  //       discountPrice: {
+  //         $multiply: [
+  //           { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
+  //           5000
+  //         ]
+  //       }
+  //     }
+  //   },
+  //   {
+  //     $sort: {
+  //       date: -1
+  //     }
+  //   },
+  //   {
+  //     $limit: 10
+  //   }
+  // ]);
 
   const categoryOffers = await Categoryoffer.aggregate([
     {
       $lookup: {
-        from: 'categories',
-        localField: 'categoryId',
-        foreignField: '_id',
-        as: 'category'
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
       },
     },
     {
       $addFields: {
-        categoryId: { $arrayElemAt: ['$category', 0] }
-      }
-    }
-  ])
-
-  // const products = await Product.aggregate([
-  //   {
-  //     $match: {
-  //       $and: [
-  //         { varient: { $exists: true, $not: { $size: 0 } } }, 
-  //         // { 'varient.subVarient': { $exists: true, $not: { $size: 0 } } }
-  //       ]
-  //     }
-  //   }
-
-  // ])
+        categoryId: { $arrayElemAt: ["$category", 0] },
+      },
+    },
+  ]);
 
   const products = await Product.aggregate([
     {
       $match: {
         $expr: {
           $and: [
-            { $gt: [{ $size: "$varient" }, 0] }, // At least one varient
-            { $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0] } // At least one subVarient in at least one varient
-          ]
-        }
-      }
+            { $gt: [{ $size: "$varient" }, 0] },
+            {
+              $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0],
+            },
+          ],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $addFields: {
+        category: { $arrayElemAt: ["$category", 0] },
+      },
     },
     {
       $sort: {
-        date: -1
-      }
+        date: -1,
+      },
     },
     {
-      $limit: 10
-    }
+      $limit: 10,
+    },
   ]);
 
   console.log("crowww", products);
-
-
 
   // let products = await Product.find({ isDelete: false })
   //       .populate("category")
@@ -322,16 +339,14 @@ const home = async (req, res) => {
   //       };
   //     });
 
-
   //     mappedProduct.sort((a, b) => b.date - a.date);
 
-  //     let newArrivals = mappedProduct.slice(0, 10)      
-
+  //     let newArrivals = mappedProduct.slice(0, 10)
 
   try {
     res.render("user/home", {
       newArrivals: products,
-      categoryOffers:categoryOffers,
+      categoryOffers: categoryOffers,
       isLogin: req.session.userId || req.session.gUser ? true : false,
       cartCount: req.session.userId ? req.session.cartCount : 0,
     });
@@ -444,7 +459,7 @@ const signin = async (req, res) => {
 
         const cart = await Cart.findOne({ userId: user._id });
 
-        req.session.cartCount = cart.items.length ? cart.items.length : 0;
+        req.session.cartCount = cart?.items?.length ? cart?.items?.length : 0;
 
         const redirectTo = req.session.redirectTo || "/";
         delete req.session.redirectTo;
@@ -531,8 +546,6 @@ const resetPasswordEmail = async (req, res) => {
       const { email } = req.body;
 
       const user = await User.findOne({ email: email });
-
-      console.log(email, "hey emailll....");
 
       if (user) {
         const resetPasswordToken = uuidv4();
@@ -652,6 +665,253 @@ const shop = async (req, res) => {
 //   }
 // }
 
+// const items = async (req, res) => {
+//   try {
+//     if (req.method === "GET") {
+//       const sort = req.query.sort;
+
+//       const search = req.query.search.toLowerCase();
+//       const categories = req.query.category.split(",");
+//       const brands = req.query.brand.split(",");
+//       const gender = req.query.gender.split(",");
+//       const color = req.query.color.split(",");
+//       const size = req.query.size.split(",");
+//       const price = req.query.price.split(",");
+
+//       let products = await Product.find({ isDelete: false })
+//         .populate("category")
+//         .populate("brand");
+
+//       let varients = await Varient.find({}).populate("product");
+//       let subVarients = await Subvarient.find({});
+
+//       const categoryOffers = await Categoryoffer.find({});
+//       const productOffers = await Productoffer.find({});
+
+//       const findingProductWithVarient = await Promise.all(
+//         products.map(async (item) => {
+//           const sub = await Subvarient.findOne({ product: item._id });
+//           return sub ? item : null;
+//         })
+//       );
+
+//       const productsWithVarients = findingProductWithVarient.filter(
+//         (item) => item !== null
+//       );
+
+//       let mappedProduct = productsWithVarients.map((product) => {
+
+//         let categoryOffer = checkCategoryOffer(categoryOffers, product);
+//         let productOffer = checkProductOffer(productOffers, product);
+
+//         let offer = selectOffer(categoryOffer, productOffer);
+
+//         let filteredVarients = varients
+//           .filter(
+//             (varient) =>
+//               varient.product._id.toString() === product._id.toString()
+//           )
+//           .map((varient) => {
+//             let filteredSubvarients = subVarients.filter(
+//               (subVarient) =>
+//                 subVarient.varient.toString() === varient._id.toString()
+//             );
+//             let finalSubVarient = filteredSubvarients.map((item) => {
+//               let offerAmount = offer ? calculateOffer(item, offer) : 0;
+
+//               return { ...item._doc, offerAmount: offerAmount };
+//             });
+//             return { ...varient._doc, subVarients: finalSubVarient };
+//           });
+
+//         return {
+//           ...product._doc,
+//           varients: filteredVarients,
+//           offerPercentage: offer ? offer : 0,
+//         };
+//       });
+
+//       let filteredProducts = mappedProduct;
+
+//       if (categories[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           if (categories.includes(product.category.categoryName)) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (brands[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           if (brands.includes(product.brand.name)) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (gender[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           if (gender.includes(product.gender)) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (color[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           let filterVarients = product.varients.filter((varient) => {
+//             if (color.includes(varient.colorName.toLowerCase())) {
+//               return varient;
+//             }
+//           });
+
+//           if (filterVarients.length != 0) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (size[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           let count = 0;
+
+//           product.varients.forEach((varient) => {
+//             let filterSubVarients = varient.subVarients.filter((item) => {
+//               if (size.includes(item.size)) {
+//                 return item;
+//               }
+//             });
+
+//             if (filterSubVarients.length != 0) {
+//               count++;
+//             }
+//           });
+
+//           if (count > 0) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (price[0] != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           let count = 0;
+
+//           product.varients.forEach((varient) => {
+//             let filterSubVarients = varient.subVarients.filter((item) => {
+//               if (price.includes("0-500")) {
+//                 if (item.price >= 1 && item.price <= 500) {
+//                   return item;
+//                 }
+//               } else if (price.includes("501-1000")) {
+//                 if (item.price >= 501 && item.price <= 1000) {
+//                   return item;
+//                 }
+//               } else if (price.includes("1001-1500")) {
+//                 if (item.price >= 1001 && item.price <= 1500) {
+//                   return item;
+//                 }
+//               } else if (price.includes("1501-2000")) {
+//                 if (item.price >= 1501 && item.price <= 2000) {
+//                   return item;
+//                 }
+//               } else if (price.includes("2001-2500")) {
+//                 if (item.price >= 2001 && item.price <= 2500) {
+//                   return item;
+//                 }
+//               } else if (price.includes("2501-3000")) {
+//                 if (item.price >= 2501 && item.price <= 3000) {
+//                   return item;
+//                 }
+//               } else if (price.includes("3001-10000")) {
+//                 if (item.price >= 3001) {
+//                   return item;
+//                 }
+//               }
+//             });
+
+//             if (filterSubVarients.length != 0) {
+//               count++;
+//             }
+//           });
+
+//           if (count > 0) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (search != "") {
+//         filteredProducts = filteredProducts.filter((product) => {
+//           if (product.modelName.toLowerCase().includes(search)) {
+//             return product;
+//           }
+//         });
+//       }
+
+//       if (sort == "name-atoz") {
+//         console.log("sort,", sort);
+//         filteredProducts.sort((a, b) => {
+//           if (a.modelName < b.modelName) {
+//             return -1;
+//           }
+//           if (a.modelName > b.modelName) {
+//             return 1;
+//           }
+//           return 0;
+//         });
+//       } else if (sort == "name-ztoa") {
+//         console.log("sort123,", sort, filteredProducts);
+//         filteredProducts.sort((a, b) => {
+//           if (a.modelName > b.modelName) {
+//             return -1;
+//           }
+//           if (a.modelName < b.modelName) {
+//             return 1;
+//           }
+//           return 0;
+//         });
+//       } else if (sort == "price-asc") {
+//         console.log(filteredProducts);
+//         filteredProducts.sort(
+//           (a, b) =>
+//             a.varients[0].subVarients[0].price -
+//             b.varients[0].subVarients[0].price
+//         );
+//       } else if (sort == "price-desc") {
+//         console.log(filteredProducts);
+//         filteredProducts.sort(
+//           (a, b) =>
+//             b.varients[0].subVarients[0].price -
+//             a.varients[0].subVarients[0].price
+//         );
+//       } else {
+//         filteredProducts.sort((a, b) => b.date - a.date);
+//       }
+
+//       // Pagenation
+
+//       const page = parseInt(req.query.page) || 1;
+//       const limit = 9;
+
+//       const skip = (page - 1) * limit;
+
+//       const totalProducts = filteredProducts.length;
+//       const totalPages = Math.ceil(totalProducts / limit);
+
+//       const paginatedProducts = filteredProducts.slice(skip, skip + limit);
+
+//       res.status(200).json({
+//         products: paginatedProducts,
+//         totalPages: totalPages,
+//         currentPage: page,
+//       });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 const items = async (req, res) => {
   try {
     if (req.method === "GET") {
@@ -661,235 +921,165 @@ const items = async (req, res) => {
       const categories = req.query.category.split(",");
       const brands = req.query.brand.split(",");
       const gender = req.query.gender.split(",");
-      const color = req.query.color.split(",");
-      const size = req.query.size.split(",");
-      const price = req.query.price.split(",");
 
-      let products = await Product.find({ isDelete: false })
-        .populate("category")
-        .populate("brand");
-
-      let varients = await Varient.find({}).populate("product");
-      let subVarients = await Subvarient.find({});
-
-      const categoryOffers = await Categoryoffer.find({});
-      const productOffers = await Productoffer.find({});
-
-      const findingProductWithVarient = await Promise.all(
-        products.map(async (item) => {
-          const sub = await Subvarient.findOne({ product: item._id });
-          return sub ? item : null;
-        })
-      );
-
-      const productsWithVarients = findingProductWithVarient.filter(
-        (item) => item !== null
-      );
-
-      let mappedProduct = productsWithVarients.map((product) => {
-
-        let categoryOffer = checkCategoryOffer(categoryOffers, product);
-        let productOffer = checkProductOffer(productOffers, product);
-
-        let offer = selectOffer(categoryOffer, productOffer);
-
-        let filteredVarients = varients
-          .filter(
-            (varient) =>
-              varient.product._id.toString() === product._id.toString()
-          )
-          .map((varient) => {
-            let filteredSubvarients = subVarients.filter(
-              (subVarient) =>
-                subVarient.varient.toString() === varient._id.toString()
-            );
-            let finalSubVarient = filteredSubvarients.map((item) => {
-              let offerAmount = offer ? calculateOffer(item, offer) : 0;
-
-              return { ...item._doc, offerAmount: offerAmount };
-            });
-            return { ...varient._doc, subVarients: finalSubVarient };
-          });
-
-        return {
-          ...product._doc,
-          varients: filteredVarients,
-          offerPercentage: offer ? offer : 0,
-        };
-      });
-
-      let filteredProducts = mappedProduct;
+      const pipeline = [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $gt: [{ $size: "$varient" }, 0] },
+                {
+                  $gt: [
+                    { $size: { $arrayElemAt: ["$varient.subVarient", 0] } },
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brand",
+            foreignField: "_id",
+            as: "brand",
+          },
+        },
+        {
+          $lookup: {
+            from: "productoffers",
+            localField: "_id",
+            foreignField: "productId",
+            as: "prooffers",
+          },
+        },
+        {
+          $lookup: {
+            from: "categoryoffers",
+            localField: "category",
+            foreignField: "categoryId",
+            as: "catoffers",
+          },
+        },
+        {
+          $addFields: {
+            coff: { $arrayElemAt: ["$catoffers", 0] },
+            poff: { $arrayElemAt: ["$prooffers", 0] },
+            category: { $arrayElemAt: ["$category", 0] },
+            brand: { $arrayElemAt: ["$brand", 0] },
+          },
+        },
+        {
+          $addFields: {
+            maxOffer: {
+              $max: [
+                { $ifNull: [{ $max: "$poff.percentage" }, 0] },
+                { $ifNull: [{ $max: "$coff.percentage" }, 0] },
+              ],
+            },
+          },
+        },
+      ];
 
       if (categories[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          if (categories.includes(product.category.categoryName)) {
-            return product;
-          }
+        pipeline.push({
+          $match: {
+            "category.categoryName": { $in: categories },
+          },
         });
       }
 
       if (brands[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          if (brands.includes(product.brand.name)) {
-            return product;
-          }
+        pipeline.push({
+          $match: {
+            "brand.name": { $in: brands },
+          },
         });
       }
 
       if (gender[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          if (gender.includes(product.gender)) {
-            return product;
-          }
-        });
-      }
-
-      if (color[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          let filterVarients = product.varients.filter((varient) => {
-            if (color.includes(varient.colorName.toLowerCase())) {
-              return varient;
-            }
-          });
-
-          if (filterVarients.length != 0) {
-            return product;
-          }
-        });
-      }
-
-      if (size[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          let count = 0;
-
-          product.varients.forEach((varient) => {
-            let filterSubVarients = varient.subVarients.filter((item) => {
-              if (size.includes(item.size)) {
-                return item;
-              }
-            });
-
-            if (filterSubVarients.length != 0) {
-              count++;
-            }
-          });
-
-          if (count > 0) {
-            return product;
-          }
-        });
-      }
-
-      if (price[0] != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          let count = 0;
-
-          product.varients.forEach((varient) => {
-            let filterSubVarients = varient.subVarients.filter((item) => {
-              if (price.includes("0-500")) {
-                if (item.price >= 1 && item.price <= 500) {
-                  return item;
-                }
-              } else if (price.includes("501-1000")) {
-                if (item.price >= 501 && item.price <= 1000) {
-                  return item;
-                }
-              } else if (price.includes("1001-1500")) {
-                if (item.price >= 1001 && item.price <= 1500) {
-                  return item;
-                }
-              } else if (price.includes("1501-2000")) {
-                if (item.price >= 1501 && item.price <= 2000) {
-                  return item;
-                }
-              } else if (price.includes("2001-2500")) {
-                if (item.price >= 2001 && item.price <= 2500) {
-                  return item;
-                }
-              } else if (price.includes("2501-3000")) {
-                if (item.price >= 2501 && item.price <= 3000) {
-                  return item;
-                }
-              } else if (price.includes("3001-10000")) {
-                if (item.price >= 3001) {
-                  return item;
-                }
-              }
-            });
-
-            if (filterSubVarients.length != 0) {
-              count++;
-            }
-          });
-
-          if (count > 0) {
-            return product;
-          }
+        pipeline.push({
+          $match: {
+            gender: { $in: gender },
+          },
         });
       }
 
       if (search != "") {
-        filteredProducts = filteredProducts.filter((product) => {
-          if (product.modelName.toLowerCase().includes(search)) {
-            return product;
-          }
+        pipeline.push({
+          $match: {
+            modelName: { $regex: search, $options: "i" },
+          },
         });
       }
 
       if (sort == "name-atoz") {
-        console.log("sort,", sort);
-        filteredProducts.sort((a, b) => {
-          if (a.modelName < b.modelName) {
-            return -1;
-          }
-          if (a.modelName > b.modelName) {
-            return 1;
-          }
-          return 0;
+        pipeline.push({
+          $sort: {
+            modelName: 1,
+          },
         });
       } else if (sort == "name-ztoa") {
-        console.log("sort123,", sort, filteredProducts);
-        filteredProducts.sort((a, b) => {
-          if (a.modelName > b.modelName) {
-            return -1;
-          }
-          if (a.modelName < b.modelName) {
-            return 1;
-          }
-          return 0;
+        pipeline.push({
+          $sort: {
+            modelName: -1,
+          },
         });
       } else if (sort == "price-asc") {
-        console.log(filteredProducts);
-        filteredProducts.sort(
-          (a, b) =>
-            a.varients[0].subVarients[0].price -
-            b.varients[0].subVarients[0].price
-        );
+        pipeline.push({
+          $sort: {
+            "varient.0.subVarient.0.price": 1,
+          },
+        });
       } else if (sort == "price-desc") {
-        console.log(filteredProducts);
-        filteredProducts.sort(
-          (a, b) =>
-            b.varients[0].subVarients[0].price -
-            a.varients[0].subVarients[0].price
-        );
+        pipeline.push({
+          $sort: {
+            "varient.0.subVarient.0.price": -1,
+          },
+        });
       } else {
-        filteredProducts.sort((a, b) => b.date - a.date);
+        pipeline.push({
+          $sort: {
+            date: -1,
+          },
+        });
       }
 
-      // Pagenation
+      const productsWithOffers = await Product.aggregate(pipeline);
+
+      console.log("ll", productsWithOffers);
 
       const page = parseInt(req.query.page) || 1;
-      const limit = 9;
+      const limit = 2;
 
       const skip = (page - 1) * limit;
 
-      const totalProducts = filteredProducts.length;
+      const totalProducts = productsWithOffers.length;
       const totalPages = Math.ceil(totalProducts / limit);
 
-      const paginatedProducts = filteredProducts.slice(skip, skip + limit);
+      pipeline.push({
+        $skip: skip,
+      });
+
+      pipeline.push({
+        $limit: limit,
+      });
+
+      const productsWithOffers2 = await Product.aggregate(pipeline);
+
+      console.log("ll", productsWithOffers2);
 
       res.status(200).json({
-        products: paginatedProducts,
+        products: productsWithOffers2,
         totalPages: totalPages,
         currentPage: page,
       });
@@ -900,102 +1090,126 @@ const items = async (req, res) => {
 };
 
 const relatedProducts = async (req, res) => {
-  try{
-    if(req.method == "GET"){
+  try {
+    if (req.method == "GET") {
       let productId = req.query.pid;
 
-      const product = await Product.findOne({_id: productId})
-      const products = await Product.find({category: product.category, isDelete: false, _id: {$ne: product._id}})
-      console.log(products, "related products...")
+      const product = await Product.findOne({ _id: productId });
+      // const products = await Product.find({
+      //   category: product.category,
+      //   isDelete: false,
+      //   _id: { $ne: product._id },
+      // });
 
 
-      let varients = await Varient.find({}).populate("product");
-      let subVarients = await Subvarient.find({});
+      const products = await Product.aggregate([
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $gt: [{ $size: "$varient" }, 0] },
+                {
+                  $gt: [
+                    { $size: { $arrayElemAt: ["$varient.subVarient", 0] } },
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brand",
+            foreignField: "_id",
+            as: "brand",
+          },
+        },
+        {
+          $lookup: {
+            from: "productoffers",
+            localField: "_id",
+            foreignField: "productId",
+            as: "prooffers",
+          },
+        },
+        {
+          $lookup: {
+            from: "categoryoffers",
+            localField: "category",
+            foreignField: "categoryId",
+            as: "catoffers",
+          },
+        },
+        {
+          $addFields: {
+            coff: { $arrayElemAt: ["$catoffers", 0] },
+            poff: { $arrayElemAt: ["$prooffers", 0] },
+            category: { $arrayElemAt: ["$category", 0] },
+            brand: { $arrayElemAt: ["$brand", 0] },
+          },
+        },
+        {
+          $addFields: {
+            maxOffer: {
+              $max: [
+                { $ifNull: [{ $max: "$poff.percentage" }, 0] },
+                { $ifNull: [{ $max: "$coff.percentage" }, 0] },
+              ],
+            },
+          },
+        },
+        {
+          $addFields: {
+            discountPrice: {
+              $multiply: [
+                { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
+                'varient.0.subVarient.0.price'
+              ],
+            },
+          },
+        },
+      ]);
 
-      const categoryOffers = await Categoryoffer.find({});
-      const productOffers = await Productoffer.find({});
-
-      // Step 2: Filter the variants that have at least one sub-variant
-      const findingProductWithVarient = await Promise.all(
-        products.map(async (item) => {
-          // const varient = await Varient.findOne({ product: item._id });
-          const sub = await Subvarient.findOne({ product: item._id });
-          return sub ? item : null;
-        })
-      );
-
-      // Step 3: Remove null values from the array
-      const productsWithVarients = findingProductWithVarient.filter(
-        (item) => item !== null
-      );
-
-      // Filter and map the products with their corresponding varients and subvarients
-      let mappedProduct = productsWithVarients.map((product) => {
-        // console.log("goat", product);
-
-        let categoryOffer = checkCategoryOffer(categoryOffers, product);
-        let productOffer = checkProductOffer(productOffers, product);
-
-        let offer = selectOffer(categoryOffer, productOffer);
-
-        let filteredVarients = varients
-          .filter(
-            (varient) =>
-              varient.product._id.toString() === product._id.toString()
-          )
-          .map((varient) => {
-            let filteredSubvarients = subVarients.filter(
-              (subVarient) =>
-                subVarient.varient.toString() === varient._id.toString()
-            );
-            let finalSubVarient = filteredSubvarients.map((item) => {
-              let offerAmount = offer ? calculateOffer(item, offer) : 0;
-
-              return { ...item._doc, offerAmount: offerAmount };
-            });
-            return { ...varient._doc, subVarients: finalSubVarient };
-          });
-
-        return {
-          ...product._doc,
-          varients: filteredVarients,
-          offerPercentage: offer ? offer : 0,
-        };
-      });
-
-
-      res.status(200).json({relatedProducts: mappedProduct})
-
+      
     }
-
-    
-
-  }catch(error){
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 const productDetailsPage = async (req, res) => {
   try {
     if (req.method === "GET") {
       let productId = req.params.productId;
 
-
       if (!mongoose.Types.ObjectId.isValid(productId)) {
         return res.status(404).render("user/forNotFor");
       }
 
-      let subVarient = await Subvarient.findOne({
-        product: productId,
-      }).populate("varient");
+      console.log("productId", productId);
 
-      if (!subVarient) {
+      // let subVarient = await Subvarient.findOne({
+      //   product: productId,
+      // }).populate("varient");
+      const product = await Product.findById(productId);
+
+      if (!product.varient[0].subVarient[0]._id) {
         return res.status(404).render("user/forNotFor");
       }
 
       res.render("user/product-detail", {
         productId: productId,
-        varientId: subVarient.varient._id,
+        varientId: product.varient[0]._id,
         isLogin: true,
         cartCount: req.session.cartCount,
       });
@@ -1012,37 +1226,40 @@ const productDetails = async (req, res) => {
       let varientId = req.query.vid;
       let subVarientId = req.query.svid;
 
+      if (subVarientId && productId && varientId) {
+        const product = await Product.findById(productId);
 
-      const categoryOffers = await Categoryoffer.find({});
-      const productOffers = await Productoffer.find({});
-
-      if (subVarientId && !productId && !varientId) {
-        let selectedSubVarientDetails = await Subvarient.findOne({
-          _id: subVarientId,
+        const variant = product.varient.find((v) => {
+          return v._id.toString() === varientId;
         });
 
-        let product = await Product.findOne({
-          _id: selectedSubVarientDetails.product,
+        const selectedSubVarientDetails = variant.subVarient.find((sv) => {
+          return sv._id.toString() === subVarientId;
         });
 
-        // let categoryOffer = checkCategoryOffer(categoryOffers, product);
-        // let productOffer = checkProductOffer(productOffers, product);
+        const categoryOffer = await Categoryoffer.findOne({
+          categoryId: product.category._id,
+        });
+        const productOffer = await Productoffer.findOne({
+          productId: product._id,
+        });
 
-        // let offer = selectOffer(categoryOffer, productOffer);
+        let offer = selectOffer(
+          categoryOffer ? categoryOffer.percentage : null,
+          productOffer ? productOffer.percentage : null
+        );
 
         const offerAmount = offer
           ? calculateOffer(selectedSubVarientDetails, offer)
           : 0;
 
-        res
-          .status(200)
-          .json({
-            subVarient: {
-              ...selectedSubVarientDetails._doc,
-              offerAmount: offerAmount,
-            },
-            product: { ...product._doc, offer: offer ? offer : 0 },
-          });
+        res.status(200).json({
+          subVarient: {
+            ...selectedSubVarientDetails._doc,
+            offerAmount: offerAmount,
+          },
+          product: { ...product._doc, offer: offer ? offer : 0 },
+        });
       }
 
       if (productId && varientId && !subVarientId) {
@@ -1050,43 +1267,37 @@ const productDetails = async (req, res) => {
           "category"
         );
 
-        let categoryOffer = checkCategoryOffer(categoryOffers, product);
-        let productOffer = checkProductOffer(productOffers, product);
-
-        let offer = selectOffer(categoryOffer, productOffer);
-
-        // Step 1: Find all variants for the given product
-        let allVarients = await Varient.find({ product: productId });
-
-        // Step 2: Filter the variants that have at least one sub-variant
-        const filteredVarients = await Promise.all(
-          allVarients.map(async (item) => {
-            const sub = await Subvarient.findOne({ varient: item._id });
-            return sub ? item : null;
-          })
-        );
-
-        // Step 3: Remove null values from the array
-        const varientsWithSubVarients = filteredVarients.filter(
-          (item) => item !== null
-        );
-
-        let selectedVarients = await Varient.find({ _id: varientId });
-
-        let selectedSubVarients = await Subvarient.find({
-          product: productId,
-          varient: varientId,
+        const categoryOffer = await Categoryoffer.findOne({
+          categoryId: product.category._id,
+        });
+        const productOffer = await Productoffer.findOne({
+          productId: product._id,
         });
 
-        let finalSelectedSubVarient = selectedSubVarients.map((item) => {
-          let offerAmount = offer ? calculateOffer(item, offer) : 0;
+        let offer = selectOffer(
+          categoryOffer ? categoryOffer.percentage : null,
+          productOffer ? productOffer.percentage : null
+        );
 
-          return { ...item._doc, offerAmount: offerAmount };
-        });
+        const varientsWithSubVarient = product.varient.filter(
+          (varient) => varient.subVarient.length > 0
+        );
+
+        let selectedVarients = product.varient.filter(
+          (v) => v._id.toString() == varientId
+        );
+
+        let finalSelectedSubVarient = selectedVarients[0].subVarient.map(
+          (item) => {
+            let offerAmount = offer ? calculateOffer(item, offer) : 0;
+
+            return { ...item._doc, offerAmount: offerAmount };
+          }
+        );
 
         res.status(200).json({
           product: { ...product._doc, offer: offer ? offer : 0 },
-          allVarients: varientsWithSubVarients,
+          allVarients: varientsWithSubVarient,
           selectedVarients: selectedVarients,
           selectedSubVarients: finalSelectedSubVarient,
         });
@@ -1126,7 +1337,7 @@ const addedtoCartProducts = async (req, res) => {
       // const cart = await applyOfferForCart(userId)
       // const categoryOffers = await Categoryoffer.find({});
       // const productOffers = await Productoffer.find({});
-  
+
       // let cartData = await Cart.findOne({ userId: userId }).populate([
       //   {
       //     path: "items.productId",
@@ -1137,19 +1348,19 @@ const addedtoCartProducts = async (req, res) => {
       //   },
       //   { path: "userId" },
       // ]);
-  
+
       // let cartItems = cartData.items.map((item) => {
       //   let categoryOffer = checkCategoryOffer(categoryOffers, item.productId.product)
       //   let productOffer = checkProductOffer(productOffers, item.productId.product)
       //   let offer = selectOffer(categoryOffer, productOffer)
       //   let offerAmount = calculateOffer(item.productId, offer)
-  
+
       //   return {...item._doc, productId: {...item.productId._doc, price: offerAmount}}
       // });
-  
+
       // const cart = {...cartData._doc, items: [...cartItems]}
 
-      const cart = await applyOfferForCart(userId)
+      const cart = await applyOfferForCart(userId);
 
       let totalAmountDetails = findTotalAmount(
         cart.items,
@@ -1199,7 +1410,7 @@ const cartQtyManagement = async (req, res) => {
           }
           await cart.save();
 
-          const cartData = await applyOfferForCart(userId)
+          const cartData = await applyOfferForCart(userId);
 
           let totalAmountDetails = findTotalAmount(
             cartData.items,
@@ -1234,7 +1445,7 @@ const cartQtyManagement = async (req, res) => {
           cart.items[itemIndex].quantity += 1;
           await cart.save();
 
-          const cartData = await applyOfferForCart(userId)
+          const cartData = await applyOfferForCart(userId);
 
           let totalAmountDetails = findTotalAmount(
             cartData.items,
@@ -1263,7 +1474,6 @@ const cartQtyManagement = async (req, res) => {
   }
 };
 
-
 const couponApply = async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -1280,7 +1490,7 @@ const couponApply = async (req, res) => {
     // const cart = await Cart.findOne({ userId: userId }).populate([
     //   { path: "items.productId" },
     // ]);
-    const cart = await applyOfferForCart(userId)
+    const cart = await applyOfferForCart(userId);
 
     if (!cart) {
       return res.status(404).json({ error: "Cannot apply coupon" });
@@ -1320,7 +1530,7 @@ const removeCoupon = async (req, res) => {
       //   { path: "items.productId" },
       // ]);
 
-      const cart = await applyOfferForCart(userId)
+      const cart = await applyOfferForCart(userId);
 
       if (!cart) {
         return res.status(404).json({ message: "Cannot remove cooupon" });
@@ -1522,7 +1732,6 @@ const wishlist = async (req, res) => {
         { path: "items.productId", populate: { path: "product" } },
       ]);
 
-
       res.render("user/wishlist", {
         wishlistItems,
         isLogin: true,
@@ -1542,7 +1751,7 @@ const checkout = async (req, res) => {
 
       const address = await Address.findOne({ userId: userId });
 
-      const cart = await applyOfferForCart(userId)
+      const cart = await applyOfferForCart(userId);
 
       let totalAmountDetails = findTotalAmount(
         cart.items,
@@ -1752,13 +1961,11 @@ const addMoneyToWallet = async (req, res) => {
 
       await wallet.save();
 
-      return res
-        .status(200)
-        .json({
-          message: "Money added to wallet.",
-          transaction: recentTransaction,
-          balance: balance
-        });
+      return res.status(200).json({
+        message: "Money added to wallet.",
+        transaction: recentTransaction,
+        balance: balance,
+      });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1831,7 +2038,10 @@ const orderItemDetail = async (req, res) => {
       const orderId = req.query.oid || null;
       const itemId = req.query.itid || null;
 
-      if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId) ) {
+      if (
+        !mongoose.Types.ObjectId.isValid(orderId) ||
+        !mongoose.Types.ObjectId.isValid(itemId)
+      ) {
         return res.status(404).render("user/forNotFor");
       }
 
@@ -1906,7 +2116,6 @@ const createAddress = async (req, res) => {
 const editAddress = async (req, res) => {
   try {
     if (req.method === "POST") {
-
       const userId = req.session.userId;
       if (!userId) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -1997,7 +2206,7 @@ const placeOrder = async (req, res) => {
 
     const coupon = req.session.coupon;
 
-    const cart = await applyOfferForCart(userId)
+    const cart = await applyOfferForCart(userId);
 
     for (let item of cart.items) {
       if (item.quantity == 0) {
@@ -2034,15 +2243,14 @@ const placeOrder = async (req, res) => {
       return res
         .status(409)
         .json({ message: "Order above ₹1000 is not allowed for COD" });
-    } 
+    }
 
-    if(paymentMethod == "WALLET"){
-      const wallet = await Wallet.findOne({userId: userId})
-      if(wallet.balance < totalAmount.totalAmount){
+    if (paymentMethod == "WALLET") {
+      const wallet = await Wallet.findOne({ userId: userId });
+      if (wallet.balance < totalAmount.totalAmount) {
         return res
-        .status(409)
-        .json({ message: "Insufficient Wallet Balance!" });
-
+          .status(409)
+          .json({ message: "Insufficient Wallet Balance!" });
       }
     }
 
@@ -2066,7 +2274,8 @@ const placeOrder = async (req, res) => {
       order.address.state = address.address[0].state;
       order.address.cityDistrictTown = address.address[0].cityDistrictTown;
       order.address.localityAreaStreet = address.address[0].localityAreaStreet;
-      order.address.housenoBuildingApartment = address.address[0].housenoBuildingApartment;
+      order.address.housenoBuildingApartment =
+        address.address[0].housenoBuildingApartment;
 
       order.paymentMethod = paymentMethod;
       order.totalAmount = totalAmount.totalAmount;
@@ -2116,32 +2325,28 @@ const placeOrder = async (req, res) => {
       }
 
       if (payment == "COD" || payment == "WALLET") {
-
-        if(payment == "WALLET"){
-          const wallet = await Wallet.findOne({userId: userId})
-          wallet.balance = wallet.balance - totalAmount.totalAmount
+        if (payment == "WALLET") {
+          const wallet = await Wallet.findOne({ userId: userId });
+          wallet.balance = wallet.balance - totalAmount.totalAmount;
           wallet.history.push({
             type: "debit",
             amount: totalAmount.totalAmount / 100,
             description: "Payment for order purchase",
           });
-          await wallet.save()
+          await wallet.save();
 
           return res.status(200).json({
             message: "Order completed successfully.",
             pMethod: "WALLET",
             order: order,
           });
-
-        }else if(payment == "COD"){
+        } else if (payment == "COD") {
           return res.status(200).json({
             message: "Order completed successfully.",
             pMethod: "COD",
             order: order,
           });
         }
-
-  
       } else if (payment == "ONLINE_PAYMENT") {
         razorpayInstance.orders.create(
           { amount, currency, receipt },
@@ -2171,10 +2376,9 @@ const placeOrder = async (req, res) => {
         receipt1,
         (notes = "Payment for shoes purchase")
       );
-    } else if(paymentMethod == "WALLET"){
+    } else if (paymentMethod == "WALLET") {
       console.log(paymentMethod, "kkk");
       createOrder("WALLET");
-      
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2359,7 +2563,10 @@ const orderComplete = async (req, res) => {
 
       let order = await Order.findOne({ _id: orderId });
 
-      if (order.paymentMethod == "ONLINE_PAYMENT" ||  order.paymentMethod == "WALLET") {
+      if (
+        order.paymentMethod == "ONLINE_PAYMENT" ||
+        order.paymentMethod == "WALLET"
+      ) {
         // to update all the orderStatus and paymentStatus.
         await Order.updateOne(
           { _id: orderId },
@@ -2438,5 +2645,5 @@ module.exports = {
   createWalletPaymentOrder,
   addMoneyToWallet,
 
-  relatedProducts
+  relatedProducts,
 };

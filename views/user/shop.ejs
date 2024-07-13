@@ -15,26 +15,10 @@
   <div class="colorlib-product">
     <div class="container">
       <div class="row">
-        <div class="col-lg-3 col-xl-3">
+         <div class="col-lg-3 col-xl-3">
           <form action="">
             <div class="row">
 
-              <!-- <div class="col-sm-12">
-                <div class="side border mb-1">
-                  <h3>Brand</h3>
-                  <ul>
-                    <% filterBrand.forEach((brand)=> {%>
-                      <li><label><input type="checkbox" class="filter-brand" name="filter-brand"
-                            value="<%= brand.name %>">
-                          <%= brand.name %>
-                        </label></li>
-                      <% }) %>
-
-                  </ul>
-                </div>
-              </div>
-              
-              -->
               <div class="col-sm-12">
                 <label style="font-size: 18px;">FILTERS</label>
               </div>
@@ -116,7 +100,7 @@
               </div>
 
 
-              <div class="col-sm-12">
+              <!-- <div class="col-sm-12">
                 <div class="side border mb-1 pb-0">
                   <a data-toggle="collapse" href="#collapseColorExample"
                     style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
@@ -138,10 +122,10 @@
                     <li><label><input type="checkbox" name="filter-color" value="brown"> Brown</label></li>
                   </ul>
                 </div>
-              </div>
+              </div> -->
 
 
-              <div class="col-sm-12">
+              <!-- <div class="col-sm-12">
                 <div class="side border mb-1 pb-0">
                   <a data-toggle="collapse" href="#collapseSizeExample"
                     style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
@@ -162,10 +146,10 @@
                     <li><label><input type="checkbox" name="filter-size" value="12"> 12</label></li>
                   </ul>
                 </div>
-              </div>
+              </div> -->
 
 
-              <div class="col-sm-12">
+              <!-- <div class="col-sm-12">
                 <div class="side border mb-1 pb-0">
                   <a data-toggle="collapse" href="#collapsePriceExample"
                     style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
@@ -185,12 +169,12 @@
                     <li><label><input type="checkbox" name="filter-price" value="3000-10000"> Above 3000</label></li>
                   </ul>
                 </div>
-              </div>
+              </div> -->
 
             </div>
           </form>
         </div>
-        <div class="col-lg-9 col-xl-9">
+        <div class="col-lg-9 col-xl-9"> 
           <div class="sort-by-container" id="sort-by">
             <label for="sort-by">SORT BY:</label>
             <select id="sort-by" name="sort-by">
@@ -217,18 +201,13 @@
                   </li>
 
                   <li class="active"><span id="pageNo">1</span></li>
-
-                  <!-- <li><a href="#">2</a></li>
-                  <li><a href="#">3</a></li>
-                  <li><a href="#">4</a></li>
-                  <li><a href="#">5</a></li> -->
                   <li>
                     <a href="" class="nxtPageClass" id="nxtPage"><i class="ion-ios-arrow-forward nxtPageClass"></i></a>
                   </li>
                 </ul>
               </div>
             </div>
-          </div>
+          </div> 
         </div>
       </div>
     </div>
@@ -268,8 +247,7 @@
 
         let itemContainer = document.getElementById("item-container");
 
-        let itemsUrl = "/shop/items" + `?page=${pg}` + `&sort=${sort}` + `&category=${categoryFilterArr}` + `&brand=${brandFilterArr}` + `&gender=${genderFilterArr}` + `&color=${colorFilterArr}` + `&size=${sizeFilterArr}` + `&price=${priceFilterArr}` + `&search=${searchValue}`
-
+        let itemsUrl = "/shop/items" + `?page=${pg}` + `&sort=${sort}` + `&category=${categoryFilterArr}` + `&brand=${brandFilterArr}` + `&gender=${genderFilterArr}` + `&search=${searchValue}`
 
         itemContainer.innerHTML = " ";
 
@@ -281,6 +259,8 @@
               let totalPages = response.data.totalPages
               let currentPage = response.data.currentPage
 
+              console.log(products,"crowww");
+
               pageNo.setAttribute("totalPages", totalPages)
               pageNo.setAttribute("currentPage", currentPage)
 
@@ -289,19 +269,19 @@
     <div class="col-lg-4 mb-4 text-center">
       <div class="product-entry border">
         <a href="/shop/items/${item._id}" class="prod-img">
-     <img src="/static/images/${item.varients[0].images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template"> 
-         
-          </a>
-        <div class="desc">
+     <img src="/static/images/${item.varient[0].images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template"> 
+            <div class="desc">
           <h2><a href="/shop/items/${item._id}" >${item.modelName} ${item.category.categoryName} for ${item.gender == "unisex" ? "Men & women" : item.gender}</a></h2>
-          <span style="color: red">${item.varients[0].subVarients[0].quantity == 0 ? "Out of stock" : item.varients[0].subVarients[0].quantity <= 5 ? `Only ${item.varients[0].subVarients[0].quantity} left` : ""}</span>
+          <span style="color: red">${item.varient[0].subVarient[0].quantity == 0 ? "Out of stock" : item.varient[0].subVarient[0].quantity <= 5 ? `Only ${item.varient[0].subVarient[0].quantity} left` : ""}</span>
 
          <span class="price">
-            ₹ ${item.varients[0].subVarients[0].offerAmount ? 
-                `<span>${item.varients[0].subVarients[0].offerAmount}</span> <span style="color: gray"><strike>${item.varients[0].subVarients[0].price}</strike></span>  <span style="color: green">${item.offerPercentage}% Off</span>` : 
-                `${item.varients[0].subVarients[0].price}`}
+            ₹ ${item.maxOffer ? 
+                `<span>${Math.round(item.varient[0].subVarient[0].price - (item.maxOffer/100 * (item.varient[0].subVarient[0].price)))}</span> <span style="color: gray"><strike>${item.varient[0].subVarient[0].price}</strike></span>  <span style="color: green">${item.maxOffer}% Off</span>` : 
+                `${item.varient[0].subVarient[0].price}`}
           </span>
         </div>
+          </a>
+     
       </div>
     </div>
   `;
@@ -314,8 +294,6 @@
       }
 
       fetchProducts(Number(pageNo.innerText))
-
-
 
 
 
@@ -343,8 +321,6 @@
 
 
       sortBy.addEventListener('change', (event) => {
-        console.log(event.target.value);
-
         fetchProducts(1, event.target.value)
 
         pageNo.innerText = 1
@@ -364,7 +340,7 @@
             if (index !== -1) {
               categoryFilterArr.splice(index, 1);
               fetchProducts()
-              // pageNo.innerText = 1
+              pageNo.innerText = 1
             }
             console.log("Checkbox is unchecked", categoryFilterArr);
           } else {
@@ -372,7 +348,7 @@
             categoryFilterArr.push(checkbox.value)
             console.log("Checkbox is checked", categoryFilterArr);
             fetchProducts()
-            // pageNo.innerText = 1
+            pageNo.innerText = 1
           }
         });
       });
@@ -430,74 +406,74 @@
 
 
       // Color filter
-      filterColor.forEach((checkbox) => {
-        checkbox.addEventListener('change', (event) => {
-          const checkbox = event.target
-          if (!checkbox.checked) {
+      // filterColor.forEach((checkbox) => {
+      //   checkbox.addEventListener('change', (event) => {
+      //     const checkbox = event.target
+      //     if (!checkbox.checked) {
 
 
-            let index = colorFilterArr.indexOf(checkbox.value);
-            if (index !== -1) {
-              colorFilterArr.splice(index, 1);
-              fetchProducts()
-              pageNo.innerText = 1
-            }
-            console.log("Checkbox is unchecked", colorFilterArr);
-          } else {
-            colorFilterArr.push(checkbox.value)
-            console.log("Checkbox is checked", colorFilterArr);
-            fetchProducts()
-            pageNo.innerText = 1
-          }
-        });
-      });
+      //       let index = colorFilterArr.indexOf(checkbox.value);
+      //       if (index !== -1) {
+      //         colorFilterArr.splice(index, 1);
+      //         fetchProducts()
+      //         pageNo.innerText = 1
+      //       }
+      //       console.log("Checkbox is unchecked", colorFilterArr);
+      //     } else {
+      //       colorFilterArr.push(checkbox.value)
+      //       console.log("Checkbox is checked", colorFilterArr);
+      //       fetchProducts()
+      //       pageNo.innerText = 1
+      //     }
+      //   });
+      // });
 
 
       // Size filter
-      filterSize.forEach((checkbox) => {
-        checkbox.addEventListener('change', (event) => {
-          const checkbox = event.target
-          if (!checkbox.checked) {
+      // filterSize.forEach((checkbox) => {
+      //   checkbox.addEventListener('change', (event) => {
+      //     const checkbox = event.target
+      //     if (!checkbox.checked) {
 
 
-            let index = sizeFilterArr.indexOf(checkbox.value);
-            if (index !== -1) {
-              sizeFilterArr.splice(index, 1);
-              fetchProducts()
-              pageNo.innerText = 1
-            }
-            console.log("Checkbox is unchecked", sizeFilterArr);
-          } else {
-            sizeFilterArr.push(checkbox.value)
-            console.log("Checkbox is checked", sizeFilterArr);
-            fetchProducts()
-            pageNo.innerText = 1
-          }
-        });
-      });
+      //       let index = sizeFilterArr.indexOf(checkbox.value);
+      //       if (index !== -1) {
+      //         sizeFilterArr.splice(index, 1);
+      //         fetchProducts()
+      //         pageNo.innerText = 1
+      //       }
+      //       console.log("Checkbox is unchecked", sizeFilterArr);
+      //     } else {
+      //       sizeFilterArr.push(checkbox.value)
+      //       console.log("Checkbox is checked", sizeFilterArr);
+      //       fetchProducts()
+      //       pageNo.innerText = 1
+      //     }
+      //   });
+      // });
 
       // Price Filter
-      filterPrice.forEach((checkbox) => {
-        checkbox.addEventListener('change', (event) => {
-          const checkbox = event.target
-          if (!checkbox.checked) {
+      // filterPrice.forEach((checkbox) => {
+      //   checkbox.addEventListener('change', (event) => {
+      //     const checkbox = event.target
+      //     if (!checkbox.checked) {
 
 
-            let index = priceFilterArr.indexOf(checkbox.value);
-            if (index !== -1) {
-              priceFilterArr.splice(index, 1);
-              fetchProducts()
-              pageNo.innerText = 1
-            }
-            console.log("Checkbox is unchecked", priceFilterArr);
-          } else {
-            priceFilterArr.push(checkbox.value)
-            console.log("Checkbox is checked", priceFilterArr);
-            fetchProducts()
-            pageNo.innerText = 1
-          }
-        });
-      });
+      //       let index = priceFilterArr.indexOf(checkbox.value);
+      //       if (index !== -1) {
+      //         priceFilterArr.splice(index, 1);
+      //         fetchProducts()
+      //         pageNo.innerText = 1
+      //       }
+      //       console.log("Checkbox is unchecked", priceFilterArr);
+      //     } else {
+      //       priceFilterArr.push(checkbox.value)
+      //       console.log("Checkbox is checked", priceFilterArr);
+      //       fetchProducts()
+      //       pageNo.innerText = 1
+      //     }
+      //   });
+      // });
 
 
       // Search input

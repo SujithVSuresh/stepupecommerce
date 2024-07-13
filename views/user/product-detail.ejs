@@ -250,8 +250,6 @@
 
 			let showImg = document.getElementById('showImg')
 
-
-
 			let pDescription = document.getElementById('p-desc')
 			let pColor = document.getElementById('p-clr')
 			let pModel = document.getElementById('p-model')
@@ -268,7 +266,7 @@
 
 						let data = response.data
 
-						console.log(data, "data")
+						console.log(data, "jjjjj123");
 
 						let varients = data.allVarients
 
@@ -287,7 +285,6 @@
 						//Setting Subvarient id to add t cart btn
 						addToCartBtn.setAttribute('svid', selectedSubVarients[0]._id)
 						addToWishlistBtn.setAttribute('svid', selectedSubVarients[0]._id)
-
 
 
 						//Setting description
@@ -444,7 +441,7 @@
 
 			}
 
-			fetchRelatedProducts()
+			// fetchRelatedProducts()
 
 
 			// Image zoom.
@@ -561,6 +558,7 @@
 
 					let varientId = clickedClrBox.getAttribute("varient-data-id")
 
+					document.getElementById('data-handler').setAttribute('varient-data-id', varientId)
 
 
 					axios.get(`/shop/item/productDetails?pid=${initialProductId}&vid=${varientId}`)
@@ -568,10 +566,11 @@
 							if (response.status == 200) {
 								let data = response.data
 
+								console.log(data, "daaaa");
+
 								pColor.innerText = `Color - ${data.selectedVarients[0].colorName}`
 
 								let selectedSubVarients = data.selectedSubVarients
-
 
 
 								if (data.selectedVarients[0]._id == varientId) {
@@ -634,8 +633,6 @@
 									}
 
 
-
-
 									// Setting stock status
 									// let showStock = document.getElementById("show-stock")
 
@@ -669,110 +666,6 @@
 				}
 
 
-				// COLOR BUTTON
-				// 	if (event.target && event.target.classList.contains("clrBox")) {
-				// 		event.preventDefault()
-
-				// 		let allClrBox = document.querySelectorAll(".clrBox")
-
-				// 		let clickedClrBox = event.target
-
-				// 		let varientId = clickedClrBox.getAttribute("varient-data-id")
-
-				// 		axios.get(`/shop/item/productDetails?pid=${initialProductId}&vid=${varientId}`)
-				// 			.then(function (response) {
-				// 				if (response.status == 200) {
-				// 					let data = response.data
-
-				// 					pColor.innerText = `Color - ${data.selectedVarients[0].colorName}`
-
-				// 					let selectedSubVarients = data.selectedSubVarients
-
-
-
-				// 					if (data.selectedVarients[0]._id == varientId) {
-
-				// 						//Setting Subvarient id to add t cart btn
-				// 						addToCartBtn.setAttribute('svid', selectedSubVarients[0]._id)
-
-				// 						for (let i = 0; i < allClrBox.length; i++) {
-				// 							allClrBox[i].style.borderColor = 'gray';
-				// 							allClrBox[i].style.borderWidth = '1px';
-				// 						}
-
-				// 						clickedClrBox.style.borderColor = "black"
-				// 						clickedClrBox.style.borderWidth = '3px'
-
-
-				// 						// Setting images
-				// 						let images = data.selectedVarients[0].images
-
-				// 						imageOne.src = `/static/images/${images[0]}`
-				// 						imageTwo.src = `/static/images/${images[1]}`
-				// 						imageThree.src = `/static/images/${images[2]}`
-				// 						imageFour.src = `/static/images/${images[3]}`
-
-				// 						showImg.src = imageOne.getAttribute('src')
-
-
-
-				// 						// Setting sizes
-				// 						let sizeContainer = imageOne.getAttribute('size-container')
-
-				// 						sizeContainer.innerHTML = ""
-
-				// 						selectedSubVarients.forEach(function (subVarient) {
-				// 							sizeContainer.innerHTML += `
-				// <li><a id="size${subVarient._id}" sub-varient-data-id="${subVarient._id}" style="border-width: 1px; border-style: solid; border-color: gray" class="sizeBox" href="#">${subVarient.size}</a></li>
-				// `
-
-				// 						});
-
-				// 						let firstSize = document.getElementById(`size${selectedSubVarients[0]._id}`)
-
-
-				// 						firstSize.style.borderColor = 'black'
-				// 						firstSize.style.borderWidth = '3px'
-
-				// 						// Setting Price
-				// 						let showPrice = document.getElementById("show-price")
-				// 						showPrice.innerText = `₹ ${selectedSubVarients[0].price}`
-
-
-
-				// 						// Setting stock status
-				// 						// let showStock = document.getElementById("show-stock")
-
-				// 						if (selectedSubVarients[0].quantity > 10) {
-				// 							showStock.style.color = 'green'
-				// 							showStock.innerText = `In Stock`
-
-				// 						} else if (selectedSubVarients[0].quantity <= 10 && selectedSubVarients[0].quantity >= 6) {
-				// 							showStock.style.color = 'red'
-				// 							showStock.innerText = `Only Few Left`
-
-				// 						} else if (selectedSubVarients[0].quantity > 0 && selectedSubVarients[0].quantity <= 5) {
-				// 							showStock.style.color = 'red'
-				// 							showStock.innerText = `Only ${selectedSubVarients[0].quantity} Left`
-
-				// 						} else {
-				// 							showStock.style.color = 'red'
-				// 							showStock.innerText = `Out of stock`
-
-				// 						}
-
-
-				// 					}
-
-				// 				}
-
-				// 			})
-				// 			.catch(function (error) {
-				// 				console.error('Error fetching data:', error);
-				// 			});
-				// 	}
-
-
 
 				// SIZE BOX
 				if (event.target && event.target.classList.contains("sizeBox")) {
@@ -784,7 +677,9 @@
 
 					let subVarientId = sizeElement.getAttribute("sub-varient-data-id")
 
-					axios.get(`/shop/item/productDetails?svid=${subVarientId}`)
+					let varientId = document.getElementById('data-handler').getAttribute('varient-data-id')
+
+					axios.get(`/shop/item/productDetails?svid=${subVarientId}&pid=${initialProductId}&vid=${varientId}`)
 						.then(function (response) {
 							if (response.status == 200) {
 
@@ -801,7 +696,6 @@
 										allSizeBox[i].style.borderColor = 'gray';
 										allSizeBox[i].style.borderWidth = '1px';
 									}
-
 
 									sizeElement.style.borderColor = "black"
 									sizeElement.style.borderWidth = '3px'

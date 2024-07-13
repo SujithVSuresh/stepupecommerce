@@ -625,16 +625,21 @@ const addSizeVarient = async (req, res) => {
       quantity,
       price
     };
+    const product = await Product.findOne({
+      _id: productId,
+      'varient._id': varientId,
+      'varient.subVarient.size': size
+    });
 
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: productId, "varient._id": varientId, "varient.subVarient.size": {$ne: size} },
-      { $push: { "varient.$.subVarient": newSubVarient }},
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedProduct) {
+    if (product) {
       return res.status(409).json({ message: "Size with this value already exists." });
     }
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId, "varient._id": varientId },
+      { $push: { "varient.$.subVarient": newSubVarient }},
+      { new: true, runValidators: true }
+    );    
 
     const varient = updatedProduct.varient.find(v => v._id == varientId);
     const lastPushedSubVarient = varient.subVarient[varient.subVarient.length - 1];
@@ -1377,6 +1382,7 @@ module.exports = {
   categoryOffer,
   addCategoryOffer,
   deleteProductOffer,
+  
   productOffer,
   addProductOffer,
   deleteCategoryOffer
