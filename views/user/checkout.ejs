@@ -83,12 +83,12 @@
 
                     <ul>
                       <% cart.items.map(function(item){ %>
-                        <% if(item.productId.quantity !=0){ %>
+                        <% if(item.subVarientId.quantity !=0){ %>
                           <li>
                             <span>
-                              <%= item.quantity %> x <%= item.productId.product.modelName %>
+                              <%= item.quantity %> x <%= item.productId.modelName %>
                             </span>
-                            <span>₹ <%= item.quantity * item.productId.price %></span>
+                            <span>₹ <%= item.quantity * item.subVarientId.price %></span>
                           </li>
                           <% } %>
                             <% }) %>

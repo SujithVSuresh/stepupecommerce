@@ -200,7 +200,7 @@
 								</div>
 							</div>
 						</div>
-				
+
 
 					</div>
 				</div>
@@ -266,8 +266,6 @@
 
 						let data = response.data
 
-						console.log(data, "jjjjj123");
-
 						let varients = data.allVarients
 
 						let selectedSubVarients = data.selectedSubVarients
@@ -284,6 +282,9 @@
 
 						//Setting Subvarient id to add t cart btn
 						addToCartBtn.setAttribute('svid', selectedSubVarients[0]._id)
+						addToCartBtn.setAttribute('vid', response.data.selectedVarients[0]._id)
+						addToCartBtn.setAttribute('pid', response.data.product._id)
+
 						addToWishlistBtn.setAttribute('svid', selectedSubVarients[0]._id)
 
 
@@ -395,24 +396,24 @@
 
 
 			// Related Products
-			function fetchRelatedProducts(){
+			function fetchRelatedProducts() {
 
-			let productId = dataHandler.getAttribute('product-data-id')
+				let productId = dataHandler.getAttribute('product-data-id')
 
-			let itemContainer = document.getElementById("item-container");
+				let itemContainer = document.getElementById("item-container");
 
-			itemContainer.innerHTML = " ";
+				itemContainer.innerHTML = " ";
 
-			axios
-				.get(`/shop/item/relatedProducts?pid=${productId}`)
-				.then((response) => {
-					if (response.status == 200) {
-						console.log(response.data.relatedProducts, "related...")
+				axios
+					.get(`/shop/item/relatedProducts?pid=${productId}`)
+					.then((response) => {
+						if (response.status == 200) {
+							console.log(response.data.relatedProducts, "related...")
 
-						let products = response.data.relatedProducts;
+							let products = response.data.relatedProducts;
 
-						products.forEach((item) => {
-							itemContainer.innerHTML += `
+							products.forEach((item) => {
+								itemContainer.innerHTML += `
 							<div class="col-lg-4 mb-4 text-center">
 							<div class="product-entry border">
 							<a href="/shop/items/${item._id}" class="prod-img">
@@ -425,19 +426,19 @@
 
 							<span class="price">
 								₹ ${item.varients[0].subVarients[0].offerAmount ?
-								`<span>${item.varients[0].subVarients[0].offerAmount}</span> <span style="color: gray"><strike>${item.varients[0].subVarients[0].price}</strike></span>  <span style="color: green">${item.offerPercentage}% Off</span>` :
-							    `${item.varients[0].subVarients[0].price}`}
+										`<span>${item.varients[0].subVarients[0].offerAmount}</span> <span style="color: gray"><strike>${item.varients[0].subVarients[0].price}</strike></span>  <span style="color: green">${item.offerPercentage}% Off</span>` :
+										`${item.varients[0].subVarients[0].price}`}
 							</span>
 							</div>
 							</div>
 							</div>
 `;
-						});
-					}
-				})
-				.catch((error) => {
-					console.log("it is an error", error);
-				});
+							});
+						}
+					})
+					.catch((error) => {
+						console.log("it is an error", error);
+					});
 
 			}
 
@@ -577,6 +578,8 @@
 
 									//Setting Subvarient id to add t cart btn
 									addToCartBtn.setAttribute('svid', selectedSubVarients[0]._id)
+									addToCartBtn.setAttribute('vid', response.data.selectedVarients[0]._id)
+									addToCartBtn.setAttribute('pid', response.data.product._id)
 
 									for (let i = 0; i < allClrBox.length; i++) {
 										allClrBox[i].style.borderColor = 'gray';
@@ -760,16 +763,20 @@
 				if (event.target && event.target.id == "addToCartBtn") {
 					event.preventDefault()
 
+					console.log("jj", event.target);
+
 					let qty = document.getElementById("quantity-input").value
 
-					let productSubVarientId = event.target.getAttribute('svid')
+					
+					const productId = event.target.getAttribute('pid')
+					const varientId = event.target.getAttribute('vid')
+					const subVarientId = event.target.getAttribute('svid')
 
 
-
-					console.log(qty, productSubVarientId, "qty Input");
+					// console.log(qty, productSubVarientId, "qty Input");
 
 					axios
-						.post("/shop/cart/addToCart", { productId: productSubVarientId, quantity: qty })
+						.post("/shop/cart/addToCart", { productId: productId, varientId:varientId, subVarientId: subVarientId, quantity: qty })
 						.then((response) => {
 							if (response.status == 200) {
 

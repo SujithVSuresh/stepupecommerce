@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     password: {type: String, required: false},
     phone: {type: String, required:false},
     isBlocked: {type:Boolean},
+    referral: {type: String, required: true},
     dateJoined: {type: Date}
 })
 

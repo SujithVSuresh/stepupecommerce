@@ -245,25 +245,26 @@
               cartItemsContainer.innerHTML = "";
 
               cartitems.forEach((item) => {
+                console.log(item, "iki");
 
                 cartItemsContainer.innerHTML += `
 					<div class="product-cart d-flex" id="cartItemContainer${item._id}">
 							<div class="one-forth">
-								<div class="product-img" style="background-image: url('/static/images/${item.productId.varient.images[0]
+								<div class="product-img" style="background-image: url('/static/images/${item.varientId.images[0]
                   }');">
 								</div>
 								<div class="display-tc">
-									<span style="margin-left: 30px; color: black">${item.productId.product.modelName
-                  } for ${item.productId.product.gender}</span><br>
-									<span style="margin-left: 30px;" class="price">Size: ${item.productId.size
-                  }, Color: ${item.productId.varient.colorName}</span><br>
-				  ${item.productId.quantity == 0
+									<span style="margin-left: 30px; color: black">${item.productId.modelName
+                  } for ${item.productId.gender}</span><br>
+									<span style="margin-left: 30px;" class="price">Size: ${item.subVarientId.size
+                  }, Color: ${item.varientId.colorName}</span><br>
+				  ${item.subVarientId.quantity == 0
                     ? '<span style="margin-left: 30px; color: red;" class="price" id="oos' +
                     item._id +
                     '">Out of stock</span>'
                     : ""
                   }
-              			${item.productId.quantity != 0 && item.productId.quantity < item.quantity
+              			${item.subVarientId.quantity != 0 && item.subVarientId.quantity < item.quantity
                     ? '<span style="margin-left: 30px; color: red;" class="price" id="oos' +
                     item._id +
                     '">Only 5 left</span>'
@@ -273,7 +274,7 @@
 							</div>
 							<div class="one-eight text-center">
 								<div class="display-tc">
-									<span class="price">₹ ${item.productId.price}</span>
+									<span class="price">₹ ${item.subVarientId.price}</span>
 								</div>
 							</div>
 							<div class="one-eight text-center" style="display: flex; justify-content: center; align-items: center;" >
@@ -288,7 +289,7 @@
 							</div>
 							<div class="one-eight text-center">
 								<div class="display-tc">
-									<span class="price" id="total${item._id}">₹ ${item.quantity * item.productId.price
+									<span class="price" id="total${item._id}">₹ ${item.quantity * item.subVarientId.price
                   }</span>
 								</div>
 							</div>
@@ -474,7 +475,7 @@
                   cartItemQtyDisplay.innerText =
                     response.data.updatedItem.quantity;
                   cartItemTotalAmountDisplay.innerText =
-                    response.data.updatedItem.productId.price *
+                    response.data.updatedItem.subVarientId.price *
                     response.data.updatedItem.quantity;
 
                   subTotal.innerText = `₹ ${totalAmountDetails.totalPrice}`;
@@ -519,7 +520,7 @@
                   cartItemQtyDisplay.innerText =
                     response.data.updatedItem.quantity;
                   cartItemTotalAmountDisplay.innerText =
-                    response.data.updatedItem.productId.price *
+                    response.data.updatedItem.subVarientId.price *
                     response.data.updatedItem.quantity;
 
                   subTotal.innerText = `₹ ${totalAmountDetails.totalPrice}`;
@@ -575,8 +576,6 @@
           const removeFromCartBtn = event.target;
 
           const cartItemId = removeFromCartBtn.getAttribute("data-cart-item-id");
-
-          console.log(removeFromCartBtn, "remove from cart btn");
 
           axios
             .post("/shop/cart/removeFromCart", {

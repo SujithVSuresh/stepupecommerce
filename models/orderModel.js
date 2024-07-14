@@ -20,6 +20,16 @@ const orderSchema = mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      varientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.varient",
+        required: true,
+      },
+      subVarientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.varient.subVarient",
+        required: true,
+      },
       modelName: {
         type: String,
         required: true,

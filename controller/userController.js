@@ -39,7 +39,7 @@ const findTotalAmount = (item, discount = 0, limit = 0, minOrderAmount = 0) => {
 
   if (item.length != 0) {
     item.forEach((k) => {
-      totalPrice += k.quantity * k.productId.price;
+      totalPrice += k.quantity * k.subVarientId.price;
     });
 
     shippingPrice = totalPrice >= 1000 ? 0 : 50;
@@ -116,35 +116,66 @@ async function applyOfferForCart(userId) {
     const categoryOffers = await Categoryoffer.find({});
     const productOffers = await Productoffer.find({});
 
+    // let cart = await Cart.findOne({ userId: userId }).populate([
+    //   {
+    //     path: "items.productId",
+    //     populate: [
+    //       { path: "varient" },
+    //       { path: "product", populate: { path: "category" } },
+    //     ],
+    //   },
+    //   { path: "userId" },
+    // ]);
     let cart = await Cart.findOne({ userId: userId }).populate([
       {
-        path: "items.productId",
-        populate: [
-          { path: "varient" },
-          { path: "product", populate: { path: "category" } },
-        ],
-      },
-      { path: "userId" },
+      path: 'items.productId',
+      populate: [
+        {
+          path: 'category'
+        }
+      ]
+      }
     ]);
+
 
     let cartItems = cart.items.map((item) => {
       let categoryOffer = checkCategoryOffer(
         categoryOffers,
-        item.productId.product
+        item.productId
       );
       let productOffer = checkProductOffer(
         productOffers,
-        item.productId.product
+        item.productId
       );
       let offer = selectOffer(categoryOffer, productOffer);
-      let offerAmount = calculateOffer(item.productId, offer);
 
+      let varient = item.productId.varient.find((v) => v._id.toString() == item.varientId);
+      let subVarient = varient.subVarient.find(
+        (sv) => sv._id.toString() == item.subVarientId
+      );
+
+      let offerAmount = calculateOffer(subVarient, offer);
+
+      // return {
+      //   ...item._doc,
+      //   productId: {
+      //     ...item.productId._doc,
+      //     price: offerAmount ? offerAmount : item.productId.price,
+      //   },
+      // };
       return {
         ...item._doc,
         productId: {
           ...item.productId._doc,
-          price: offerAmount ? offerAmount : item.productId.price,
+          
         },
+        varientId: {
+          ...varient._doc
+        },
+        subVarientId: {
+          ...subVarient._doc,
+          price: offerAmount ? offerAmount : subVarient.price,
+        }
       };
     });
 
@@ -281,7 +312,6 @@ const home = async (req, res) => {
     },
   ]);
 
-  console.log("crowww", products);
 
   // let products = await Product.find({ isDelete: false })
   //       .populate("category")
@@ -359,12 +389,14 @@ let googleSuccess = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.user.emails[0].value });
 
+    console.log("green", req.user);
     if (!user) {
       user = new User({
-        firstName: req.user.name.given_name,
-        lastName: req.user.name.family_name,
+        firstName: req.user.name.givenName,
+        lastName: req.user.name.familyName,
         email: req.user.emails[0].value,
         isBlocked: false,
+        referral: uuidv4(),
         dateJoined: Date(),
       });
       await user.save();
@@ -607,6 +639,7 @@ const verifyOtp = async (req, res) => {
         phone: req.session.user.phone,
         password: req.session.user.password,
         isBlocked: false,
+        referral: uuidv4(),
         dateJoined: Date(),
       });
 
@@ -1101,7 +1134,6 @@ const relatedProducts = async (req, res) => {
       //   _id: { $ne: product._id },
       // });
 
-
       const products = await Product.aggregate([
         {
           $match: {
@@ -1173,14 +1205,12 @@ const relatedProducts = async (req, res) => {
             discountPrice: {
               $multiply: [
                 { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
-                'varient.0.subVarient.0.price'
+                "varient.0.subVarient.0.price",
               ],
             },
           },
         },
       ]);
-
-      
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1362,12 +1392,16 @@ const addedtoCartProducts = async (req, res) => {
 
       const cart = await applyOfferForCart(userId);
 
+      console.log("my log,", cart.items[0].subVarientId);
+
       let totalAmountDetails = findTotalAmount(
         cart.items,
         coupon ? coupon.discountPercentage : 0,
         coupon ? coupon.maxOfferLimit : 0,
         coupon ? coupon.minOrderAmount : 0
       );
+
+      console.log(totalAmountDetails, "toootooal");
 
       return res.status(200).json({ cartData: cart, totalAmountDetails });
     }
@@ -1392,6 +1426,9 @@ const cartQtyManagement = async (req, res) => {
       const itemIndex = cart.items.findIndex((item) => item._id == itemId);
 
       if (itemIndex >= 0) {
+        const varient = cart.items[itemIndex].productId.varient.find((v) => v._id.toString() == cart.items[itemIndex].varientId)
+        const subVarient = varient.subVarient.find((sv) => sv._id.toString() == cart.items[itemIndex].subVarientId)
+
         if (qtyUpdateIdentifier == 0) {
           if (cart.items[itemIndex].quantity <= 1) {
             return res.status(409).json({
@@ -1400,11 +1437,11 @@ const cartQtyManagement = async (req, res) => {
           }
 
           if (
-            cart.items[itemIndex].productId.quantity <
+            subVarient.quantity <
             cart.items[itemIndex].quantity
           ) {
             cart.items[itemIndex].quantity =
-              cart.items[itemIndex].productId.quantity;
+              subVarient.quantity
           } else {
             cart.items[itemIndex].quantity -= 1;
           }
@@ -1436,7 +1473,7 @@ const cartQtyManagement = async (req, res) => {
             });
           } else if (
             cart.items[itemIndex].quantity >=
-            cart.items[itemIndex].productId.quantity
+            subVarient.quantity
           ) {
             return res.status(409).json({
               message: `Insufficient stock. Available stock: ${cart.items[itemIndex].productId.quantity}`,
@@ -1551,7 +1588,7 @@ const removeCoupon = async (req, res) => {
 const addToCart = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const { productId, quantity } = req.body;
+      const { productId, varientId, subVarientId, quantity } = req.body;
 
       const userId = req.session.userId;
 
@@ -1559,7 +1596,13 @@ const addToCart = async (req, res) => {
 
       let productQuantity = Number(quantity);
 
-      let subVarient = await Subvarient.findOne({ _id: productId });
+      let product = await Product.findById(productId);
+      let varient = product.varient.find((v) => v._id.toString() == varientId);
+      let subVarient = varient.subVarient.find(
+        (sv) => sv._id.toString() == subVarientId
+      );
+
+      // let subVarient = await Subvarient.findOne({ _id: productId });
 
       if (subVarient && quantity > subVarient.quantity) {
         if (subVarient.quantity == 0) {
@@ -1576,7 +1619,7 @@ const addToCart = async (req, res) => {
       }
 
       const productIndex = cart.items.findIndex((item) =>
-        item.productId.equals(productId)
+        item.subVarientId.equals(subVarientId)
       );
 
       if (productIndex > -1) {
@@ -1584,7 +1627,12 @@ const addToCart = async (req, res) => {
           .status(409)
           .json({ message: "Product already exists in cart", cart });
       } else {
-        cart.items.push({ productId: productId, quantity: productQuantity });
+        cart.items.push({
+          productId: productId,
+          varientId: varientId,
+          subVarientId: subVarientId,
+          quantity: productQuantity,
+        });
         await cart.save();
         if (req.session.cartCount) {
           req.session.cartCount += 1;
@@ -1696,8 +1744,10 @@ const removeFromCart = async (req, res) => {
           req.session.cartCount = 0;
         }
 
+        const cartData = await applyOfferForCart(userId);
+
         let totalAmountDetails = findTotalAmount(
-          cart.items,
+          cartData.items,
           coupon ? coupon.discountPercentage : 0,
           coupon ? coupon.maxOfferLimit : 0,
           coupon ? coupon.minOrderAmount : 0
@@ -2208,14 +2258,16 @@ const placeOrder = async (req, res) => {
 
     const cart = await applyOfferForCart(userId);
 
+    console.log("aama", cart);
+
     for (let item of cart.items) {
-      if (item.quantity == 0) {
+      if (item.subVarientId.quantity == 0) {
         return res
           .status(409)
           .json({ message: "Out of stock. Update cart to continue." });
       } else if (
-        item.quantity != 0 &&
-        item.productId.quantity < item.quantity
+        item.subVarientId.quantity != 0 &&
+        item.subVarientId.quantity < item.quantity
       ) {
         return res
           .status(409)
@@ -2283,18 +2335,20 @@ const placeOrder = async (req, res) => {
       cart.items.forEach((item) => {
         order.orderedItems.push({
           productId: item.productId._id,
-          modelName: item.productId.product.modelName,
-          brand: item.productId.product.brand,
-          gender: item.productId.product.gender,
-          outerMaterial: item.productId.product.outerMaterial,
-          soleMaterial: item.productId.product.soleMaterial,
-          description: item.productId.product.description,
-          category: item.productId.product.category,
+          varientId: item.varientId._id,
+          subVarientId: item.subVarientId._id,
+          modelName: item.productId.modelName,
+          brand: item.productId.brand,
+          gender: item.productId.gender,
+          outerMaterial: item.productId.outerMaterial,
+          soleMaterial: item.productId.soleMaterial,
+          description: item.productId.description,
+          category: item.productId.category._id,
           quantity: item.quantity,
-          price: item.productId.price,
-          color: item.productId.varient.colorName,
-          size: item.productId.size,
-          image: item.productId.varient.images[0],
+          price: item.subVarientId.price,
+          color: item.varientId.colorName,
+          size: item.subVarientId.size,
+          image: item.varientId.images[0],
           orderStatus: payment == "COD" || "WALLET" ? "Ordered" : "Pending",
         });
       });
@@ -2316,12 +2370,13 @@ const placeOrder = async (req, res) => {
       const orderById = await Order.findOne({ _id: order._id });
 
       for (const item of orderById.orderedItems) {
-        let subVartient = await Subvarient.findOne({ _id: item.productId });
-        let qtyDiff = subVartient.quantity - item.quantity;
-        await Subvarient.updateOne(
-          { _id: item.productId._id },
-          { $set: { quantity: qtyDiff } }
-        );
+      let product = await Product.findById(item.productId)
+      let varient = product.varient.find((v) => v._id.toString() == item.varientId)
+      let subVarient = varient.subVarient.find((sv) => sv._id.toString() == item.subVarientId)
+
+      let qtyDiff = subVarient.quantity - item.quantity
+      subVarient.quantity = qtyDiff
+      await product.save()
       }
 
       if (payment == "COD" || payment == "WALLET") {
@@ -2364,7 +2419,6 @@ const placeOrder = async (req, res) => {
         );
       }
     }
-
     if (paymentMethod == "COD") {
       createOrder("COD");
     } else if (paymentMethod == "ONLINE_PAYMENT") {
@@ -2377,7 +2431,6 @@ const placeOrder = async (req, res) => {
         (notes = "Payment for shoes purchase")
       );
     } else if (paymentMethod == "WALLET") {
-      console.log(paymentMethod, "kkk");
       createOrder("WALLET");
     }
   } catch (error) {
