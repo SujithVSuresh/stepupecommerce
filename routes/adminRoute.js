@@ -36,6 +36,7 @@ router.post('/', auth.isAdminLogout, adminController.login)
 router.get("/logout", auth.isAdminLogin, adminController.logout);
 
 router.get('/dashboard', auth.isAdminLogin, adminController.dashboard)
+router.get('/dashboard/salesData', auth.isAdminLogin, adminController.dashboardSalesData)
 
 router.get('/products', auth.isAdminLogin, adminController.products)
 router.get('/unlistedProducts', auth.isAdminLogin, adminController.unlistedProducts)
@@ -89,6 +90,7 @@ router.get('/salesReport/data', auth.isAdminLogin, adminController.salesReportDa
 
 router.get('/categoryOffer', auth.isAdminLogin, adminController.categoryOffer)
 router.post('/addCategoryOffer', auth.isAdminLogin, adminController.addCategoryOffer)
+router.post('/editCategoryOffer', auth.isAdminLogin, adminController.editCategoryOffer)
 router.post('/deleteCategoryOffer', auth.isAdminLogin, adminController.deleteCategoryOffer)
 
 

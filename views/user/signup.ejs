@@ -118,6 +118,7 @@
       </div>
     </div>
   </form>
+  <span style="display: none;" id="referral" referral-code="<%= referralCode %>"></span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -212,6 +213,8 @@
       phoneError.textContent = "";
     }
 
+    const referral = document.getElementById('referral').getAttribute('referral-code')
+
     if (isValid) {
       let data = {
         fname: firstName,
@@ -219,6 +222,7 @@
         email: email,
         phone: phone,
         password: password,
+        referral: referral
       };
 
       axios

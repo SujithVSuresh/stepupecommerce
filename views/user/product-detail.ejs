@@ -352,7 +352,6 @@
 						} else {
 							showPriceOffer.style.display = "none"
 							showPrice.innerText = `₹ ${selectedSubVarients[0].price}`
-
 						}
 
 						let firstColor = document.getElementById(`clr${varients[0]._id}`)
@@ -383,10 +382,7 @@
 						} else {
 							showStock.style.color = 'red'
 							showStock.innerText = `Out of stock`
-
 						}
-
-
 					}
 
 				})
@@ -414,24 +410,21 @@
 
 							products.forEach((item) => {
 								itemContainer.innerHTML += `
-							<div class="col-lg-4 mb-4 text-center">
-							<div class="product-entry border">
-							<a href="/shop/items/${item._id}" class="prod-img">
-							<img src="/static/images/${item.varients[0].images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template"> 
-							
-							</a>
-							<div class="desc">
-							<h2><a href="/shop/items/${item._id}" >${item.modelName} ${item.category.categoryName} for ${item.gender}</a></h2>
-							<span style="color: red">${item.varients[0].subVarients[0].quantity == 0 ? "Out of stock" : item.varients[0].subVarients[0].quantity <= 5 ? `Only ${item.varients[0].subVarients[0].quantity} left` : ""}</span>
-
-							<span class="price">
-								₹ ${item.varients[0].subVarients[0].offerAmount ?
-										`<span>${item.varients[0].subVarients[0].offerAmount}</span> <span style="color: gray"><strike>${item.varients[0].subVarients[0].price}</strike></span>  <span style="color: green">${item.offerPercentage}% Off</span>` :
-										`${item.varients[0].subVarients[0].price}`}
-							</span>
-							</div>
-							</div>
-							</div>
+							         <div class="col-lg-4 mb-4 text-center">
+            <div class="product-entry border">
+              <a href="/shop/items/${item._id}" class="prod-img">
+                <img src="/static/images/${item.varient[0].images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+              </a>
+              <div class="desc">
+                <h2>
+                  <a href="/shop/items/${item._id}">
+                    ${item.modelName} ${item.category.categoryName} for ${item.gender}
+                  </a>
+                </h2>
+            
+              </div>
+            </div>
+          </div>
 `;
 							});
 						}
@@ -442,7 +435,7 @@
 
 			}
 
-			// fetchRelatedProducts()
+			fetchRelatedProducts()
 
 
 			// Image zoom.
@@ -767,7 +760,7 @@
 
 					let qty = document.getElementById("quantity-input").value
 
-					
+
 					const productId = event.target.getAttribute('pid')
 					const varientId = event.target.getAttribute('vid')
 					const subVarientId = event.target.getAttribute('svid')
@@ -776,7 +769,7 @@
 					// console.log(qty, productSubVarientId, "qty Input");
 
 					axios
-						.post("/shop/cart/addToCart", { productId: productId, varientId:varientId, subVarientId: subVarientId, quantity: qty })
+						.post("/shop/cart/addToCart", { productId: productId, varientId: varientId, subVarientId: subVarientId, quantity: qty })
 						.then((response) => {
 							if (response.status == 200) {
 

@@ -132,6 +132,9 @@ async function applyOfferForCart(userId) {
       populate: [
         {
           path: 'category'
+        },
+        {
+          path: 'brand'
         }
       ]
       }
@@ -186,79 +189,7 @@ async function applyOfferForCart(userId) {
 }
 
 const home = async (req, res) => {
-  // const categoryOffers = await Categoryoffer.find({}).populate('categoryId')
-
-  // const productsWithOffers = await Product.aggregate([
-  //   {
-  //     $match: {
-  //       $expr: {
-  //         $and: [
-  //           { $gt: [{ $size: "$varient" }, 0]},
-  //           { $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0] }
-  //         ]
-  //       }
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: 'categories',
-  //       localField: 'category',
-  //       foreignField: '_id',
-  //       as: 'category'
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: 'productoffers',
-  //       localField: '_id',
-  //       foreignField: 'productId',
-  //       as: 'prooffers'
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: 'categoryoffers',
-  //       localField: 'category',
-  //       foreignField: 'categoryId',
-  //       as: 'catoffers'
-  //     }
-  //   },
-  //   {
-  //     $addFields: {
-  //       coff: { $arrayElemAt: ['$catoffers', 0] },
-  //       poff: { $arrayElemAt: ['$prooffers', 0] },
-  //       category: { $arrayElemAt: ['$category', 0] }
-  //     }
-  //   },
-  //   {
-  //     $addFields: {
-  //       maxOffer: {
-  //         $max: [
-  //           { $ifNull: [{ $max: "$poff.percentage" }, 0] },
-  //           { $ifNull: [{ $max: "$coff.percentage" }, 0] }
-  //         ]
-  //       }
-  //     }
-  //   },
-  //   {
-  //     $addFields: {
-  //       discountPrice: {
-  //         $multiply: [
-  //           { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
-  //           5000
-  //         ]
-  //       }
-  //     }
-  //   },
-  //   {
-  //     $sort: {
-  //       date: -1
-  //     }
-  //   },
-  //   {
-  //     $limit: 10
-  //   }
-  // ]);
+  
 
   const categoryOffers = await Categoryoffer.aggregate([
     {
@@ -313,66 +244,6 @@ const home = async (req, res) => {
   ]);
 
 
-  // let products = await Product.find({ isDelete: false })
-  //       .populate("category")
-  //       .populate("brand");
-
-  //     let varients = await Varient.find({}).populate("product");
-  //     let subVarients = await Subvarient.find({});
-
-  //     // const categoryOffers = await Categoryoffer.find({});
-  //     const productOffers = await Productoffer.find({});
-
-  //     // Step 2: Filter the variants that have at least one sub-variant
-  //     const findingProductWithVarient = await Promise.all(
-  //       products.map(async (item) => {
-  //         // const varient = await Varient.findOne({ product: item._id });
-  //         const sub = await Subvarient.findOne({ product: item._id });
-  //         return sub ? item : null;
-  //       })
-  //     );
-
-  //     // Step 3: Remove null values from the array
-  //     const productsWithVarients = findingProductWithVarient.filter(
-  //       (item) => item !== null
-  //     );
-
-  //     // Filter and map the products with their corresponding varients and subvarients
-  //     let mappedProduct = productsWithVarients.map((product) => {
-  //       let categoryOffer = checkCategoryOffer(categoryOffers, product);
-  //       let productOffer = checkProductOffer(productOffers, product);
-
-  //       let offer = selectOffer(categoryOffer, productOffer);
-
-  //       let filteredVarients = varients
-  //         .filter(
-  //           (varient) =>
-  //             varient.product._id.toString() === product._id.toString()
-  //         )
-  //         .map((varient) => {
-  //           let filteredSubvarients = subVarients.filter(
-  //             (subVarient) =>
-  //               subVarient.varient.toString() === varient._id.toString()
-  //           );
-  //           let finalSubVarient = filteredSubvarients.map((item) => {
-  //             let offerAmount = offer ? calculateOffer(item, offer) : 0;
-
-  //             return { ...item._doc, offerAmount: offerAmount };
-  //           });
-  //           return { ...varient._doc, subVarients: finalSubVarient };
-  //         });
-
-  //       return {
-  //         ...product._doc,
-  //         varients: filteredVarients,
-  //         offerPercentage: offer ? offer : 0,
-  //       };
-  //     });
-
-  //     mappedProduct.sort((a, b) => b.date - a.date);
-
-  //     let newArrivals = mappedProduct.slice(0, 10)
-
   try {
     res.render("user/home", {
       newArrivals: products,
@@ -423,12 +294,15 @@ let googleSuccess = async (req, res) => {
 const signup = async (req, res) => {
   try {
     if (req.method == "GET") {
-      console.log("4");
-      res.render("user/signup", { isLogin: false });
+      console.log("12345", req.query.referralCode)
+      
+      res.render("user/signup", { isLogin: false, referralCode: req.query.referralCode ? req.query.referralCode : ""  });
     }
 
     if (req.method == "POST") {
-      const { fname, lname, email, phone, password } = req.body;
+      const { fname, lname, email, phone, password, referral } = req.body;
+
+      
 
       const existingUser = await User.findOne({ email });
 
@@ -457,6 +331,10 @@ const signup = async (req, res) => {
         "Verification Email",
         `This is your OTP ${otp}`
       );
+
+      if(referral){
+      req.session.referralCode = referral
+      }
 
       res.status(200).json({ message: "User created successfully." });
     }
@@ -631,7 +509,6 @@ const otpMailSender = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     if (req.session.otp == req.body.otpVal) {
-      console.log("otp is same");
       const newUser = new User({
         firstName: req.session.user.fname,
         lastName: req.session.user.lname,
@@ -644,6 +521,49 @@ const verifyOtp = async (req, res) => {
       });
 
       await newUser.save();
+
+      if(req.session.referralCode){
+        const referral = req.session.referralCode
+        console.log("haveelss", referral);
+
+        const user = await User.findOne({referral: referral})
+
+        if(user){
+          let wallet = await Wallet.findOne({userId: user._id})
+          if(!wallet){
+              wallet = new Wallet({
+                userId: user._id,
+                balance: 0,
+                history: [],
+              });
+              await wallet.save();
+          }
+          wallet.history.push({
+            type: "credit",
+            amount: 100,
+            description: "Referral amount",
+          });
+          wallet.balance += 100;
+          await wallet.save();
+
+
+         let newUserWallet = await Wallet.findOne({userId: newUser._id})
+         if(!newUserWallet){
+          newUserWallet = new Wallet({
+            userId: newUser._id,
+            balance: 0,
+            history: [],
+          });
+          newUserWallet.history.push({
+            type: "credit",
+            amount: 50,
+            description: "Referral amount",
+          });
+          newUserWallet.balance += 50;
+          await newUserWallet.save();
+         }
+        }
+      }
 
       req.session.destroy((err) => {
         if (err) {
@@ -1126,25 +1046,19 @@ const relatedProducts = async (req, res) => {
   try {
     if (req.method == "GET") {
       let productId = req.query.pid;
+      console.log("givennnn");
 
-      const product = await Product.findOne({ _id: productId });
-      // const products = await Product.find({
-      //   category: product.category,
-      //   isDelete: false,
-      //   _id: { $ne: product._id },
-      // });
+      const product = await Product.findOne({ _id: productId }, {category: 1});
 
       const products = await Product.aggregate([
         {
           $match: {
+            category: product.category,
             $expr: {
               $and: [
                 { $gt: [{ $size: "$varient" }, 0] },
                 {
-                  $gt: [
-                    { $size: { $arrayElemAt: ["$varient.subVarient", 0] } },
-                    0,
-                  ],
+                  $gt: [{ $size: { $arrayElemAt: ["$varient.subVarient", 0] } }, 0],
                 },
               ],
             },
@@ -1159,58 +1073,21 @@ const relatedProducts = async (req, res) => {
           },
         },
         {
-          $lookup: {
-            from: "brands",
-            localField: "brand",
-            foreignField: "_id",
-            as: "brand",
-          },
-        },
-        {
-          $lookup: {
-            from: "productoffers",
-            localField: "_id",
-            foreignField: "productId",
-            as: "prooffers",
-          },
-        },
-        {
-          $lookup: {
-            from: "categoryoffers",
-            localField: "category",
-            foreignField: "categoryId",
-            as: "catoffers",
-          },
-        },
-        {
           $addFields: {
-            coff: { $arrayElemAt: ["$catoffers", 0] },
-            poff: { $arrayElemAt: ["$prooffers", 0] },
             category: { $arrayElemAt: ["$category", 0] },
-            brand: { $arrayElemAt: ["$brand", 0] },
           },
         },
         {
-          $addFields: {
-            maxOffer: {
-              $max: [
-                { $ifNull: [{ $max: "$poff.percentage" }, 0] },
-                { $ifNull: [{ $max: "$coff.percentage" }, 0] },
-              ],
-            },
+          $sort: {
+            date: -1,
           },
         },
         {
-          $addFields: {
-            discountPrice: {
-              $multiply: [
-                { $subtract: [1, { $divide: ["$maxOffer", 100] }] },
-                "varient.0.subVarient.0.price",
-              ],
-            },
-          },
+          $limit: 10,
         },
       ]);
+
+      res.status(200).json({relatedProducts: products})
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2258,7 +2135,7 @@ const placeOrder = async (req, res) => {
 
     const cart = await applyOfferForCart(userId);
 
-    console.log("aama", cart);
+    console.log("aama12324", cart.items);
 
     for (let item of cart.items) {
       if (item.subVarientId.quantity == 0) {
@@ -2338,12 +2215,12 @@ const placeOrder = async (req, res) => {
           varientId: item.varientId._id,
           subVarientId: item.subVarientId._id,
           modelName: item.productId.modelName,
-          brand: item.productId.brand,
+          brand: item.productId.brand.name,
           gender: item.productId.gender,
           outerMaterial: item.productId.outerMaterial,
           soleMaterial: item.productId.soleMaterial,
           description: item.productId.description,
-          category: item.productId.category._id,
+          category: item.productId.category.categoryName,
           quantity: item.quantity,
           price: item.subVarientId.price,
           color: item.varientId.colorName,

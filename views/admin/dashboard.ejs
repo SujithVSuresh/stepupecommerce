@@ -1,13 +1,13 @@
 <%- include('./header', {adminName: adminName}) %>
 
-<!-- partial -->
-<div class="container-fluid page-body-wrapper">
+  <!-- partial -->
+  <div class="container-fluid page-body-wrapper">
 
-  <!-- partial:partials/_sidebar.html -->
-  <nav class="sidebar sidebar-offcanvas" id="sidebar">
-    <ul class="nav">
+    <!-- partial:partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
 
-      <!-- <li class="nav-item nav-profile">
+        <!-- <li class="nav-item nav-profile">
         <a href="#" class="nav-link">
           <div class="nav-profile-image">
             <img src="assets/images/faces/face1.jpg" alt="profile">
@@ -21,198 +21,403 @@
           <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
         </a>
       </li> -->
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/dashboard">
-          <span class="menu-title text-dark">DASHBOARD</span>
-          <i class="mdi mdi-home menu-icon text-dark"></i>
-        </a>
-      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/dashboard">
+            <span class="menu-title text-dark">DASHBOARD</span>
+            <i class="mdi mdi-home menu-icon text-dark"></i>
+          </a>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#ui-products" aria-expanded="false" aria-controls="ui-basic">
-          <span class="menu-title">PRODUCTS</span>
-          <i class="menu-arrow"></i>
-          <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px;"></i>
-        </a>
-        <div class="collapse" id="ui-products">
-          <ul class="nav flex-column sub-menu">
-            <li class="nav-item"> <a class="nav-link" href="/admin/products">LISTED</a></li>
-            <li class="nav-item"> <a class="nav-link" href="">UNLISTED</a></li>
-          </ul>
-        </div>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/users">
-          <span class="menu-title">USERS</span>
-          <i class="mdi menu-icon mdi-account-multiple"></i>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#ui-categories" aria-expanded="false" aria-controls="ui-basic">
-          <span class="menu-title">CATEGORIES</span>
-          <i class="menu-arrow"></i>
-          <i class="mdi mdi-cube-outline menu-icon"></i>
-        </a>
-        <div class="collapse" id="ui-categories">
-          <ul class="nav flex-column sub-menu">
-            <li class="nav-item"> <a class="nav-link" href="/admin/category">LISTED</a></li>
-            <li class="nav-item"> <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a></li>
-          </ul>
-        </div>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/order">
-          <span class="menu-title">ORDERS</span>
-          <i class="mdi mdi-cart menu-icon"></i>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/coupon">
-          <span class="menu-title">COUPON</span>
-          <i class="mdi mdi-tag menu-icon"></i>
-        </a>
-      </li>
-
-      
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/salesReport">
-          <span class="menu-title">SALES REPORT</span>
-
-          <i class="mdi menu-icon mdi-chart-line"></i>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#ui-offers" aria-expanded="false" aria-controls="ui-basic">
-          <span class="menu-title">OFFERS</span>
-          <i class="menu-arrow"></i>
-          <i class="mdi mdi-cube-outline menu-icon"></i>
-        </a>
-        <div class="collapse" id="ui-offers">
-          <ul class="nav flex-column sub-menu">
-            <li class="nav-item"> <a class="nav-link" href="/admin/categoryOffer">CATEGORY</a></li>
-            <li class="nav-item"> <a class="nav-link" href="/admin/productOffer">PRODUCT</a></li>
-          </ul>
-        </div>
-      </li>
-
-
-    </ul>
-  </nav>
-  <!-- partial -->
-  <div class="main-panel">
-    <div class="content-wrapper">
-      <div class="page-header">
-        <h3 class="page-title">
-          <span class="page-title-icon bg-dark  text-white mr-2">
-            <i class="mdi mdi-home"></i>
-          </span>
-          Dashboard
-        </h3>
-        <nav aria-label="breadcrumb">
-          <ul class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">
-              <span></span>Overview
-              <i
-                class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"
-              ></i>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div class="row">
-        <div class="col-md-4 stretch-card grid-margin">
-          <div class="card bg-gradient-danger card-img-holder text-white">
-            <div class="card-body">
-              <img
-                src="/static/admin/images/dashboard/circle.svg"
-                class="card-img-absolute"
-                alt="circle-image"
-              />
-              <h4 class="font-weight-normal mb-3">
-                Total Orders
-                <i class="mdi mdi-chart-line mdi-24px float-right"></i>
-              </h4>
-              <h2 class="mb-5"><%= orderCount %></h2>
-              <!-- <h6 class="card-text">Increased by 60%</h6> -->
-            </div>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="collapse" href="#ui-products" aria-expanded="false" aria-controls="ui-basic">
+            <span class="menu-title">PRODUCTS</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi menu-icon mdi-shoe-formal" style="font-size: 24px;"></i>
+          </a>
+          <div class="collapse" id="ui-products">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"> <a class="nav-link" href="/admin/products">LISTED</a></li>
+              <li class="nav-item"> <a class="nav-link" href="">UNLISTED</a></li>
+            </ul>
           </div>
-        </div>
-        <div class="col-md-4 stretch-card grid-margin">
-          <div class="card bg-gradient-info card-img-holder text-white">
-            <div class="card-body">
-              <img
-                src="/static/admin/images/dashboard/circle.svg"
-                class="card-img-absolute"
-                alt="circle-image"
-              />
-              <h4 class="font-weight-normal mb-3">
-                Total Sales
-                <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-              </h4>
-              <h2 class="mb-5"><%= salesCount %></h2>
-              <!-- <h6 class="card-text">Decreased by 10%</h6> -->
-            </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/users">
+            <span class="menu-title">USERS</span>
+            <i class="mdi menu-icon mdi-account-multiple"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="collapse" href="#ui-categories" aria-expanded="false"
+            aria-controls="ui-basic">
+            <span class="menu-title">CATEGORIES</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-cube-outline menu-icon"></i>
+          </a>
+          <div class="collapse" id="ui-categories">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"> <a class="nav-link" href="/admin/category">LISTED</a></li>
+              <li class="nav-item"> <a class="nav-link" href="/admin/category/unlisted">UNLISTED</a></li>
+            </ul>
           </div>
-        </div>
-        <div class="col-md-4 stretch-card grid-margin">
-          <div class="card bg-gradient-success card-img-holder text-white">
-            <div class="card-body">
-              <img
-                src="/static/admin/images/dashboard/circle.svg"
-                class="card-img-absolute"
-                alt="circle-image"
-              />
-              <h4 class="font-weight-normal mb-3">
-                Total Users
-                <i class="mdi mdi-diamond mdi-24px float-right"></i>
-              </h4>
-              <h2 class="mb-5"><%= userCount %></h2>
-              <!-- <h6 class="card-text">Increased by 5%</h6> -->
-            </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/order">
+            <span class="menu-title">ORDERS</span>
+            <i class="mdi mdi-cart menu-icon"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/coupon">
+            <span class="menu-title">COUPON</span>
+            <i class="mdi mdi-tag menu-icon"></i>
+          </a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/salesReport">
+            <span class="menu-title">SALES REPORT</span>
+
+            <i class="mdi menu-icon mdi-chart-line"></i>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="collapse" href="#ui-offers" aria-expanded="false" aria-controls="ui-basic">
+            <span class="menu-title">OFFERS</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-cube-outline menu-icon"></i>
+          </a>
+          <div class="collapse" id="ui-offers">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"> <a class="nav-link" href="/admin/categoryOffer">CATEGORY</a></li>
+              <li class="nav-item"> <a class="nav-link" href="/admin/productOffer">PRODUCT</a></li>
+            </ul>
           </div>
+        </li>
+
+
+      </ul>
+    </nav>
+    <!-- partial -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-header">
+          <h3 class="page-title">
+            <span class="page-title-icon bg-dark  text-white mr-2">
+              <i class="mdi mdi-home"></i>
+            </span>
+            Dashboard
+          </h3>
+          <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item active" aria-current="page">
+                <span></span>Overview
+                <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-7 grid-margin stretch-card">
-          <div class="card">
-            <div class="card-body">
-              <div class="clearfix">
-                <h4 class="card-title float-left">
-                  Visit And Sales Statistics
+        <div class="row">
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-danger card-img-holder text-white">
+              <div class="card-body">
+                <img src="/static/admin/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">
+                  Total Orders
+                  <i class="mdi mdi-chart-line mdi-24px float-right"></i>
                 </h4>
-                <div
+                <h2 class="mb-5">
+                  <%= orderCount %>
+                </h2>
+                <!-- <h6 class="card-text">Increased by 60%</h6> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-info card-img-holder text-white">
+              <div class="card-body">
+                <img src="/static/admin/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">
+                  Total Sales
+                  <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                </h4>
+                <h2 class="mb-5">
+                  <%= salesCount %>
+                </h2>
+                <!-- <h6 class="card-text">Decreased by 10%</h6> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-success card-img-holder text-white">
+              <div class="card-body">
+                <img src="/static/admin/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">
+                  Total Users
+                  <i class="mdi mdi-diamond mdi-24px float-right"></i>
+                </h4>
+                <h2 class="mb-5">
+                  <%= userCount %>
+                </h2>
+                <!-- <h6 class="card-text">Increased by 5%</h6> -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <div class="clearfix">
+                  <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                    <h4 class="card-title float-left">
+                      SALES STATISTICS
+                    </h4>
+                    <select id="sales-filter" class="form-control mr-3" style="width: 170px;">
+
+                      <option value="week">This week</option>
+                      <option value="month">This month</option>
+                      <option value="year">This year</option>
+
+                    </select>
+                  </div>
+                  <!-- <div
                   id="visit-sale-chart-legend"
                   class="rounded-legend legend-horizontal legend-top-right float-right"
-                ></div>
+                ></div> -->
+                </div>
+                <canvas id="sales-chart" class="mt-4"></canvas>
               </div>
-              <canvas id="visit-sale-chart" class="mt-4"></canvas>
             </div>
           </div>
-        </div>
-        <div class="col-md-5 grid-margin stretch-card">
-          <div class="card">
-            <div class="card-body">
-              <h4 class="card-title">Traffic Sources</h4>
-              <canvas id="traffic-chart"></canvas>
+          <div class="col-md-5 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">ORDERS</h4>
+                <div style="display: none;" id="orderChartData" pending-orders-count="<%= pendingOrdersCount %>"
+                  completed-orders-count="<%= completedOrdersCount %>"></div>
+
+                <canvas id="order-chart"></canvas>
+                <!-- 
               <div
                 id="traffic-chart-legend"
                 class="rounded-legend legend-vertical legend-bottom-left pt-4"
-              ></div>
+              ></div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-4 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <table class="table table-hover ">
+                  <thead>
+                    <tr>
+                      <th>BEST SELLING PRODUCTS</th>
+
+                    </tr>
+                  </thead>
+
+                  <tbody id="table-container">
+                    <% topSellingProducts.forEach((item)=> { %>
+
+                      <tr>
+                        <td>
+                          <%= item.product.modelName %>
+                        </td>
+                      </tr>
+                      <% }) %>
+
+                  </tbody>
+
+
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <table class="table table-hover ">
+                  <thead>
+                    <tr>
+                      <th>BEST SELLING CATEGORIES</th>
+
+                    </tr>
+                  </thead>
+
+                  <tbody id="table-container">
+
+                    <% topSellingCategories.forEach((item)=> { %>
+
+                      <tr>
+                        <td>
+                          <%= item.category %>
+                        </td>
+                      </tr>
+                      <% }) %>
+                  </tbody>
+
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <table class="table table-hover ">
+                  <thead>
+                    <tr>
+                      <th>BEST SELLING BRANDS</th>
+
+                    </tr>
+                  </thead>
+
+                  <tbody id="table-container">
+
+                    <% topSellingBrands.forEach((item)=> { %>
+
+                      <tr>
+                        <td>
+                          <%= item.brand %>
+                        </td>
+                      </tr>
+                      <% }) %>
+                  </tbody>
+
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <!-- content-wrapper ends -->
+
+
     </div>
-    <!-- content-wrapper ends -->
-
-   
   </div>
-</div>
 
-<%- include('./loader') %>
-<%- include('./footer') %>
+  <%- include('./loader') %>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const orderChartData = document.getElementById('orderChartData')
+        const pendingOrdersCount = orderChartData.getAttribute('pending-orders-count')
+        const completedOrdersCount = orderChartData.getAttribute('completed-orders-count')
+
+
+        var ctx = document.getElementById('order-chart').getContext('2d');
+        var trafficChart = new Chart(ctx, {
+          type: 'doughnut', // You can change this to 'bar', 'line', etc.
+          data: {
+            labels: ['Completed', 'Pending'], // Sample labels
+            datasets: [{
+              label: 'Traffic Sources',
+              data: [completedOrdersCount, pendingOrdersCount], // Sample data
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            legend: {
+              display: true,
+              position: 'bottom'
+            },
+            plugins: {
+              legend: {
+                display: false // Hide default legend
+              }
+            }
+          }
+        });
+
+
+        function salesDataChart(val) {
+
+          axios
+            .get(`/admin/dashboard/salesData?filter=${val}`)
+            .then((response) => {
+              if (response.status == 200) {
+                let dates = response.data.dates
+                let counts = response.data.counts
+
+                var ctx = document.getElementById('sales-chart').getContext('2d');
+                var visitSaleChart = new Chart(ctx, {
+                  type: 'line', // You can change this to 'bar', 'doughnut', etc.
+                  data: {
+                    labels: [...dates], // Sample labels
+                    datasets: [{
+                      label: 'Sales',
+                      data: [...counts], // Sample data for sales
+                      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                      borderColor: 'rgba(255, 99, 132, 1)',
+                      borderWidth: 1,
+                      fill: true
+                    }]
+                  },
+                  options: {
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        display: false // Hide default legend
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true
+                      }
+                    }
+                  }
+                });
+
+                // Custom legend
+                document.getElementById('visit-sale-chart-legend').innerHTML = visitSaleChart.generateLegend();
+
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            });
+
+
+        }
+
+
+        salesDataChart("week")
+
+
+        const salesFilter = document.getElementById('sales-filter')
+
+        salesFilter.addEventListener('change', (event) => {
+          event.preventDefault()
+          
+
+          salesDataChart(event.target.value)
+
+        })
+      });
+
+    </script>
+    <%- include('./footer') %>

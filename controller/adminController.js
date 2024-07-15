@@ -8,8 +8,8 @@ const Subvarient = require("../models/subVarientModel");
 const Order = require("../models/orderModel");
 const Wallet = require("../models/walletModel");
 const Coupon = require("../models/couponModel");
-const Categoryoffer = require("../models/categoryOfferModel")
-const Productoffer = require("../models/productOfferModel")
+const Categoryoffer = require("../models/categoryOfferModel");
+const Productoffer = require("../models/productOfferModel");
 const bcrypt = require("bcrypt");
 
 const login = async (req, res) => {
@@ -54,20 +54,340 @@ const logout = (req, res) => {
 
 const dashboard = async (req, res) => {
   try {
+    const userCount = await User.find({}).count();
+    const orderCount = await Order.find({}).count();
+    const salesCount = await Order.aggregate([
+      {
+        $unwind: "$orderedItems",
+      },
+      {
+        $match: {
+          "orderedItems.orderStatus": "Delivered",
+        },
+      },
+      {
+        $count: "salesCount",
+      },
+    ]);
+    console.log("jj", salesCount);
 
-    let userCount = await User.find({}).count()
-    let orderCount = await Order.find({}).count()
-    let salesCount = await Order.find({orderStatus: "Completed"}).count()
+    const pendingOrdersCount = await Order.find({
+      orderStatus: "Pending",
+    }).count();
 
-    console.log(userCount);
+    const completedOrdersCount = await Order.find({
+      orderStatus: "Completed",
+    }).count();
+
+    const topSellingProducts = await Order.aggregate([
+      {
+        $unwind: "$orderedItems",
+      },
+      {
+        $group: {
+          _id: "$orderedItems.productId",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $sort: { count: 1 },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $addFields: {
+          product: { $arrayElemAt: ["$product", 0] },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          count: 1,
+          "product.modelName": 1,
+        },
+      },
+      {
+        $limit: 10,
+      },
+    ]);
+
+    const topSellingBrands = await Order.aggregate([
+      {
+        $unwind: "$orderedItems",
+      },
+      {
+        $group: { _id: "$orderedItems.brand", count: { $sum: 1 } },
+      },
+      {
+        $sort: { count: 1 },
+      },
+      {
+        $project: {
+          _id: 0,
+          count: 1,
+          brand: "$_id",
+        },
+      },
+      {
+        $limit: 10,
+      },
+    ]);
+
+    const topSellingCategories = await Order.aggregate([
+      {
+        $unwind: "$orderedItems",
+      },
+      {
+        $group: { _id: "$orderedItems.category", count: { $sum: 1 } },
+      },
+      {
+        $sort: { count: 1 },
+      },
+      {
+        $project: {
+          _id: 0,
+          count: 1,
+          category: "$_id",
+        },
+      },
+      {
+        $limit: 10,
+      },
+    ]);
 
     res.render("admin/dashboard", {
+      pendingOrdersCount,
+      completedOrdersCount,
+      topSellingBrands,
+      topSellingCategories,
+      topSellingProducts,
       userCount,
       orderCount,
-      salesCount,
+      salesCount: salesCount[0].salesCount,
       isLogin: true,
       adminName: req.session.adminName,
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const dashboardSalesData = async (req, res) => {
+  try {
+    const filterType = req.query.filter;
+    let gte = null;
+    let lte = null;
+
+    if (filterType == "week") {
+      const currentDate = new Date();
+
+      const startOfWeek = new Date(currentDate);
+      const dayOfWeek = currentDate.getDay();
+      startOfWeek.setDate(currentDate.getDate() - dayOfWeek);
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      gte = startOfWeek;
+      lte = endOfWeek;
+    }
+
+    if (filterType == "month") {
+      const currentDate = new Date();
+
+      const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+      startOfYear.setHours(0, 0, 0, 0);
+
+      const endOfYear = new Date(currentDate.getFullYear(), 11, 31);
+      endOfYear.setHours(23, 59, 59, 999);
+
+      gte = startOfYear;
+      lte = endOfYear;
+    }
+
+    if (filterType == "year") {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+
+      const startOfLast5Years = new Date(currentYear - 5, 0, 1);
+      startOfLast5Years.setHours(0, 0, 0, 0);
+
+      const endOfCurrentYear = new Date(currentYear, 11, 31);
+      endOfCurrentYear.setHours(23, 59, 59, 999);
+
+      gte = startOfLast5Years;
+      lte = endOfCurrentYear;
+    }
+
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    let salesData;
+
+    if (filterType == "week") {
+      salesData = await Order.aggregate([
+        {
+          $unwind: "$orderedItems",
+        },
+        {
+          $match: {
+            "orderedItems.deliveredDate": { $gte: gte, $lte: lte },
+          },
+        },
+        {
+          $group: {
+            _id: "$orderedItems.deliveredDate",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            dayOfWeek: { $dayOfWeek: "$_id" },
+            count: 1,
+          },
+        },
+        {
+          $sort: { dayOfWeek: 1 },
+        },
+      ]);
+    } else if (filterType == "month") {
+      salesData = await Order.aggregate([
+        {
+          $unwind: "$orderedItems",
+        },
+        {
+          $match: {
+            "orderedItems.deliveredDate": { $gte: gte, $lte: lte },
+          },
+        },
+        {
+          $project: {
+            month: { $month: "$orderedItems.deliveredDate" },
+            orderedItems: 1,
+          },
+        },
+        {
+          $group: {
+            _id: "$month",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+    } else if (filterType == "year") {
+      salesData = await Order.aggregate([
+        {
+          $unwind: "$orderedItems",
+        },
+        {
+          $match: {
+            "orderedItems.deliveredDate": { $gte: gte, $lte: lte },
+          },
+        },
+        {
+          $project: {
+            year: { $year: "$orderedItems.deliveredDate" },
+            orderedItems: 1,
+          },
+        },
+        {
+          $group: {
+            _id: "$year",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+    }
+
+
+    let d = [];
+    let c = [];
+
+    if (filterType == "week") {
+      for (let i = 0; i < daysOfWeek.length; i++) {
+        const day = i + 1;
+        const salesForDay = salesData.find((sale) => sale.dayOfWeek === day);
+        d.push(daysOfWeek[i]);
+        if (salesForDay) {
+          c.push(salesForDay.count);
+        } else {
+          c.push(0);
+        }
+      }
+    } else if (filterType == "month") {
+
+      for (let i = 0; i < months.length; i++) {
+        const month = i + 1; 
+        const salesForMonth = salesData.find((sale) => sale._id === month);
+        d.push(months[i]);
+        if (salesForMonth) {
+          c.push(salesForMonth.count);
+        } else {
+          c.push(0);
+        }
+      }
+    } else {
+      const currentYear = new Date().getFullYear();
+      const lastFiveYears = [];
+      
+      for (let i = 0; i < 5; i++) {
+        lastFiveYears.push(currentYear - i);
+      }
+      
+      // Reverse the array to have years in ascending order
+      lastFiveYears.reverse();
+      
+      lastFiveYears.forEach(year => {
+        const salesForYear = salesData.find(sale => sale._id === year);
+        d.push(year);
+        if (salesForYear) {
+          c.push(salesForYear.count);
+        } else {
+          c.push(0);
+        }
+      });      console.log(salesData, "dd");
+    }
+
+    console.log("ggg", d, c);
+
+    res.status(200).json({ dates: d, counts: c });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -157,7 +477,6 @@ const addProduct = async (req, res) => {
 
       const trimmedValue = model.trim().toLowerCase();
 
-   
       let checkProduct = await Product.findOne({
         modelName: { $regex: new RegExp(`^${trimmedValue}$`, "i") },
         isDelete: false,
@@ -174,16 +493,21 @@ const addProduct = async (req, res) => {
           description: description,
         });
 
-  
         await newProduct.save();
 
-        let createdProduct = await Product.findOne({ _id: newProduct._id }).populate("brand").populate("category");
+        let createdProduct = await Product.findOne({ _id: newProduct._id })
+          .populate("brand")
+          .populate("category");
 
-        return res.status(200).json({ msg: "Product created successfully", product: createdProduct });
+        return res.status(200).json({
+          msg: "Product created successfully",
+          product: createdProduct,
+        });
       } else {
-        res.status(409).json({ message: "Product with this name already exists" });
+        res
+          .status(409)
+          .json({ message: "Product with this name already exists" });
       }
-
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -212,25 +536,35 @@ const editProduct = async (req, res) => {
       });
 
       if (!checkingProduct) {
+        const product = await Product.updateOne(
+          { _id: id },
+          {
+            $set: {
+              modelName: model,
+              brand: brand,
+              gender: gender,
+              category: category,
+              outerMaterial: outerMaterial,
+              soleMaterial: soleMaterial,
+              description: description,
+            },
+          }
+        );
 
-        const product = await Product.updateOne({_id: id}, {$set: {
-          modelName: model,
-          brand: brand,
-          gender: gender,
-          category: category,
-          outerMaterial: outerMaterial,
-          soleMaterial: soleMaterial,
-          description: description
-        }})
-
-        let updatedProduct = await Product.findOne({ _id: id }).populate("brand").populate("category");
+        let updatedProduct = await Product.findOne({ _id: id })
+          .populate("brand")
+          .populate("category");
 
         console.log(":product updated", updatedProduct);
-        return res.status(200).json({ message: "Product edited successfully.", product: updatedProduct});
+        return res.status(200).json({
+          message: "Product edited successfully.",
+          product: updatedProduct,
+        });
       } else {
-        return res.status(409).json({ message: "Product already already exists" });
+        return res
+          .status(409)
+          .json({ message: "Product already already exists" });
       }
-
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -512,81 +846,83 @@ const addColorVarient = async (req, res) => {
   try {
     let { colorName, colorCode, productId } = req.body;
 
-    colorCode = colorCode.toLowerCase()
+    colorCode = colorCode.toLowerCase();
 
     const files = req.files;
 
-    const productImage = Object.values(files).map(
-      (item) => item[0].filename
-    );
+    const productImage = Object.values(files).map((item) => item[0].filename);
 
-    if(productImage.length != 4){
+    if (productImage.length != 4) {
       return res.status(409).json({ message: "Minimum 4 images are required" });
-
     }
 
     const newVariant = {
       colorName: colorName,
       colorCode: colorCode,
-      images: productImage
+      images: productImage,
     };
 
     const updatedProduct = await Product.findOneAndUpdate(
-      {_id: productId, 'varient.colorCode': {$ne: colorCode}},
-      {$push: {varient: newVariant}},
-      {new: true, runValidators: true}
-    )
+      { _id: productId, "varient.colorCode": { $ne: colorCode } },
+      { $push: { varient: newVariant } },
+      { new: true, runValidators: true }
+    );
 
-    if(!updatedProduct){
-
-         return res.status(409).json({ message: "Color already exist" });
+    if (!updatedProduct) {
+      return res.status(409).json({ message: "Color already exist" });
     }
-    
-    const varient = updatedProduct.varient[updatedProduct.varient.length - 1]
 
-    return res.status(200).json({message: "Color added successfully", colorVarient: varient })
+    const varient = updatedProduct.varient[updatedProduct.varient.length - 1];
 
-  
+    return res
+      .status(200)
+      .json({ message: "Color added successfully", colorVarient: varient });
   } catch (error) {
     console.error("Error in addColorVarient:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-
 const editColorVarient = async (req, res) => {
   try {
     const { colorName, colorCode, varientId } = req.body;
 
     const colorVarient = await Varient.findOne({
-      _id: varientId
-    })
+      _id: varientId,
+    });
 
-    let images = colorVarient.images
+    let images = colorVarient.images;
 
     const files = req.files;
 
-    console.log(files.productImgOne, files.productImgTwo, files.productImgThree, files.productImgFour, "files...");
+    console.log(
+      files.productImgOne,
+      files.productImgTwo,
+      files.productImgThree,
+      files.productImgFour,
+      "files..."
+    );
 
     if (files.productImgOne) {
       images.splice(0, 1, files.productImgOne[0].filename);
-  }
-  if (files.productImgTwo) {
+    }
+    if (files.productImgTwo) {
       images.splice(1, 1, files.productImgTwo[0].filename);
-  }
-  if (files.productImgThree) {
+    }
+    if (files.productImgThree) {
       images.splice(2, 1, files.productImgThree[0].filename);
-  }
-  if (files.productImgFour) {
+    }
+    if (files.productImgFour) {
       images.splice(3, 1, files.productImgFour[0].filename);
-  }
+    }
 
+    await Varient.updateOne(
+      { _id: varientId },
+      { $set: { images: images, colorName: colorName, colorCode: colorCode } }
+    );
 
-    await Varient.updateOne({_id: varientId}, {$set: {images: images, colorName:colorName, colorCode: colorCode}})
-
-    console.log("updated successfully...")
-    res.status(200).json({message: "Product updated successfully"})
-
+    console.log("updated successfully...");
+    res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
     console.error("Error in addColorVarient:", error);
     res.status(500).json({ error: error.message });
@@ -623,28 +959,34 @@ const addSizeVarient = async (req, res) => {
     const newSubVarient = {
       size,
       quantity,
-      price
+      price,
     };
     const product = await Product.findOne({
       _id: productId,
-      'varient._id': varientId,
-      'varient.subVarient.size': size
+      "varient._id": varientId,
+      "varient.subVarient.size": size,
     });
 
     if (product) {
-      return res.status(409).json({ message: "Size with this value already exists." });
+      return res
+        .status(409)
+        .json({ message: "Size with this value already exists." });
     }
 
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: productId, "varient._id": varientId },
-      { $push: { "varient.$.subVarient": newSubVarient }},
+      { $push: { "varient.$.subVarient": newSubVarient } },
       { new: true, runValidators: true }
-    );    
+    );
 
-    const varient = updatedProduct.varient.find(v => v._id == varientId);
-    const lastPushedSubVarient = varient.subVarient[varient.subVarient.length - 1];
+    const varient = updatedProduct.varient.find((v) => v._id == varientId);
+    const lastPushedSubVarient =
+      varient.subVarient[varient.subVarient.length - 1];
 
-    return res.status(200).json({ message: "Size added successfully", subVarient:lastPushedSubVarient  });
+    return res.status(200).json({
+      message: "Size added successfully",
+      subVarient: lastPushedSubVarient,
+    });
   } catch (error) {
     console.error("Error in addColorVarient:", error);
     res.status(500).json({ error: error.message });
@@ -704,7 +1046,7 @@ const getAllColorVarient = async (req, res) => {
   try {
     const productId = req.query.pid;
 
-    const varients = await Product.findById(productId).select('varient')
+    const varients = await Product.findById(productId).select("varient");
 
     if (!varients) {
       return res.status(404).json({ message: "Color varient not found" });
@@ -719,15 +1061,15 @@ const getAllColorVarient = async (req, res) => {
 const getAllSizeVarient = async (req, res) => {
   try {
     const varientId = req.query.varientid;
-    const productId = req.query.productid
+    const productId = req.query.productid;
 
-    const product = await Product.findById(productId)
+    const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const varient = product.varient.find((v) => v._id == varientId)
+    const varient = product.varient.find((v) => v._id == varientId);
 
     if (!varient) {
       return res.status(404).json({ message: "Colors varient not found" });
@@ -1132,10 +1474,7 @@ const salesReportData = async (req, res) => {
     });
     const soldProductsCount = await Order.aggregate(pipeline2);
 
-    const pipeline3 = [
-      { $unwind: "$orderedItems" },
-      { $match: {} },
-    ];
+    const pipeline3 = [{ $unwind: "$orderedItems" }, { $match: {} }];
 
     pipeline3.push({
       $match: {},
@@ -1171,13 +1510,12 @@ const salesReportData = async (req, res) => {
   }
 };
 
-
 const categoryOffer = async (req, res) => {
   try {
     if (req.method == "GET") {
-      const categoryOffers = await Categoryoffer.find({}).populate('categoryId')
-
-
+      const categoryOffers = await Categoryoffer.find({}).populate(
+        "categoryId"
+      );
 
       res.render("admin/categoryOffer", {
         categoryOffers: categoryOffers,
@@ -1193,17 +1531,11 @@ const categoryOffer = async (req, res) => {
 const addCategoryOffer = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const {
-        categoryId,
-        offerPercentage,
-        expiryDate,
-      } = req.body.data;
-
+      const { categoryId, offerPercentage, expiryDate } = req.body.data;
 
       const categoryOffer = await Categoryoffer.findOne({
-          categoryId: categoryId,
+        categoryId: categoryId,
       });
-
 
       if (categoryOffer) {
         return res
@@ -1219,7 +1551,40 @@ const addCategoryOffer = async (req, res) => {
 
       await offer.save();
 
-      res.status(200).json({ offer: offer, message: "Offer created successfully" });
+      res
+        .status(200)
+        .json({ offer: offer, message: "Offer created successfully" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const editCategoryOffer = async (req, res) => {
+  try {
+    if (req.method == "POST") {
+      const { offerId, offerPercentage, expiryDate } = req.body.data;
+
+      const offer = await Categoryoffer.findOneAndUpdate(
+        {_id: offerId},
+        {
+          percentage: offerPercentage,
+          expiryDate: expiryDate
+        },
+        {
+          new: true
+        }
+      )
+
+      if (!offer) {
+        return res
+          .status(400)
+          .json({ error: "Offer for this categoey does not exist" });
+      }
+
+      res
+        .status(200)
+        .json({ offer: offer, message: "Offer edited successfully" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1229,20 +1594,18 @@ const addCategoryOffer = async (req, res) => {
 const deleteCategoryOffer = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const {
-        offerId
-      } = req.body.data;
-
+      const { offerId } = req.body.data;
 
       const categoryOffer = await Categoryoffer.findByIdAndDelete({
-          _id: offerId,
+        _id: offerId,
       });
 
-
       if (categoryOffer) {
-        return res.status(200).json({ offer: categoryOffer, message: "Category offer deleted successfully" });
+        return res.status(200).json({
+          offer: categoryOffer,
+          message: "Category offer deleted successfully",
+        });
       }
-
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1252,9 +1615,9 @@ const deleteCategoryOffer = async (req, res) => {
 const productOffer = async (req, res) => {
   try {
     if (req.method == "GET") {
-      const products = await Product.find({isDelete: false})
+      const products = await Product.find({ isDelete: false });
 
-      const productOffer = await Productoffer.find({}).populate('productId')
+      const productOffer = await Productoffer.find({}).populate("productId");
 
       res.render("admin/productOffer", {
         productOffer: productOffer,
@@ -1262,28 +1625,20 @@ const productOffer = async (req, res) => {
         isLogin: true,
         adminName: req.session.adminName,
       });
-      
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-
 const addProductOffer = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const {
-        productId,
-        offerPercentage,
-        expiryDate,
-      } = req.body.data;
-
+      const { productId, offerPercentage, expiryDate } = req.body.data;
 
       const productOffer = await Productoffer.findOne({
-          productId: productId,
+        productId: productId,
       });
-
 
       if (productOffer) {
         return res
@@ -1299,41 +1654,39 @@ const addProductOffer = async (req, res) => {
 
       await offer.save();
 
-      res.status(200).json({ offer: offer, message: "Offer created successfully" });
+      res
+        .status(200)
+        .json({ offer: offer, message: "Offer created successfully" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const deleteProductOffer = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const {
-        offerId,
-      } = req.body.data;
-
+      const { offerId } = req.body.data;
 
       const productOffer = await Productoffer.findByIdAndDelete({
-          _id: offerId,
+        _id: offerId,
       });
 
-
       if (productOffer) {
-        return res.status(200).json({ offer: productOffer, message: "Product offer deleted successfully" });
+        return res.status(200).json({
+          offer: productOffer,
+          message: "Product offer deleted successfully",
+        });
       }
-
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-
-
 module.exports = {
   dashboard,
+  dashboardSalesData,
   products,
   unlistedProducts,
   addProduct,
@@ -1381,9 +1734,10 @@ module.exports = {
 
   categoryOffer,
   addCategoryOffer,
+  editCategoryOffer,
   deleteProductOffer,
-  
+
   productOffer,
   addProductOffer,
-  deleteCategoryOffer
+  deleteCategoryOffer,
 };

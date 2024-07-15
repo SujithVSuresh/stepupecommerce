@@ -90,7 +90,7 @@ app.get(
 
 app.get("/auth/destroy-otp", (req, res) => {
   delete req.session.otp;
-  res.send(200).json({ message: "OTP destroyed" });
+  res.status(200).json({ message: "OTP destroyed" });
 });
 
 app.get('*', (req, res) => {
