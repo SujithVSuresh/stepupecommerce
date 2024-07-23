@@ -3,8 +3,6 @@ const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Brand = require("../models/brandModal");
-const Varient = require("../models/varientModel");
-const Subvarient = require("../models/subVarientModel");
 const Order = require("../models/orderModel");
 const Wallet = require("../models/walletModel");
 const Coupon = require("../models/couponModel");
@@ -1319,8 +1317,6 @@ const addCoupon = async (req, res) => {
         expiryDate,
       } = req.body.data;
 
-      // let realCouponCode = couponCode.toUpperCase()
-
       const existingCoupon = await Coupon.findOne({
         couponCode: couponCode.toUpperCase(),
       });
@@ -1347,6 +1343,41 @@ const addCoupon = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+const editCoupon = async (req, res) => {
+  try {
+    if (req.method == "POST") {
+      const { couponId, discountPercentage, maxOfferLimit, minOrderAmount, expiryDate } = req.body.data;
+
+      const offer = await Coupon.findOneAndUpdate(
+        { _id: couponId },
+        {
+          discountPercentage: discountPercentage,
+          maxOfferLimit: maxOfferLimit,
+          minOrderAmount: minOrderAmount,
+          expiryDate: expiryDate,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!offer) {
+        return res
+          .status(400)
+          .json({ error: "Coupon does not exist" });
+      }
+
+      res
+        .status(200)
+        .json({ offer: offer, message: "Coupon edited successfully" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 const deleteCoupon = async (req, res) => {
   try {
@@ -1809,6 +1840,7 @@ module.exports = {
 
   coupon,
   addCoupon,
+  editCoupon,
   deleteCoupon,
 
   salesReport,

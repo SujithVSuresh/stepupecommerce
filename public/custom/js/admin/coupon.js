@@ -1,7 +1,25 @@
 document.addEventListener("DOMContentLoaded", (event) => {
   let tableContainer = document.getElementById("table-container");
 
+  let couponCodeEdit = document.getElementById('couponCodeEdit')
+  let discountPercentageEdit = document.getElementById('discountPercentageEdit')
+  let maxOfferLimitEdit = document.getElementById('maxOfferLimitEdit')
+  let minOrderAmountEdit = document.getElementById('minOrderAmountEdit')
+  let expiryDateEdit = document.getElementById('expiryDateEdit')
+
   document.addEventListener("click", (event) => {
+
+
+    if(event.target && event.target.classList.contains("couponEditBtn")){
+      couponCodeEdit.value = event.target.getAttribute('coupon-code')
+      discountPercentageEdit.value = event.target.getAttribute('percentage')
+      maxOfferLimitEdit.value = event.target.getAttribute('max-off-limit')
+      minOrderAmountEdit.value = event.target.getAttribute('min-order-amount')
+      expiryDateEdit.value = event.target.getAttribute('expiry-date')
+      document.getElementById('couponEditForm').setAttribute('coupon-id', event.target.getAttribute('coupon-id'))
+    }
+
+
     if (event.target && event.target.id == "cuponAddBtnSubmit") {
       event.preventDefault();
 
@@ -87,24 +105,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           })
           .then((response) => {
             if (response.status == 200) {
-              let coupon = response.data.coupon;
-              document.querySelector("#couponAddModal .close").click();
-              tableContainer.insertAdjacentHTML(
-                "afterbegin",
-                `
-<tr id="tr${coupon._id}">
-<td>${coupon.couponCode}</td>
-<td>${coupon.discountPercentage} %</td>
-<td>₹ ${coupon.maxOfferLimit}</td>
-<td>₹ ${coupon.minOrderAmount}</td>
-<td>${new Date(coupon.expiryDate).toISOString().slice(0, 10)}</td>
-<td>
-<button data-coupon-id="${coupon._id}" id="coupon${coupon._id}" type="button"
-    class="btn btn-outline-dark btn-sm couponDltBtn">Delete</button>
-</td>
-</tr>
-`
-              );
+              window.location.href = "/admin/coupon"              
             }
           })
           .catch((error) => {
@@ -112,6 +113,107 @@ document.addEventListener("DOMContentLoaded", (event) => {
           });
       }
     }
+
+
+    if (event.target && event.target.id == "cuponEditBtnSubmit") {
+      event.preventDefault();
+
+      let couponCodeEdit = document.getElementById('couponCodeEdit').value
+      let discountPercentageEdit = document.getElementById('discountPercentageEdit').value
+      let maxOfferLimitEdit = document.getElementById('maxOfferLimitEdit').value
+      let minOrderAmountEdit = document.getElementById('minOrderAmountEdit').value
+      let expiryDateEdit = document.getElementById('expiryDateEdit').value
+      let couponId = document.getElementById('couponEditForm').getAttribute('coupon-id')
+
+      let couponCodeEditError = document.getElementById("couponCodeEditError");
+      let discountEditError = document.getElementById("discountEditError");
+      let maxOfferLimitEditError = document.getElementById("maxOfferLimitEditError");
+      let minOrderAmountEditError = document.getElementById("minOrderAmountEditError");
+      let expiryDateEditError = document.getElementById("expiryDateEditError");
+
+      let isValid = true;
+
+      if (!couponCodeEdit.trim()) {
+        couponCodeEditError.textContent = "This field is required";
+        isValid = false;
+      } else if (!/^[A-Za-z0-9]+$/.test(couponCodeEdit)) {
+        couponCodeEditError.textContent = "Enter a valid coupon code";
+        isValid = false;
+      } else {
+        couponCodeEditError.textContent = "";
+      }
+
+      if (!discountPercentageEdit.trim()) {
+        discountEditError.textContent = "This field is required";
+        isValid = false;
+      } else if (!/^\d+$/.test(discountPercentageEdit)) {
+        discountEditError.textContent = "Enter a valid value.";
+        isValid = false;
+      } else if(discountPercentageEdit < 1 || discountPercentageEdit > 99){
+        discountEditError.textContent = "Enter a valid value.";
+        isValid = false;
+      } else if (discountPercentageEdit > 100){
+        discountEditError.textContent = "Enter a valid value.";
+        isValid = false;
+      } else {
+        discountEditError.textContent = "";
+      }
+
+      if (!maxOfferLimitEdit.trim()) {
+        maxOfferLimitEditError.textContent = "This field is required";
+        isValid = false;
+      } else if (!/^\d+$/.test(maxOfferLimitEdit)) {
+        maxOfferLimitEditError.textContent = "Enter a valid value.";
+        isValid = false;
+      } else {
+        maxOfferLimitEditError.textContent = "";
+      }
+
+      if (!minOrderAmountEdit.trim()) {
+        minOrderAmountEditError.textContent = "This field is required";
+        isValid = false;
+      } else if (!/^\d+$/.test(minOrderAmountEdit)) {
+        minOrderAmountEditError.textContent = "Enter a valid value.";
+        isValid = false;
+      } else {
+        minOrderAmountEditError.textContent = "";
+      }
+
+      if (!expiryDateEdit.trim()) {
+        expiryDateEditError.textContent = "Choose an expiry date";
+        isValid = false;
+      } else {
+        expiryDateEditError.textContent = "";
+      }
+
+      if (isValid) {
+        axios
+          .post("/admin/coupon/editCoupon", {
+            data: {
+              couponCode: couponCodeEdit,
+              discountPercentage: discountPercentageEdit,
+              maxOfferLimit: maxOfferLimitEdit,
+              minOrderAmount: minOrderAmountEdit,
+              expiryDate: expiryDateEdit,
+              couponId: couponId
+            },
+          })
+          .then((response) => {
+            if (response.status == 200) {
+              window.location.href = "/admin/coupon"
+  
+            }
+          })
+          .catch((error) => {
+            console.log("it is an error", error);
+          });
+      }
+    }
+
+
+
+
+    
 
     if (event.target && event.target.classList.contains("couponDltBtn")) {
       event.preventDefault();

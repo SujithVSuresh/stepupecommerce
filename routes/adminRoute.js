@@ -83,6 +83,7 @@ router.post('/order/items/changeStatus', auth.isAdminLogin, adminController.chan
 
 router.get('/coupon', auth.isAdminLogin, adminController.coupon)
 router.post('/coupon/addCoupon', auth.isAdminLogin, adminController.addCoupon)
+router.post('/coupon/editCoupon', auth.isAdminLogin, adminController.editCoupon)
 router.post('/coupon/deleteCoupon', auth.isAdminLogin, adminController.deleteCoupon)
 
 router.get('/salesReport', auth.isAdminLogin, adminController.salesReport)

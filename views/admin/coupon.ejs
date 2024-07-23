@@ -128,6 +128,7 @@
                                         <th>MIN ORDER LIMIT</th>
                                         <th>EXPIRY DATE</th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-container">
@@ -145,6 +146,13 @@
                                             </td>
                                             <td>
                                                 <%= item.expiryDate.toISOString().slice(0, 10) %>
+                                            </td>
+                                            <td>
+                                                <button coupon-code="<%= item.couponCode %>" max-off-limit="<%= item.maxOfferLimit %>" min-order-amount="<%= item.minOrderAmount %>" percentage="<%= item.discountPercentage %>" expiry-date="<%= item.expiryDate.toISOString().slice(0, 10) %>" coupon-id="<%= item._id %>" id="coupon-edit<%= item._id %>"
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#couponEditModal" 
+                                                    class="btn btn-outline-dark btn-sm couponEditBtn">Edit</button>
                                             </td>
                                             <td>
                                                 <button data-coupon-id="<%= item._id %>" id="coupon<%= item._id %>"
@@ -236,6 +244,63 @@
             </div>
         </div>
     </div>
+
+
+           <!---------------------------------------------- EDIT FORM MODAL START ----------------------------------->
+
+           <div class="modal fade" id="couponEditModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="padding: 15px">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel">EDIT COUPON</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="forms-sample" id="couponEditForm">
+                            <div class="form-group">
+                                <label for="couponCodeEdit">Coupon code</label>
+                                <input type="text" disabled class="form-control" id="couponCodeEdit" placeholder="Enter code" />
+                                <span id="couponCodeEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+    
+                            <div class="form-group">
+                                <label for="discountPercentageEdit">Discount %</label>
+                                <input type="text" class="form-control" id="discountPercentageEdit"
+                                    placeholder="Enter percentage" />
+                                <span id="discountEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="maxOfferLimitEdit">Max offer limit</label>
+                                <input type="text" class="form-control" id="maxOfferLimitEdit" placeholder="Enter limit" />
+                                <span id="maxOfferLimitEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="minOrderAmountEdit">Min order amount</label>
+                                <input class="form-control" id="minOrderAmountEdit" placeholder="Enter amount">
+                                <span id="minOrderAmountEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="expiryDate">Enter expiry date</label>
+                                <input class="form-control" type="date" id="expiryDateEdit" placeholder="Expiry date">
+                                <span id="expiryDateEditError" style="color: red; font-size: 12px"></span>
+    
+                            </div>
+    
+                            <a type="submit" id="cuponEditBtnSubmit" class="btn btn-dark mr-2">Submit</a>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <%- include('./loader') %>
 

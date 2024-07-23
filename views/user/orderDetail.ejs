@@ -30,7 +30,7 @@
                 <span>Total discount: <%= order.discountAmount ? order.discountAmount : 0 %></span> <br>
                 <span>Payment status: <%= order.paymentStatus %></span> <br>
               </div>
-              <% if(order.paymentMethod!="COD" && order.paymentStatus!="Pending" && order.orderStatus!="Completed" ){ %>
+              <% if(order.orderStatus=="Completed" ){ %>
               <div>
                 <a id="downloadInvoice" class="button editDltBtn"
                   style="border-color: black; padding: 5px; color: black; background-color: #f1f1f1;"><i

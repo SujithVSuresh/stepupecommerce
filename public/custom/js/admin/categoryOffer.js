@@ -227,27 +227,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
               })
               .then((response) => {
                 if (response.status == 200) {
-                  console.log("category offer.....");
-                  // let coupon = response.data.coupon;
-                  console.log(response.data);
-                  // document.querySelector("#couponAddModal .close").click();
+
                   window.location.href = "/admin/categoryOffer"
-    //               tableContainer.insertAdjacentHTML(
-    //                 "afterbegin",
-    //                 `
-    // <tr id="tr${coupon._id}">
-    // <td>${coupon.couponCode}</td>
-    // <td>${coupon.discountPercentage} %</td>
-    // <td>₹ ${coupon.maxOfferLimit}</td>
-    // <td>₹ ${coupon.minOrderAmount}</td>
-    // <td>${new Date(coupon.expiryDate).toISOString().slice(0, 10)}</td>
-    // <td>
-    // <button data-coupon-id="${coupon._id}" id="coupon${coupon._id}" type="button"
-    //     class="btn btn-outline-dark btn-sm couponDltBtn">Delete</button>
-    // </td>
-    // </tr>
-    // `
-    //               );
+
                 }
               })
               .catch((error) => {
