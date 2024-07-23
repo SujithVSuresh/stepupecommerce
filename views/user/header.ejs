@@ -59,7 +59,7 @@
 			            <form class="search-wrap">
 			               <div class="form-group">
 			                  <input type="search" id="searchInput" class="form-control search" placeholder="Search">
-			                  <button style="border-color: #008AD8;" class="btn btn-light bg-white submit-search text-center" type="submit"><i style="color: #008AD8;" class="icon-search"></i></button>
+			                  <button style="border-color: #4f2f2d;" class="btn btn-light bg-white submit-search text-center" type="submit"><i style="color: #4f2f2d;" class="icon-search"></i></button>
 			               </div>
 			            </form>
 			         </div>
@@ -67,8 +67,8 @@
 					<div class="row">
 						<div class="col-sm-12 text-left menu-1">
 							<ul>
-								<li class="active"><a href="/">Home</a></li>
-								<li><a href="/shop">Shop</a></li>
+								<li><a href="/" id="homeSelect">Home</a></li>
+								<li><a href="/shop" id="shopSelect">Shop</a></li>
 								<li><a href="">About</a></li>
 								<li><a href="">Contact</a></li>
 
@@ -100,9 +100,11 @@
 					</div>
 				</div>
 			</div>
-			<div style="background-color: #008AD8; height: 2px;">
-			<!-- <div class="sale" style="background-color: #008AD8; height: 5px;"> -->
-				<!-- <div class="container">
+			<div style="background-color: #4f2f2d; height: 2px;" id="header-line">
+
+			</div>
+			<div class="sale" style="background-color: #4f2f2d; display: none;" id="header-offer"> 
+				<div class="container">
 					<div class="row">
 						<div class="col-sm-8 offset-sm-2 text-center">
 							<div class="row">
@@ -121,6 +123,6 @@
 							</div>
 						</div>
 					</div>
-				</div> -->
+				</div>
 			</div>
 		</nav>

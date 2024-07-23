@@ -11,25 +11,31 @@
     class="colorlib-form col-md-3"
     style="height: auto"
   >
-    <h2 class="text-center">Please enter OTP send to sujith@gmail.com</h2>
-    <div class="row">
+
+  <span class="text-center">Enter the OTP that has been send to the email address associated with this account.</span>    
+    <div class="row mt-3">
       <div class="col-md-12">
         <div class="form-group">
           <input
             type="text"
             id="otpVal"
             class="form-control"
-            placeholder="Company Name"
+            placeholder="Enter OTP"
           />
         </div>
       </div>
-
-      <input type="submit" class="btn btn-dark" />
+      <input type="submit" class="btn theme-bg text-white" style="
+      width: 100%;
+      border-radius: 10px;
+      height: 50px;
+      margin-left: 15px;
+      margin-right: 15px;
+    " />
     </div>
-    <h5 class="text-center" id="otp-timer-container">
-      Resend otp in <span id="otp-timer">30</span> Sec
+    <h5 class="text-center mt-3" id="otp-timer-container">
+      Resend otp in <span id="otp-timer"></span> Sec
     </h5>
-    <h5 class="text-center" id="otp-resend" style="display: none">
+    <h5 class="text-center mt-3" id="otp-resend" style="display: none">
       Didn't get the OTP? <span><a id="resend" href="">Resend</a></span>
     </h5>
   </form>
@@ -59,12 +65,16 @@
   }
 
   function otpTimerFunction() {
-    let k = 30;
+    let k =  localStorage.getItem('otpTimer') ? parseInt(localStorage.getItem('otpTimer')) : 30;
     function timerFunc() {
+      if(k >= 0){
       otpTimer.innerText = k;
       k--;
+      localStorage.setItem('otpTimer', k);
+      }
       if (k < 0) {
         clearInterval(otpTimerHandler);
+        localStorage.removeItem('otpTimer');
         otpTimerContainer.style.display = "none";
         otpResend.style.display = "block";
 
@@ -75,6 +85,11 @@
     let otpTimerHandler = setInterval(() => {
       timerFunc();
     }, 1000);
+
+    window.addEventListener('beforeunload', () => {
+    localStorage.setItem('otpTimer', k);
+  });
+
   }
 
   otpTimerFunction();
@@ -100,6 +115,14 @@
   otpForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    let isValid = true
+
+    if(!otpVal.value.trim()){
+      isValid = false
+    }
+
+    if(isValid){
+
     axios
       .post("/signup/otp/verify", { otpVal: otpVal.value })
       .then((response) => {
@@ -120,6 +143,8 @@
           }).show();
         }
       });
+    }
+
   });
 </script>
 

@@ -191,7 +191,23 @@
 <%- include('./loader') %>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document.getElementById('search-input').addEventListener('keydown', (event) => {
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+    let searchQuery = document.getElementById('search-input').value
+
+    const url = new URL('http://localhost:3000/admin/users?page=1');
+
+    url.searchParams.append('search', encodeURIComponent(searchQuery));
+
+    window.location.href = url.toString();
+
+    }
+  })
+</script>
 <script src="/static/custom/js/admin/user.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/SujithVSuresh/pagenation@master/pagenation.js"></script>
+<script src="/static/custom/js/admin/pagenation.js"></script>
 
 <%- include('./footer') %>

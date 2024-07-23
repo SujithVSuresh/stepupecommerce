@@ -5,8 +5,8 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
-            <span>Order</span> /
+            <span><a href="/" style="color: #4f2f2d">Home</a></span> / <span><a href="/profile" style="color: #4f2f2d">Profile</a></span> /
+            <span><a href="/profile/order" style="color: #4f2f2d">Order</a></span> /
             <span>
               <%= order.orderId %>
             </span>
@@ -23,16 +23,17 @@
 
           <div style="display: flex;">
             <div
-              style="background-color: #f0faff; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px; display: flex; flex-direction: row; justify-content: space-between;">
+              style="background-color: #f1f1f1; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px; display: flex; flex-direction: row; justify-content: space-between;">
               <div>
                 Order id: <span id="showOrderId"><%= order.orderId %></span> <br>
                 <span>Total amount: ₹<%= order.totalAmount %></span> <br>
-                <span>Order status: <%= order.orderStatus %></span> <br>
+                <span>Total discount: <%= order.discountAmount ? order.discountAmount : 0 %></span> <br>
                 <span>Payment status: <%= order.paymentStatus %></span> <br>
               </div>
+              <% if(order.paymentMethod!="COD" && order.paymentStatus!="Pending" && order.orderStatus!="Completed" ){ %>
               <div>
                 <a id="downloadInvoice" class="button editDltBtn"
-                  style="border-color: black; padding: 5px; color: black; background-color: #f0faff;"><i
+                  style="border-color: black; padding: 5px; color: black; background-color: #f1f1f1;"><i
                     class="icon-download"> </i>Invoice</a>
 
               <table id="invoiceTable" style="display: none;">
@@ -61,9 +62,10 @@
 
               </div>
               </div>
+              <% } %>
             </div>
 
-            <div style="background-color: #f0faff; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px;">
+            <div style="background-color: #f1f1f1; flex: 1; padding: 20px; border-radius: 15px; margin-right: 15px;">
               Delivery address:<br>
               <span id="deliveryNameShow">
                 <%= order.address.name %>
@@ -76,7 +78,7 @@
 
             </div>
 
-            <% if(order.paymentMethod!="COD" && order.paymentStatus=="Pending" ){ %>
+            <% if(order.paymentMethod!="COD" && order.paymentStatus=="Pending" && order.orderStatus!="Completed" ){ %>
 
               <div style="flex: 1; text-align: center; padding-top: 20px;">
                 <p>Your order has not been completed. Please complete the payment</p>
@@ -89,7 +91,7 @@
 
           <div class="row row-pb-lg mt-3">
             <div class="col-md-12">
-              <div class="product-name d-flex" style="background-color: #f0faff;">
+              <div class="product-name d-flex">
                 <div class="one-forth text-left px-4">
                   <span>Product Details</span>
                 </div>
@@ -142,10 +144,12 @@
                     </div>
                     <div class="one-eight text-center">
                       <div class="display-tc">
-                        <a address-id="" href="/profile/order/itemDetail?oid=<%= order._id %>&itid=<%= item._id %>"
+                        <!-- <a address-id="" href="/profile/order/itemDetail?oid=<%= order._id %>&itid=<%= item._id %>"
                           class="button editDltBtn"
                           style="border-color: black; padding: 5px; color: black; background-color: white;">View
-                          more</a>
+                          more</a> -->
+                          <a href="/profile/order/itemDetail?oid=<%= order._id %>&itid=<%= item._id %>" style="background-color: white; color: black;" class="btn btn-primary btn-sm">View More</a>
+
                       </div>
                     </div>
                   </div>
@@ -165,95 +169,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.22/jspdf.plugin.autotable.min.js"></script>
 
-
-  <script>
-    document.addEventListener('click', (event) => {
-
-      if (event.target && event.target.id == "downloadInvoice") {
-          const totalAmount = document.getElementById('totalAmount').innerText
-
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-
-          let content = "Total revenue: ";
-
-          doc.text("INVOICE", 90, 15);
-
-          let todayDate = new Date();
-          doc.text("STEPUP ECOMMERCE", 15, 30);
-
-          doc.setFontSize(12)
-          doc.text(String(`Date: ${todayDate.toISOString().slice(0, 10)}`), 15, 40); // Positioning "Total sales" on the same row
-          doc.text(String(`Order id: ${document.getElementById('showOrderId').innerText}`), 15, 50); // Positioning "Total sales" on the same row
-          doc.text(String(`Ordered date: ${todayDate.toISOString().slice(0, 10)}`), 15, 60); // Positioning "Total sales" on the same row
-
-          
-          doc.text("Delivery address:", 15, 80);
-          doc.text(document.getElementById('deliveryNameShow').innerText, 15, 90);
-          doc.text(document.getElementById('deliveryAddressShow').innerText, 15, 100); // Positioning "Total sales" on the same row
-          doc.text(`Phone: ${document.getElementById('deliveryPhoneShow').innerText}`, 15, 110); 
-
-          doc.autoTable({ html: "#invoiceTable", startY: 120 });
-
-          // doc.text("Total price: 4352", 150, 200);
-          // doc.text("Discount: 10%", 150, 210);
-          // doc.text("Delivery charge: 50", 150, 220); // Positioning "Total sales" on the same row
-          doc.text(`Total amount: Rs ${totalAmount}`, 150, 200); 
-
-
-          doc.save("invoice.pdf");
-      
-      }
-      if (event.target && event.target.id == "payAmountNow") {
-        const orderId = event.target.getAttribute('order-id')
-
-        axios
-          .post(`/profile/order/payNowOrder`, { orderId: orderId })
-          .then((response) => {
-            if (response.status == 200) {
-              const data = response.data
-              var options = {
-                "key": "rzp_test_3v8uE4x50656nf",
-                "amount": data.razOrder.amount,
-                "currency": "INR",
-                "name": "STEPUP",
-                "order_id": data.razOrder.id,
-                "handler": function (response) {
-                  // Payment success handler
-                  window.location.href = `/shop/orderComplete?oid=${data.order._id}`
-
-                },
-                "theme": {
-                  "color": "#66BCEE"
-                },
-                "modal": {
-                  "ondismiss": function () {
-                    // Payment dismiss handler
-                    console.log("payment dismissed.")
-                  }
-                }
-              };
-              var razorpayObject = new Razorpay(options);
-              razorpayObject.on('payment.failed', function (response) {
-                // Payment failure handler
-                new Noty({
-                  type: 'error',
-                  text: "Payment failed",
-                  timeout: 3000,
-                  layout: 'bottomCenter',
-                  theme: 'metroui',
-                }).show();
-              });
-              razorpayObject.open();
-            }
-          })
-          .catch((error) => {
-            console.log("it is an error", error);
-          });
-
-      }
-    })
-  </script>
+  <script src="/static/custom/js/user/orderDetail.js"></script>
 
 
   <%- include('./footer') %>

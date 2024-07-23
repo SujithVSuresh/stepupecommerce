@@ -166,9 +166,9 @@ const orderSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  totalAmount: {
+  discountAmount: {
     type: Number,
-    required: true,
+    required: false,
   },
   paymentMethod: {
     type: String,

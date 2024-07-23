@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="col">
                     <p class="bread">
-                        <span><a href="index.html">Home</a></span> /
+                        <span><a href="/" style="color: #4f2f2d;">Home</a></span> /
                         <span>Wishlist</span>
                     </p>
                 </div>
@@ -23,6 +23,9 @@
                             <span>Product Details</span>
                         </div>
                         <div class="one-eight text-center">
+                            <span></span>
+                        </div>
+                        <div class="one-eight text-center">
                             <span>Price</span>
                         </div>
                         <div class="one-eight text-center">
@@ -34,32 +37,36 @@
                         </div>
                     </div>
 
-                    <div id="cartItemsContainer">
-                        <% wishlistItems?.items?.map((item) => { %>
+                    <div id="wishlistItemsContainer">
+                        <% if(wishlistItems.items && wishlistItems.items.length != 0){ %>
+                        <% wishlistItems.items.map((item) => { %>
 
                         <div class="product-cart d-flex" id="wishlistItemContainer<%= item._id %>">
 							<div class="one-forth">
-								<div class="product-img" style="background-image: url('/static/images/<%= item.productId.varient.images[0] %>');">
+								<div class="product-img" style="background-image: url('/static/images/<%= item.varientId.images[0] %>');">
 								</div>
 								<div class="display-tc">
-									<span style="margin-left: 30px; color: black">modelname for gender</span><br>
-									<span style="margin-left: 30px;" class="price">Size: <%= item.productId.size %>, Color: <%= item.productId.varient.colorName %></span><br>
-				                   <% if(item.productId.quantity==0){ %>
+									<span style="margin-left: 30px; color: black"><%= item.productId.modelName %> for <%= item.productId.gender %></span><br>
+									<span style="margin-left: 30px;" class="price">Size: <%= item.subVarientId.size %>, Color: <%= item.varientId.colorName %></span><br>
+				                   <% if(item.subVarientId.quantity==0){ %>
                                     <span style="margin-left: 30px; color: red;" >Out of stock</span>
                                     <% } %>
 								</div>
 							</div>
+                            <div class="one-eight text-center">
+								<div class="display-tc">
+									<span class="price"></span>
+								</div>
+							</div>
 							<div class="one-eight text-center">
 								<div class="display-tc">
-									<span class="price">₹ <%= item.productId.price %></span>
+									<span class="price">₹ <%= item.subVarientId.price %></span>
 								</div>
 							</div>
 							<div class="one-eight text-center" >
                                 <div class="display-tc">
-                                  <a href="" data-wishlist-item-id="<%= item._id %>" id="addToCartBtn<%= item.productId._id %>" product-id="<%= item.productId._id %>"
-                                            class="btn btn-primary btn-addtocart addToCartBtn"><i class="icon-shopping-cart"></i> Add </a>
+                                  <a href="" style="background-color: #4f2f2d;" data-wishlist-item-id="<%= item._id %>" id="addToCartBtn<%= item.productId._id %>" product-id="<%= item.productId._id %>" varient-id="<%= item.varientId._id %>" sub-varient-id="<%= item.subVarientId._id %>" class="btn btn-primary btn-addtocart addToCartBtn"><i class="icon-shopping-cart"></i> Add </a>
                                 </div>
-							
 							</div>
 		
 							<div class="one-eight text-center">
@@ -70,6 +77,10 @@
 						</div>
 
                         <% }) %>
+                        <% }else{ %>
+                           <div class="text-center"> <img src="/static/user/images/empty.png" class="mt-5" width="250px" height="250px" alt="empty cart"> </div>
+
+                        <% } %>    
 
                     </div>
                 </div>
@@ -79,119 +90,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-            let cartCount = document.getElementById('mainCartCount')
-  
 
-            //   -------------------------------------CLICK EVENT START-----------------------------------
-
-            function removeFromWishlistFunc(wishlistItemId){
-                axios
-                        .post("/shop/wishlist/removeFromWishlist", {
-                            itemId: wishlistItemId,
-                        })
-                        .then((response) => {
-                            if (response.status == 200) {
-                                if (response.data) {
-                    
-                                    let cartItemContainer = document.getElementById(
-                                        `wishlistItemContainer${wishlistItemId}`
-                                    );
-
-                                    if (cartItemContainer) {
-                                        cartItemContainer.remove();
-                                    }
-
-                                    new Noty({
-                                        type: "success",
-                                        text: response.data.message,
-                                        timeout: 3000,
-                                        layout: "bottomCenter",
-                                        theme: "metroui",
-                                        animation: {
-                                            open: "animated bounceInRight",
-                                            close: "animated bounceOutRight",
-                                        },
-                                    }).show();
-                                }
-                            }
-                        })
-                        .catch((error) => {
-                            console.log("error code");
-                        });
-            }
-
-            document.addEventListener("click", (event) => {
-
-                if (
-                    event.target &&
-                    event.target.classList.contains("removeFromWishlist")
-                ) {
-                    event.preventDefault();
-
-                    const removeFromWishlistBtn = event.target;
-
-                    const wishlistItemId = removeFromWishlistBtn.getAttribute("data-wishlist-item-id");
-
-                    removeFromWishlistFunc(wishlistItemId)
-
-                }else if(
-                    event.target &&
-                    event.target.classList.contains("addToCartBtn")
-                ){
-                    event.preventDefault();
-
-              
-
-                    const addToCartBtn = event.target;
-
-                    const productId = addToCartBtn.getAttribute("product-id");
-
-                    const wishlistItemId = addToCartBtn.getAttribute('data-wishlist-item-id')
-
-                    axios
-						.post("/shop/cart/addToCart", { productId: productId, quantity: 1 })
-						.then((response) => {
-							if (response.status == 200) {
-                                cartCount.innerText = response.data.cartCount
-
-                                removeFromWishlistFunc(wishlistItemId)
-
-								new Noty({
-									type: 'success',
-									text: response.data.message,
-									timeout: 3000,
-									layout: 'bottomCenter',
-									theme: 'metroui',
-									animation: {
-										open: 'animated bounceInRight',
-										close: 'animated bounceOutRight',
-									}
-								}).show();
-							}
-						})
-						.catch((error) => {
-							console.log("it is an error", error);
-							if (error.response.status == 409) {
-								new Noty({
-									type: 'warning',
-									text: error.response.data.message,
-									timeout: 3000,
-									layout: 'bottomCenter',
-									theme: 'metroui',
-									animation: {
-										open: 'animated bounceInRight',
-										close: 'animated bounceOutRight',
-									}
-								}).show();
-
-							}
-						});
-
-                }
-            });
-        });
-    </script>
+<script src="/static/custom/js/user/wishlist.js"></script>
 
     <%- include('./footer') %>

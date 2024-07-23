@@ -96,8 +96,8 @@ router.post('/deleteCategoryOffer', auth.isAdminLogin, adminController.deleteCat
 
 router.get('/productOffer', auth.isAdminLogin, adminController.productOffer)
 router.post('/addProductOffer', auth.isAdminLogin, adminController.addProductOffer)
+router.post('/editProductOffer', auth.isAdminLogin, adminController.editProductOffer)
 router.post('/deleteProductOffer', auth.isAdminLogin, adminController.deleteProductOffer)
-
 
 
 module.exports = router;

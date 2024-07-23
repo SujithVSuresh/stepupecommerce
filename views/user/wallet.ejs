@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
+            <span><a href="/" style="color: #4f2f2d;">Home</a></span> / <span><a href="/profile" style="color: #4f2f2d;">Profile</a></span> /
             <span>Wallet</span>
           </p>
         </div>
@@ -25,15 +25,17 @@
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div class="d-flex flex-column">
-                <span style="font-size: 18px; margin-bottom: 10px;">BALANCE: ₹ <%= wallet?.balance %></span>
+                <span style="font-size: 18px; margin-bottom: 10px;">BALANCE: ₹ <span id="balanceAmount"><%= wallet[0] && wallet[0].balance ? wallet[0].balance : 0 %></span></span>
                 <span style="font-size: 18px;" id="addMoneyBtn">ADD MONEY <a
                     style="border: white 1px solid; border-radius: 0px; width: 10px; padding: 0px 5px; color: white; border-radius: 180px;"
                     data-toggle="modal" data-target="#addMoneyModal">+</a></span>
               </div>
+              <% if(wallet[0] && wallet[0].userId){ %>
               <span style="font-size: 18px;" class="text-uppercase">
-                <%= wallet.userId.firstName %>
-                  <%= wallet.userId.lastName %>
+                <%= wallet[0].userId.firstName %>
+                  <%= wallet[0].userId.lastName %>
               </span>
+              <% } %>
             </div>
           </div>
         </div>
@@ -65,12 +67,13 @@
 
 
                 <div class="one-forth text-center px-4">
-                  <span>Order Details</span>
+                  <span>Transaction Details</span>
                 </div>
               </div>
 
               <div id="tableDataContainer">
-              <% wallet?.history.forEach((transaction)=> { %>
+                <% if(wallet[0] && wallet[0].history && wallet[0].history.length != 0){ %>
+              <% wallet[0].history.forEach((transaction)=> { %>
 
                 <div class="product-cart d-flex" style="height: 40px;">
 
@@ -106,12 +109,35 @@
 
 
                 <% }) %>
+                <% }else{ %>
+                  <div class="text-center" id="empty-show"> <img src="/static/user/images/empty.png" class="mt-5" width="250px" height="250px" alt="empty"> </div>
+                <% } %>
               </div>
             </div>
           </div>
         </div>
 
       </div>
+
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <div class="block-27">
+            <ul>
+              <li>
+                <a href="" class="prevPageClass" id="prevBtn"><i class="ion-ios-arrow-back prevPageClass"></i></a>
+              </li>
+
+              <% for(let i=1; i<= totalPages; i++){ %>
+                <li class="active pagenationBtn" data-page-no="<%= i %>"><a id="pageNo"  style="background-color: #4f2f2d;"><%= i %></a></li>
+                <% } %>
+
+              <li>
+                <a href="" total-pages="<%= totalPages %>" class="nxtPageClass" id="nxtBtn"><i class="ion-ios-arrow-forward nxtPageClass"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div> 
     </div>
   </div>
   </div>
@@ -168,189 +194,237 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+  <!-- <script src="/static/custom/js/user/wallet.js"></script> -->
+   <script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+  let queryString = window.location.search;
+  let urlParams = new URLSearchParams(queryString);
+  let pgno = urlParams.get("page");
 
-  <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+  let currentPath = window.location.pathname; 
+
+  if(!pgno){
+  urlParams.set('page', 1);
+  window.history.replaceState({}, '', `${currentPath}?page=${1}`);
+  }
+
+  document.addEventListener("click", (event) => {
+    queryString = window.location.search;
+    urlParams = new URLSearchParams(queryString);
+    pgno = urlParams.get("page");
+  
+    currentPath = window.location.pathname; 
+  
+    // Pagination number button
+    if (event.target && event.target.closest(".pagenationBtn")) {
+      let pageNo = event.target
+        .closest(".pagenationBtn")
+        .getAttribute("data-page-no");
+      console.log(pageNo);
+      if (pgno != pageNo) {
+      //   urlParams.set('page', pageNo);
+        window.location.href = `${currentPath}?page=${pageNo}`;
+      }
+    }
+    // Next button
+    if (event.target && event.target.closest("#nxtBtn")) {
+      event.preventDefault();
+      const totalPages = event.target
+        .closest("#nxtBtn")
+        .getAttribute("total-pages");
+
+      if (pgno < totalPages) {
+        let n = Number(pgno) + 1;
+      //   urlParams.set('page', n);
+        window.location.href = `${currentPath}?page=${n}`;
+      }
+    }
+    // Previous button
+    if (event.target && event.target.closest("#prevBtn")) {
+      event.preventDefault();
+      if (pgno > 1) {
+        let n = Number(pgno) - 1;
+      //   urlParams.set('page', n);
+        window.location.href = `${currentPath}?page=${n}`;
+      }
+    }
+  });
+
+})
+document.addEventListener('DOMContentLoaded', (event) => {
 
 
-      const amountError = document.getElementById('amountError')
-      const walletAmountForm = document.getElementById('walletAmountForm')
-      const addAmountToWalletBtn = document.getElementById('addAmountToWalletBtn')
+const amountError = document.getElementById('amountError')
+const walletAmountForm = document.getElementById('walletAmountForm')
+const addAmountToWalletBtn = document.getElementById('addAmountToWalletBtn')
 
-      const addMoneyBtn = document.getElementById('addMoneyBtn')
+const addMoneyBtn = document.getElementById('addMoneyBtn')
 
-      const tableDataContainer = document.getElementById('tableDataContainer')
-
-
-      function walletPaymentSuccess(amount) {
-
-        axios.post('/profile/wallet/addMoney', { amount })
-          .then((response) => {
-            if (response.status == 200) {
-
-              let transaction = response.data.transaction
-              
-              document.querySelector("#addMoneyModal .close").click();
-              tableDataContainer.insertAdjacentHTML(
-                "afterbegin",
-                `
-                <div class="product-cart d-flex" style="height: 40px;">
-
-                  <div class="one-eight text-center">
-                    <span>₹ ${transaction.amount}</span>
-                  </div>
-
-                  <div class="one-eight text-center">
-                  </div>
-
-                  <div class="one-eight text-center">
-                    <span>
-                      ${ transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) }
-                    </span>
-                  </div>
-
-                  <div class="one-eight text-center">
-                  </div>
-
-                  <div class="one-eight text-center">
-                    <span>
-                   ${ transaction.date ? new Date(transaction.date).toISOString().slice(0, 10) : '' }
-                    </span>
-                  </div>
+const tableDataContainer = document.getElementById('tableDataContainer')
 
 
-                  <div class="one-forth text-center px-4">
-                    <span>
-                      ${ transaction.description }
-                    </span>
-                  </div>
-                </div>
+function walletPaymentSuccess(amount) {
+
+  axios.post('/profile/wallet/addMoney', { amount })
+    .then((response) => {
+      if (response.status == 200) {
+
+        let transaction = response.data.transaction
+
+        document.getElementById('balanceAmount').innerText = response.data.balance
+        
+        document.querySelector("#addMoneyModal .close").click();
+        tableDataContainer.insertAdjacentHTML(
+          "afterbegin",
+          `
+          <div class="product-cart d-flex" style="height: 40px;">
+
+            <div class="one-eight text-center">
+              <span>₹ ${transaction.amount}</span>
+            </div>
+
+            <div class="one-eight text-center">
+            </div>
+
+            <div class="one-eight text-center">
+              <span>
+                ${ transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) }
+              </span>
+            </div>
+
+            <div class="one-eight text-center">
+            </div>
+
+            <div class="one-eight text-center">
+              <span>
+             ${ transaction.date ? new Date(transaction.date).toISOString().slice(0, 10) : '' }
+              </span>
+            </div>
+
+
+            <div class="one-forth text-center px-4">
+              <span>
+                ${ transaction.description }
+              </span>
+            </div>
+          </div>
 `
-              );
+        );
 
-              new Noty({
-                type: "success",
-                text: response.data.message,
-                timeout: 3000,
-                layout: "bottomCenter",
-                theme: "metroui",
-                animation: {
-                  open: "animated bounceInRight",
-                  close: "animated bounceOutRight",
-                },
-              }).show();
-            }
-          })
-          .catch((error) => {
-            console.log("it is an error123", error)
-            if (error.response.status == 404) {
+        new Noty({
+          type: "success",
+          text: response.data.message,
+          timeout: 3000,
+          layout: "bottomCenter",
+          theme: "metroui",
+          animation: {
+            open: "animated bounceInRight",
+            close: "animated bounceOutRight",
+          },
+        }).show();
+      }
+    })
+    .catch((error) => {
+      console.log("it is an error123", error)
+      if (error.response.status == 404) {
 
-              new Noty({
-                type: 'error',
-                text: error.response.data.message,
-                timeout: 3000,
-                layout: 'bottomCenter',
-                theme: 'metroui',
-              }).show();
-
-            }
-          })
+        new Noty({
+          type: 'error',
+          text: error.response.data.message,
+          timeout: 3000,
+          layout: 'bottomCenter',
+          theme: 'metroui',
+        }).show();
 
       }
-
-      addMoneyBtn.addEventListener('click', (event) => {
-        walletAmountForm.reset()
-        amountError.innerText = ""
-        
-      })
-
-      addAmountToWalletBtn.addEventListener('click', (event) => {
-        event.preventDefault()
-
-        const amount = document.getElementById('addToWalletAmount').value
-
-        let isValid = true
-
-        if (!amount.trim()) {
-          console.log(amount)
-          amountError.textContent = "This field is required";
-          isValid = false;
-        } else if (!/^(?!0\d)\d+(\.\d+)?$/.test(amount)) {
-          amountError.textContent = "Enter a valid amount";
-          isValid = false;
-        } else {
-          amountError.textContent = "";
-        }
-
-        if (isValid) {
-
-          axios.post('/profile/wallet/createOrder', { amount: amount })
-            .then((response) => {
-              if (response.status == 200) {
-                const data = response.data
-                var options = {
-                  "key": "rzp_test_3v8uE4x50656nf",
-                  "amount": data.razOrder.amount,
-                  "currency": "INR",
-                  "name": "STEPUP",
-                  "order_id": data.razOrder.id,
-                  "handler": function (response) {
-                    // Payment success handler
-                    walletPaymentSuccess(data.razOrder.amount)
-                  },
-                  "theme": {
-                    "color": "#66BCEE"
-                  },
-                  "modal": {
-                    "ondismiss": function () {
-                      // Payment dismiss handler
-                      console.log("payment dismissed.")
-                    }
-                  }
-                };
-                var razorpayObject = new Razorpay(options);
-                razorpayObject.on('payment.failed', function (response) {
-                  // Payment failure handler
-                  new Noty({
-                  type: 'error',
-                  text: "Payment failed",
-                  timeout: 3000,
-                  layout: 'bottomCenter',
-                  theme: 'metroui',
-                }).show();
-                });
-
-
-                razorpayObject.open();
-
-
-              }
-            })
-            .catch((error) => {
-              console.log("it is an error123", error)
-              if (error.response.status == 409) {
-                new Noty({
-                  type: 'error',
-                  text: error.response.data.message,
-                  timeout: 3000,
-                  layout: 'bottomCenter',
-                  theme: 'metroui',
-                }).show();
-
-              }
-            })
-
-        }
-
-      })
-
-
-
-
-
     })
 
+}
 
-  </script>
+addMoneyBtn.addEventListener('click', (event) => {
+  walletAmountForm.reset()
+  amountError.innerText = ""
+  
+})
+
+addAmountToWalletBtn.addEventListener('click', (event) => {
+  event.preventDefault()
+
+  const amount = document.getElementById('addToWalletAmount').value
+
+  let isValid = true
+
+  if (!amount.trim()) {
+    console.log(amount)
+    amountError.textContent = "This field is required";
+    isValid = false;
+  } else if (!/^(?!0\d)\d+(\.\d+)?$/.test(amount)) {
+    amountError.textContent = "Enter a valid amount";
+    isValid = false;
+  } else {
+    amountError.textContent = "";
+  }
+
+  if (isValid) {
+
+    axios.post('/profile/wallet/createOrder', { amount: amount })
+      .then((response) => {
+        if (response.status == 200) {
+          const data = response.data
+          var options = {
+            "key": "rzp_test_3v8uE4x50656nf",
+            "amount": data.razOrder.amount,
+            "currency": "INR",
+            "name": "STEPUP",
+            "order_id": data.razOrder.id,
+            "handler": function (response) {
+              // Payment success handler
+              walletPaymentSuccess(data.razOrder.amount)
+            },
+            "theme": {
+              "color": "#66BCEE"
+            },
+            "modal": {
+              "ondismiss": function () {
+                // Payment dismiss handler
+                console.log("payment dismissed.")
+              }
+            }
+          };
+          var razorpayObject = new Razorpay(options);
+          razorpayObject.on('payment.failed', function (response) {
+            // Payment failure handler
+            new Noty({
+            type: 'error',
+            text: "Payment failed",
+            timeout: 3000,
+            layout: 'bottomCenter',
+            theme: 'metroui',
+          }).show();
+          });
+
+          razorpayObject.open();
+        }
+      })
+      .catch((error) => {
+        console.log("it is an error123", error)
+        if (error.response.status == 409) {
+          new Noty({
+            type: 'error',
+            text: error.response.data.message,
+            timeout: 3000,
+            layout: 'bottomCenter',
+            theme: 'metroui',
+          }).show();
+
+        }
+      })
+
+  }
+
+})
+})
+   </script>
+
 
   <%- include('./footer') %>

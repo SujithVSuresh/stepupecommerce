@@ -5,7 +5,7 @@
     <div class="row">
       <div class="col">
         <p class="bread">
-          <span><a href="index.html">Home</a></span> / <span>Profile</span> /
+          <span><a href="/" style="color: #4f2f2d;">Home</a></span> / <span><a href="/profile" style="color: #4f2f2d;">Profile</a></span> /
           <span>Address</span>
         </p>
       </div>
@@ -25,19 +25,20 @@
               justify-content: space-between;
             "
           >
-            <h2>DELIVERY ADDRESS</h2>
+            <h2></h2>
             <button
               style="width: auto; border-radius: 10px; height: 40px"
-              class="btn btn-primary"
+              class="btn theme-bg text-white"
               data-toggle="modal"
               data-target="#addAddressModal"
+              id="addAddressBtn"
             >
               Add Address
             </button>
           </div>
 
           <div class="address-selection" id="addressContainer">
-            <% if (address){ %> <% address.address.map(function (item){ %>
+            <% if (address && address.address != 0){ %> <% address.address.map(function (item){ %>
             <div
               style="display: flex; flex-direction: row"
               class="address-card-two"
@@ -65,7 +66,8 @@
               </div>
             </div>
             <% }); %> <% } else { %>
-            <h3 style="color: gray; text-align: center">No address found !</h3>
+              <div class="text-center w-100"> <img src="/static/user/images/empty.png" class="mt-5" width="250px" height="250px" alt="empty cart"> </div>
+
             <% } %>
           </div>
         </div>
@@ -97,7 +99,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form method="post" class="colorlib-form">
+        <form method="post" class="colorlib-form" id="addAddressForm">
           <!-- <h2>Billing Details</h2> -->
           <div class="row">
             <div class="col-md-12">
@@ -375,409 +377,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-
-<script>
-  document.addEventListener("DOMContentLoaded", (event) => {
-    const states = [
-      "Select state",
-      "Andhra Pradesh",
-      "Arunachal Pradesh",
-      "Assam",
-      "Bihar",
-      "Chhattisgarh",
-      "Goa",
-      "Gujarat",
-      "Haryana",
-      "Himachal Pradesh",
-      "Jharkhand",
-      "Karnataka",
-      "Kerala",
-      "Madhya Pradesh",
-      "Maharashtra",
-      "Manipur",
-      "Meghalaya",
-      "Mizoram",
-      "Nagaland",
-      "Odisha",
-      "Punjab",
-      "Rajasthan",
-      "Sikkim",
-      "Tamil Nadu",
-      "Telangana",
-      "Tripura",
-      "Uttar Pradesh",
-      "Uttarakhand",
-      "West Bengal",
-    ];
-
-    const stateSelect = document.getElementById("state");
-    // const stateSelectEdit = document.getElementById("stateEdit");
-    
-
-    for (const state of states) {
-      const option = document.createElement("option");
-      if (state == "Select state") {
-        option.value = "";
-        option.text = state;
-      } else {
-        option.value = state;
-        option.text = state;
-      }
-      stateSelect.appendChild(option);
-      // stateSelectEdit.appendChild(option)
-    }
-
-
-
-
-    const stateSelectEdit = document.getElementById("stateEdit");
-    
-
-    for (const state of states) {
-      const option = document.createElement("option");
-      if (state == "Select state") {
-        option.value = "";
-        option.text = state;
-      } else {
-        option.value = state;
-        option.text = state;
-      }
-      stateSelectEdit.appendChild(option)
-    }
-
-    let addressId
-
-    document.addEventListener("click", (event) => {
-
-
-      if(event.target && event.target.classList.contains("editBtn")){
-        // const addressId = event.target.getAttribute('address-id')
-        addressId = event.target.getAttribute('address-id')
-
-        const name = document.getElementById(`name${addressId}`).innerText
-        const locality = document.getElementById(`locality${addressId}`).innerText
-        const landmark = document.getElementById(`landmark${addressId}`).innerText
-        const city = document.getElementById(`city${addressId}`).innerText
-        const state = document.getElementById(`state${addressId}`).innerText
-        const pincode = document.getElementById(`pincode${addressId}`).innerText
-        const phone = document.getElementById(`phone${addressId}`).innerText
-
-
-        const nameInput = document.getElementById("fullNameEdit").value = name
-        const stateInput = document.getElementById("stateEdit").value = state
-        const cityDistrictTownInput = document.getElementById("cityDistrictTownEdit").value = city
-        const zipPostalCodeInput = document.getElementById("zipPostalCodeEdit").value = pincode
-        const localityAreaStreetInput = document.getElementById("localityAreaStreetEdit").value = locality
-        const landmarkInput = document.getElementById("landmarkEdit").value = landmark
-        const phoneInput = document.getElementById("phoneEdit").value = phone
-
-      }
-
-
-      if(event.target && event.target.id == "addressEditSaveBtn"){
-
-        const nameInput = document.getElementById("fullNameEdit").value
-        const stateInput = document.getElementById("stateEdit").value 
-        const cityDistrictTownInput = document.getElementById("cityDistrictTownEdit").value 
-        const zipPostalCodeInput = document.getElementById("zipPostalCodeEdit").value
-        const localityAreaStreetInput = document.getElementById("localityAreaStreetEdit").value 
-        const landmarkInput = document.getElementById("landmarkEdit").value 
-        const phoneInput = document.getElementById("phoneEdit").value 
-
-
-
-
-        const data = {
-          fullName: nameInput,
-          state: stateInput,
-          cityDistrictTown: cityDistrictTownInput,
-          zipPostalCode: zipPostalCodeInput,
-          localityAreaStreet: localityAreaStreetInput,
-          housenoBuildingApartment:"123",
-          phone: phoneInput,
-          landmark: landmarkInput,
-          addressId: addressId
-        };
-
-        axios
-          .post("/address/editAddress", data)
-          .then((response) => {
-            if (response.status == 200) {
-              window.location.href = "/address"
-
-              document.querySelector("#addAddressModal .close").click();
-            }
-          })
-          .catch((error) => {
-            console.log("error code");
-          });
-      
-
-
-      }
-
-
-      if (event.target && event.target.id == "addressSaveBtn") {
-        event.preventDefault();
-
-        const addressContainer = document.getElementById("addressContainer");
-
-        let fullName = document.getElementById("fullName");
-        let state = document.getElementById("state");
-        let cityDistrictTown = document.getElementById("cityDistrictTown");
-        let zipPostalCode = document.getElementById("zipPostalCode");
-        let localityAreaStreet = document.getElementById("localityAreaStreet");
-        let housenoBuildingApartment = document.getElementById(
-          "housenoBuildingApartment"
-        );
-        let phone = document.getElementById("phone");
-        let landmark = document.getElementById("landmark")
-
-
-        let nameError = document.getElementById("nameError");
-        let stateError = document.getElementById("stateError");
-        let cityError = document.getElementById("cityError");
-        let pincodeError = document.getElementById("pincodeError");
-        let localityError = document.getElementById("localityError");
-        let landmarkError = document.getElementById("landmarkError");
-        let houseError = document.getElementById("houseError");
-        let phoneError = document.getElementById("phoneError");
-
-        let isValid = true
-
-            //Name validation
-            if (!fullName.value.trim()) {
-        nameError.textContent = "Name is required";
-        isValid = false;
-      } else if (fullName.value.trim().length < 2) {
-        nameError.textContent = "Name must be at least 2 characters long";
-        isValid = false;
-      } else if (fullName.value.trim().length > 100) {
-        nameError.textContent = "Name must be less than 100 characters long";
-        isValid = false;
-      } else {
-        nameError.textContent = "";
-      }
-
-        //state validation
-      if (!state.value.trim()) {
-        stateError.textContent = "This field is required";
-      isValid = false;
-    } else {
-      stateError.textContent = "";
-    }
-
-            //city validation
-            if (!cityDistrictTown.value.trim()) {
-        cityError.textContent = "This field is required";
-        isValid = false;
-      } else if (cityDistrictTown.value.trim().length > 100) {
-        cityError.textContent = "City/District/Town must be less than 100 characters long";
-        isValid = false;
-      } else {
-        cityError.textContent = "";
-      }
-
-      const postalCodePattern = /^\d{5,6}$/;
-                //pincode validation
-                if (!zipPostalCode.value.trim()) {
-        pincodeError.textContent = "This field is required";
-        isValid = false;
-      } else if (!postalCodePattern.test(zipPostalCode.value.trim())) {
-        pincodeError.textContent = "Please enter a valid 5 or 6-digit postal code";
-        isValid = false;
-      } else {
-        pincodeError.textContent = "";
-      }
-
-
-      if (!localityAreaStreet.value.trim()) {
-        localityError.textContent = "This field is required";
-        isValid = false;
-      } else if (localityAreaStreet.value.trim().length > 100) {
-        localityError.textContent = "Locality/Area/Street must be less than 100 characters long";
-        isValid = false;
-      } else {
-        localityError.textContent = "";
-      }
-
-
-                    //house validation
-      if (!housenoBuildingApartment.value.trim()) {
-              houseError.textContent = "This field is required";
-      isValid = false;
-    } else {
-      houseError.textContent = "";
-    }
-
-
-                    //landmark validation
-                    if (!landmark.value.trim()) {
-              landmarkError.textContent = "This field is required";
-      isValid = false;
-    } else {
-      landmarkError.textContent = "";
-    }
-
-
-      //Phone validation
-      if (!phone.value.trim()) {
-      phoneError.textContent = "This field is required";
-      isValid = false;
-    } else if (
-      phone &&
-      !/^\(?([0-9]{3})\)?[- ]?([0-9]{3})[- ]?([0-9]{4})$/.test(phone)
-    ) {
-      phoneError.textContent = "Enter a valid phone number";
-    } else {
-      phoneError.textContent = "";
-    }
-
-    if(isValid){
-
-        const data = {
-          fullName: fullName.value,
-          state: state.value,
-          cityDistrictTown: cityDistrictTown.value,
-          zipPostalCode: zipPostalCode.value,
-          localityAreaStreet: localityAreaStreet.value,
-          housenoBuildingApartment: housenoBuildingApartment.value,
-          phone: phone.value,
-          landmark: landmark.value,
-        };
-
-        axios
-          .post("/address/addAddress", data)
-          .then((response) => {
-            if (response.status == 200) {
-              console.log("Hey", response.data);
-              const data = response.data.data;
-
-              addressContainer.innerHTML += `
-                
-                <div style="display: flex; flex-direction: row;" id="addressCard${data._id}" class="address-card-two">
-                  <div style="flex: 4;">
-                      <p><strong><span id="name${data._id}">${data.name}<span></strong></p>
-                      <p>
-                        <span id="locality${data._id}">${data.localityAreaStreet}</span>, <span id="landmark${data._id}">${data.landmark}</span>, <span id="city${data._id}">${data.cityDistrictTown}</span>, <span id="state${data._id}">${data.state}</span>, <span id="pincode${data._id}">${data.pincode}</span>
-                      </p>
-                      <p>Phone: <span id="phone${data._id}">${data.phoneNumber}</span></p>
-    
-                            </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-evenly;">
-                    <a href="" class="editBtn editDltBtn" style="border-color: rgb(76, 174, 212);" address-id="${data._id}">Edit</a>
-                    <button class="editDltBtn" address-id="${data._id}" style="border-color: rgb(250, 141, 141);">Delete</button>
-
-                  </div>
-                </div>
-                `;
-              document.querySelector("#addAddressModal .close").click();
-            }
-          })
-          .catch((error) => {
-            console.log("error code");
-          });
-        }
-
-      }
-
-
-
-      if (event.target && event.target.classList.contains("dltBtn")) {
-        console.log("moyi");
-        const addressId = event.target.getAttribute("address-id")
-        let n = new Noty({
-          text: "Are you sure you want to delete this item?",
-          type: "confirm",
-          theme: "metroui",
-          layout: "center",
-          modal: true,
-          timeout: false,
-          progressBar: true,
-          animation: {
-            open: "animated bounceInLeft",
-            close: "animated bounceOutRight",
-          },
-          buttons: [
-            Noty.button("Yes", "btn btn-success btn-yes", function () {
-
-              console.log("hey yes clicked");
-
-              axios
-                .post("/address/deleteAddress", { addressId: addressId })
-                .then((response) => {
-                  if (response.status == 200) {
-                    const addressCard = document.getElementById(`addressCard${addressId}`)
-                    addressCard.remove()
-                    n.close();
-                  }
-                })
-                .catch((error) => {
-                  console.log("it is an error", error);
-                  if (error.response.status == 409) {
-                  }
-                });
-
-            }),
-            Noty.button("No", "btn btn-danger btn-no", function () {
-              // Handle the cancel action here
-              console.log("Delete canceled");
-              n.close();
-            }),
-          ],
-        }).show();
-      }
-    });
-  });
-  //   const changePasswordForm = document.getElementById("changePasswordForm");
-
-  //   changePasswordForm.addEventListener("submit", (event) => {
-  //     event.preventDefault();
-
-  //     const currentPassword = document.getElementById("currentPassword");
-  //     const newPassword = document.getElementById("newPassword");
-  //     const confirmNewPassword = document.getElementById("confirmNewPassword");
-
-  //     axios
-  //       .post("/profile/changePassword", {
-  //         currentPassword: currentPassword.value,
-  //         newPassword: newPassword.value,
-  //       })
-  //       .then((response) => {
-  //         if (response.status == 200) {
-  //           new Noty({
-  //             type: "success",
-  //             text: response.data.message,
-  //             timeout: 3000, // Duration to display the message (in milliseconds)
-  //             layout: "bottomCenter",
-  //             theme: "relax",
-  //             animation: {
-  //               open: "animated bounceInRight",
-  //               close: "animated bounceOutRight",
-  //             },
-  //             callbacks: {
-  //               afterClose: function () {
-  //                 // Redirect to the sign-in page after the notification closes
-  //                 window.location.href = "/profile";
-  //               },
-  //             },
-  //           }).show();
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log("it is an error", error);
-  //         if (error.response.status == 409) {
-  //           new Noty({
-  //             type: "error",
-  //             text: error.response.data.message,
-  //             timeout: 3000,
-  //             layout: "bottomCenter",
-  //             theme: "metroui",
-  //           }).show();
-  //         }
-  //       });
-  //   });
-</script>
+<script src="/static/custom/js/user/address.js"></script>
 
 <%- include('./footer') %>

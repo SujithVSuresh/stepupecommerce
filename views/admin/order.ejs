@@ -207,8 +207,37 @@
   <%- include('./loader') %>
 
 
+
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="/static/custom/js/admin/order.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+
+    document.getElementById('searchFormContainer').style.display = "block"
+
+    const url = new URL(window.location.href);
+  const searchValue = url.searchParams.get('search');
+
+  if(searchValue){
+  document.getElementById('search-input').value = searchValue
+  }
+  
+    document.getElementById('search-input').addEventListener('keydown', (event) => {
+  
+      if (event.key === 'Enter') {
+        event.preventDefault()
+      let searchQuery = document.getElementById('search-input').value
+  
+      const url = new URL('http://localhost:3000/admin/order?page=1');
+  
+      url.searchParams.append('search', encodeURIComponent(searchQuery));
+  
+      window.location.href = url.toString();
+  
+      }
+    })
+
+  })
+  </script>
   <script src="/static/custom/js/admin/pagenation.js"></script>
 
     <%- include('./footer') %>

@@ -114,6 +114,10 @@ document.addEventListener("click", (event) => {
 
     let sizeVarientId = dltSizeVarientBtn.getAttribute("data-subvarient-id");
 
+    let colorNameTag = document.getElementById("colorNameTag");
+    let productId = colorNameTag.getAttribute('productid')
+    let varientId = colorNameTag.getAttribute('varientid')
+
     Swal.fire({
       title: "Are you sure?",
       text: `Do you want to delete?`,
@@ -127,6 +131,8 @@ document.addEventListener("click", (event) => {
         axios
           .post("/admin/deleteProduct/sizeVarient", {
             id: sizeVarientId,
+            productId: productId,
+            varientId: varientId
           })
           .then((response) => {
             if (response.status == 200) {
@@ -259,7 +265,9 @@ document.addEventListener("click", (event) => {
       const priceEditError = document.getElementById("priceEditError");
       const quantityEditError = document.getElementById("quantityEditError");
       const sizeEditError = document.getElementById("sizeEditError");
-
+      
+      let colorNameTag = document.getElementById("colorNameTag");
+      let productId = colorNameTag.getAttribute("productId");
       let varientId = colorNameTag.getAttribute("varientid");
 
       let isValid = true;
@@ -322,6 +330,7 @@ document.addEventListener("click", (event) => {
           size: sizeEdit,
           id: subVarientId,
           varientId: varientId,
+          productId: productId
         };
 
         axios
@@ -713,6 +722,7 @@ document.addEventListener("click", (event) => {
     let colorNameTag = document.getElementById("colorNameTag");
 
     let varientId = colorNameTag.getAttribute("varientid");
+    // let productId = colorNameTag.getAttribute('productid')
 
     let selectedColor = document.getElementById(varientId);
 
@@ -764,9 +774,10 @@ document.addEventListener("click", (event) => {
     event.preventDefault();
 
     let varientBtn = event.target;
-    let colorNameTag = document.getElementById("colorNameTag");
 
+    let colorNameTag = document.getElementById("colorNameTag");
     let varientId = colorNameTag.getAttribute("varientid");
+    let productId = colorNameTag.getAttribute("productId");
 
     Swal.fire({
       title: "Are you sure?",
@@ -779,7 +790,7 @@ document.addEventListener("click", (event) => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .post("/admin/delete/colorVarient", { varientId: varientId })
+          .post("/admin/delete/colorVarient", { varientId: varientId, productId: productId })
           .then((response) => {
             if (response.status === 200) {
               // window.location.href = "/admin/products";
@@ -1141,6 +1152,7 @@ productColorVarientEditForm.addEventListener("submit", (event) => {
 
   let colorNameTag = document.getElementById("colorNameTag");
   let varientId = colorNameTag.getAttribute("varientid");
+  let productId = colorNameTag.getAttribute("productId");
 
   let colorEditName = document.getElementById("colorEditName").value;
   let colorEditCode = document.getElementById("colorEditCode").value;
@@ -1225,8 +1237,8 @@ productColorVarientEditForm.addEventListener("submit", (event) => {
           formData.append("colorName", colorEditName);
           formData.append("colorCode", colorEditCode);
           formData.append("varientId", varientId);
+          formData.append("productId", productId);
 
-          console.log("All blobs appended", formData);
           //POST REQUEST - ADD COLOR VARIENT
 
           axios

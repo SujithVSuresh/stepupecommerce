@@ -129,6 +129,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
           } else if (!/^\d+$/.test(offerPercentage)) {
             percentageError.textContent = "Enter a valid value.";
             isValid = false;
+          }else if (offerPercentage < 1 || offerPercentage > 99){
+            percentageError.textContent = "Enter a valid value.";
+            isValid = false;
           } else {
             percentageError.textContent = "";
           }
@@ -152,9 +155,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
               })
               .then((response) => {
                 if (response.status == 200) {
-                  console.log("category offer.....");
                   // let coupon = response.data.coupon;
-                  console.log(response.data);
                   // document.querySelector("#couponAddModal .close").click();
                   window.location.href = "/admin/categoryOffer"
     //               tableContainer.insertAdjacentHTML(
@@ -194,23 +195,26 @@ document.addEventListener("DOMContentLoaded", (event) => {
           let isValid = true;
     
     
-          // if (!offerPercentage.trim()) {
-          //   percentageError.textContent = "This field is required";
-          //   isValid = false;
-          // } else if (!/^\d+$/.test(offerPercentage)) {
-          //   percentageError.textContent = "Enter a valid value.";
-          //   isValid = false;
-          // } else {
-          //   percentageError.textContent = "";
-          // }
+          if (!editPercentage.trim()) {
+            percentageEditError.textContent = "This field is required";
+            isValid = false;
+          } else if (!/^\d+$/.test(editPercentage)) {
+            percentageEditError.textContent = "Enter a valid value.";
+            isValid = false;
+          }else if (editPercentage < 1 || editPercentage > 99){
+            percentageEditError.textContent = "Enter a valid value.";
+            isValid = false;
+          } else {
+            percentageEditError.textContent = "";
+          }
     
     
-          // if (!expiryDate.trim()) {
-          //   expiryDateError.textContent = "Choose an expiry date";
-          //   isValid = false;
-          // } else {
-          //   expiryDateError.textContent = "";
-          // }
+          if (!editExpiryDate.trim()) {
+            expiryDateEditError.textContent = "Choose an expiry date";
+            isValid = false;
+          } else {
+            expiryDateEditError.textContent = "";
+          }
     
           if (isValid) {
             axios

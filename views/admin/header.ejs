@@ -52,19 +52,18 @@
           </button> -->
 
           <% if (isLogin) { %>
-          <!-- <div class="search-field d-none d-md-block">
-            <form class="d-flex align-items-center h-100" action="#">
+          <div class="search-field" id="searchFormContainer" style="display: none;">
+            <form method="GET" id="search-form" class="d-flex align-items-center h-100" action="#">
               <div class="input-group">
                 <div class="input-group-prepend bg-transparent">
                   <i class="input-group-text border-0 mdi mdi-magnify"></i>
                 </div>
-                <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects">
+                <input type="text" name="search-input" id="search-input" class="form-control bg-transparent border-0" placeholder="Search">
               </div>
             </form>
-          </div> -->
+          </div>
           <% } %>
           <ul class="navbar-nav navbar-nav-right">
-
             <% if (isLogin) { %>
             <li class="nav-item nav-profile dropdown">
               <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">

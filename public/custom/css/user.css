@@ -1,3 +1,12 @@
+/* Theme color */
+
+.theme-bg{
+    background-color: #4f2f2d; 
+}
+
+.theme-txt{
+    color: #4f2f2d;
+}
 
 
 .form-button {
@@ -368,7 +377,7 @@ html {
 /* Timeline */
 .track-line {
     height: 2px !important;
-    background-color: #488978;
+    background-color: #4CAF50;
     opacity: 1;
     }
     
@@ -378,21 +387,49 @@ html {
     margin-left: 3px;
     margin-right: 3px;
     margin-top: 0px;
-    background-color: #488978;
+    background-color: #4CAF50;
     border-radius: 50%;
     display: inline-block
     }
     
-    .big-dot {
+    /* .big-dot {
     height: 25px;
     width: 25px;
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 0px;
-    background-color: #488978;
+    background-color: #4CAF50;
     border-radius: 50%;
     display: inline-block;
+    }*/
+
+    .big-dot {
+        height: 25px;
+        width: 25px;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 0px;
+        background-color: #4CAF50;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
     }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
     
     .big-dot i {
     font-size: 12px;
@@ -401,6 +438,8 @@ html {
     .card-stepper {
     z-index: 0
     }
+
+ 
 
 
 

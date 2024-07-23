@@ -141,8 +141,10 @@
                                                 <%= item.expiryDate.toISOString().slice(0, 10) %>
                                             </td>
                                             <td>
-                                                <button data-coupon-id="<%= item._id %>" id="offer<%= item._id %>"
+                                                <button product-name="<%= item.productId.modelName %>" percentage="<%= item.percentage %>" expiry-date="<%= item.expiryDate.toISOString().slice(0, 10) %>" data-offer-id="<%= item._id %>" id="offer<%= item._id %>"
                                                     type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#offerEditModal" 
                                                     class="btn btn-outline-dark btn-sm offerEditBtn">Edit</button>
                                             </td>
                                             <td>
@@ -160,6 +162,18 @@
                 </div>
 
 
+                <div class="d-flex justify-content-center">
+                    <nav aria-label="Page navigation example">
+                      <ul class="pagination">
+                        <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
+                        <% for(let i=1; i<= totalPages; i++){ %>
+                        <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+                        <% } %>
+            
+                        <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
+                      </ul>
+                    </nav>
+                </div>
 
             </div>
             <!-- content-wrapper ends -->
@@ -218,11 +232,56 @@
         </div>
     </div>
 
-    <%- include('./loader') %>
+
+
+
+        <!---------------------------------------------- Edit FORM MODAL START ----------------------------------->
+
+        <div class="modal fade" id="offerEditModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="padding: 15px">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel">EDIT OFFER</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="forms-sample" id="offerEditForm">
+                            <div class="form-group">
+                                <label for="product">Product</label>
+                                <input type="text" class="form-control" disabled id="editProduct" />
+                           
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="offerPercentage">Offer %</label>
+                                <input type="text" class="form-control" id="editPercentage"
+                                    placeholder="Enter percentage" />
+                                <span id="percentageEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="expiryDate">Enter expiry date</label>
+                                <input class="form-control" type="date" id="editExpiryDate" placeholder="Expiry date">
+                                <span id="expiryDateEditError" style="color: red; font-size: 12px"></span>
+                            </div>
+    
+                            <input type="submit" id="cuponAddBtnSubmit" class="btn btn-dark mr-2" />
+                            <button type="button" class="btn btn-light" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+  
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/custom/js/admin/productOffer.js"></script>
-    <!-- <script src="/static/custom/js/admin/pagenation.js"></script> -->
+    <script src="/static/custom/js/admin/pagenation.js"></script>
 
-
+    <%- include('./loader') %>
   <%- include('./footer') %>

@@ -36,6 +36,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
       } else if (!/^\d+$/.test(discountPercentage)) {
         discountError.textContent = "Enter a valid value.";
         isValid = false;
+      } else if(discountPercentage < 1 || discountPercentage > 99){
+        discountError.textContent = "Enter a valid value.";
+        isValid = false;
+
+      } else if (discountPercentage > 100){
+        discountError.textContent = "Enter a valid value.";
+        isValid = false;
       } else {
         discountError.textContent = "";
       }

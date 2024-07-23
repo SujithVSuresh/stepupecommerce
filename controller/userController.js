@@ -16,13 +16,15 @@ const Razorpay = require("razorpay");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
+require('dotenv').config();
+
 const RAZORPAY_ID_KEY = process.env.RAZORPAY_ID_KEY;
 const RAZORPAY_SECRET_KEY = process.env.RAZORPAY_SECRET_KEY;
 
 // Creating razorpay instance
 const razorpayInstance = new Razorpay({
-  key_id: "rzp_test_3v8uE4x50656nf",
-  key_secret: "s0gjaedeIT4genxOVInUe4VI",
+  key_id: RAZORPAY_ID_KEY,
+  key_secret: RAZORPAY_SECRET_KEY,
 });
 
 const bcrypt = require("bcrypt");
@@ -116,16 +118,6 @@ async function applyOfferForCart(userId) {
     const categoryOffers = await Categoryoffer.find({});
     const productOffers = await Productoffer.find({});
 
-    // let cart = await Cart.findOne({ userId: userId }).populate([
-    //   {
-    //     path: "items.productId",
-    //     populate: [
-    //       { path: "varient" },
-    //       { path: "product", populate: { path: "category" } },
-    //     ],
-    //   },
-    //   { path: "userId" },
-    // ]);
     let cart = await Cart.findOne({ userId: userId }).populate([
       {
       path: 'items.productId',
@@ -139,6 +131,10 @@ async function applyOfferForCart(userId) {
       ]
       }
     ]);
+
+    if(!cart || !cart.items || cart.items.length == 0){
+      return null
+    }
 
 
     let cartItems = cart.items.map((item) => {
@@ -159,13 +155,6 @@ async function applyOfferForCart(userId) {
 
       let offerAmount = calculateOffer(subVarient, offer);
 
-      // return {
-      //   ...item._doc,
-      //   productId: {
-      //     ...item.productId._doc,
-      //     price: offerAmount ? offerAmount : item.productId.price,
-      //   },
-      // };
       return {
         ...item._doc,
         productId: {
@@ -239,7 +228,7 @@ const home = async (req, res) => {
       },
     },
     {
-      $limit: 10,
+      $limit: 6,
     },
   ]);
 
@@ -918,7 +907,7 @@ const items = async (req, res) => {
         {
           $lookup: {
             from: "categoryoffers",
-            localField: "category",
+            localField: "category._id",
             foreignField: "categoryId",
             as: "catoffers",
           },
@@ -1170,9 +1159,7 @@ const productDetails = async (req, res) => {
       }
 
       if (productId && varientId && !subVarientId) {
-        let product = await Product.findOne({ _id: productId }).populate(
-          "category"
-        );
+        let product = await Product.findOne({ _id: productId }).populate([{path: "category"}, {path: "brand"}]);
 
         const categoryOffer = await Categoryoffer.findOne({
           categoryId: product.category._id,
@@ -1241,44 +1228,19 @@ const addedtoCartProducts = async (req, res) => {
       let userId = req.session.userId;
       let coupon = req.session.coupon;
 
-      // const cart = await applyOfferForCart(userId)
-      // const categoryOffers = await Categoryoffer.find({});
-      // const productOffers = await Productoffer.find({});
-
-      // let cartData = await Cart.findOne({ userId: userId }).populate([
-      //   {
-      //     path: "items.productId",
-      //     populate: [
-      //       { path: "varient" },
-      //       { path: "product", populate: { path: "category" } },
-      //     ],
-      //   },
-      //   { path: "userId" },
-      // ]);
-
-      // let cartItems = cartData.items.map((item) => {
-      //   let categoryOffer = checkCategoryOffer(categoryOffers, item.productId.product)
-      //   let productOffer = checkProductOffer(productOffers, item.productId.product)
-      //   let offer = selectOffer(categoryOffer, productOffer)
-      //   let offerAmount = calculateOffer(item.productId, offer)
-
-      //   return {...item._doc, productId: {...item.productId._doc, price: offerAmount}}
-      // });
-
-      // const cart = {...cartData._doc, items: [...cartItems]}
-
       const cart = await applyOfferForCart(userId);
 
-      console.log("my log,", cart.items[0].subVarientId);
+      if(!cart){
+        return res.status(404).json({ message: "Cart not found or no items in the cart" })
+      }
+
 
       let totalAmountDetails = findTotalAmount(
-        cart.items,
+        cart.items ? cart.items : [],
         coupon ? coupon.discountPercentage : 0,
         coupon ? coupon.maxOfferLimit : 0,
         coupon ? coupon.minOrderAmount : 0
       );
-
-      console.log(totalAmountDetails, "toootooal");
 
       return res.status(200).json({ cartData: cart, totalAmountDetails });
     }
@@ -1297,7 +1259,7 @@ const cartQtyManagement = async (req, res) => {
         req.body;
 
       const cart = await Cart.findOne({ userId: userId }).populate([
-        { path: "items.productId" },
+        { path: "items.productId" }
       ]);
 
       const itemIndex = cart.items.findIndex((item) => item._id == itemId);
@@ -1531,33 +1493,55 @@ const addToCart = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     if (req.method == "POST") {
+      // const { itemId } = req.body;
+      // const userId = req.session.userId;
+
+      // let wishlist = await Wishlist.findOne({ userId });
+
+      // if (!wishlist) {
+      //   return res.status(404).json({ message: "Wishlist not found." });
+      // }
+
+      // const productIndex = wishlist.items.findIndex((item) =>
+      //   item._id.equals(itemId)
+      // );
+
+      // if (productIndex > -1) {
+      //   let wishlistItem = await Wishlist.findOneAndUpdate(
+      //     { userId: userId },
+      //     { $pull: { items: { _id: itemId } } },
+      //     { new: true }
+      //   );
+      //   console.log("wishlistItem...", wishlistItem);
+      //   return res
+      //     .status(200)
+      //     .json({ message: "Product removed from wishlist." });
+      // } else {
+      //   return res
+      //     .status(404)
+      //     .json({ message: "Product does not exist in wishlist." });
+      // }
       const { itemId } = req.body;
       const userId = req.session.userId;
 
-      let wishlist = await Wishlist.findOne({ userId });
+      // Use $pull directly to remove the item from the wishlist
+      let wishlist = await Wishlist.findOneAndUpdate(
+        { userId },
+        { $pull: { items: { _id: itemId } } },
+        { new: true }
+      );
 
       if (!wishlist) {
         return res.status(404).json({ message: "Wishlist not found." });
       }
 
-      const productIndex = wishlist.items.findIndex((item) =>
-        item._id.equals(itemId)
-      );
-
-      if (productIndex > -1) {
-        await Wishlist.findOneAndUpdate(
-          { userId: userId },
-          { $pull: { items: { _id: itemId } } },
-          { new: true }
-        );
-        return res
-          .status(200)
-          .json({ message: "Product removed from wishlist." });
-      } else {
-        return res
-          .status(404)
-          .json({ message: "Product does not exist in wishlist." });
+      const productExists = wishlist.items.some(item => item._id.equals(itemId));
+      if (productExists) {
+        return res.status(404).json({ message: "Product not removed from wishlist." });
       }
+
+      return res.status(200).json({ message: "Product removed from wishlist.", wishlist});
+
     } else {
       return res.status(405).json({ message: "Method not allowed" });
     }
@@ -1569,7 +1553,9 @@ const removeFromWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
   try {
     if (req.method == "POST") {
-      const { productId } = req.body;
+      const { productId, varientId, subVarientId } = req.body;
+
+      console.log(productId, varientId, subVarientId, "sssss131313");
       const userId = req.session.userId;
 
       let wishlist = await Wishlist.findOne({ userId });
@@ -1578,9 +1564,9 @@ const addToWishlist = async (req, res) => {
         wishlist = new Wishlist({ userId, items: [] });
       }
 
-      const productIndex = wishlist.items.findIndex((item) =>
-        item.productId.equals(productId)
-      );
+      const productIndex = wishlist.items.findIndex(item =>
+        item.subVarientId && item.subVarientId.equals(subVarientId)
+    );
 
       if (productIndex > -1) {
         // const message = await productRemoveFromWishlist(userId, productId)
@@ -1588,7 +1574,13 @@ const addToWishlist = async (req, res) => {
           .status(409)
           .json({ message: "Product already exist in wishlist." });
       } else {
-        wishlist.items.push({ productId: productId });
+        console.log(productId, varientId, subVarientId, "jjj");
+        wishlist.items.push({
+          
+           productId: productId, 
+           varientId: varientId, 
+           subVarientId: subVarientId 
+          });
         await wishlist.save();
 
         return res
@@ -1608,11 +1600,15 @@ const removeFromCart = async (req, res) => {
       const userId = req.session.userId;
       const coupon = req.session.coupon;
 
+      console.log(itemId, userId, coupon, "blalala");
+
       const cart = await Cart.findOneAndUpdate(
         { userId: userId },
         { $pull: { items: { _id: itemId } } },
         { new: true }
       ).populate("items.productId");
+
+      console.log(cart, "cccc");
 
       if (cart) {
         if (req.session.cartCount) {
@@ -1624,7 +1620,7 @@ const removeFromCart = async (req, res) => {
         const cartData = await applyOfferForCart(userId);
 
         let totalAmountDetails = findTotalAmount(
-          cartData.items,
+          cartData ? cartData.items : [],
           coupon ? coupon.discountPercentage : 0,
           coupon ? coupon.maxOfferLimit : 0,
           coupon ? coupon.minOrderAmount : 0
@@ -1654,13 +1650,69 @@ const wishlist = async (req, res) => {
     if (req.method == "GET") {
       const userId = req.session.userId;
 
-      const wishlistItems = await Wishlist.findOne({ userId }).populate([
-        { path: "items.productId", populate: { path: "varient" } },
-        { path: "items.productId", populate: { path: "product" } },
+      const products = await Wishlist.findOne({ userId }).populate([
+        {
+        path: 'items.productId',
+        populate: [
+          {
+            path: 'category'
+          },
+          {
+            path: 'brand'
+          }
+        ]
+        }
       ]);
 
+      if (!products || !products.items || products.items.length === 0) {
+        return res.render("user/wishlist", {
+          wishlistItems: {},
+          isLogin: true,
+          cartCount: req.session.cartCount,
+          message: "Wishlist not found or no items available in wishlist"
+        });
+      }
+
+
+      const categoryOffers = await Categoryoffer.find({});
+      const productOffers = await Productoffer.find({});
+
+      let wishlistItems = products.items.map((item) => {
+        let categoryOffer = checkCategoryOffer(
+          categoryOffers,
+          item.productId
+        );
+        let productOffer = checkProductOffer(
+          productOffers,
+          item.productId
+        );
+        let offer = selectOffer(categoryOffer, productOffer);
+  
+        let varient = item.productId.varient.find((v) => v._id.toString() == item.varientId);
+        let subVarient = varient.subVarient.find(
+          (sv) => sv._id.toString() == item.subVarientId
+        );
+  
+        let offerAmount = calculateOffer(subVarient, offer);
+  
+        return {
+          ...item._doc,
+          productId: {
+            ...item.productId._doc,
+            
+          },
+          varientId: {
+            ...varient._doc
+          },
+          subVarientId: {
+            ...subVarient._doc,
+            price: offerAmount ? offerAmount : subVarient.price,
+          }
+        };
+      });
+
       res.render("user/wishlist", {
-        wishlistItems,
+        wishlistItems: {...products._doc, items: [...wishlistItems]},
         isLogin: true,
         cartCount: req.session.cartCount,
       });
@@ -1809,17 +1861,74 @@ const wallet = async (req, res) => {
   try {
     if (req.method == "GET") {
       const userId = req.session.userId;
+      let page = req.query.page || 1;
+      let limit = 6;
+      let skip = (page - 1) * limit;
 
-      const wallet = await Wallet.findOne({ userId: userId }).populate(
-        "userId"
-      );
+      // const wallet = await Wallet.findOne({ userId: userId })
+      //     .populate("userId")
 
-      wallet.history.sort((a, b) => b.date - a.date);
 
-      console.log(wallet);
+      const wallet = await Wallet.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+            { $unwind: "$history" },
+            { $sort: { "history.date": -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $group: {
+                _id: "$_id",
+                userId: { $first: "$userId" },
+                balance: { $first: "$balance" },
+                history: { $push: "$history" }
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+              }
+            },
+            {
+              $addFields: {
+                userId: { $arrayElemAt: ["$user", 0] },
+              },
+            },
+            {
+              $project: {
+                user: 0
+              },
+            },
+          ]);
 
+      console.log(wallet, "wallet935890425");    
+
+      const totalTransactions = await Wallet.aggregate([
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        {
+            $project: {
+                userId: 1,
+                balance: 1,
+                historyCount: { $size: "$history" }
+            }
+        }
+    ]);
+      const totalPages = Math.ceil(totalTransactions[0].historyCount / limit);
+
+      if(!wallet){
+        return res.render("user/wallet", {
+          wallet: {},
+          isLogin: userId ? true : false,
+          cartCount: userId ? req.session.cartCount : 0,
+        });
+      }
+
+  
       res.render("user/wallet", {
         wallet,
+        totalPages: totalPages,
         isLogin: userId ? true : false,
         cartCount: userId ? req.session.cartCount : 0,
       });
@@ -1891,7 +2000,7 @@ const addMoneyToWallet = async (req, res) => {
       return res.status(200).json({
         message: "Money added to wallet.",
         transaction: recentTransaction,
-        balance: balance,
+        balance: wallet.balance,
       });
     }
   } catch (error) {
@@ -1903,13 +2012,29 @@ const order = async (req, res) => {
   try {
     if (req.method == "GET") {
       const userId = req.session.userId;
+      let page = req.query.page || 1;
+      let limit = 6;
+      let skip = (page - 1) * limit;
 
-      const orders = await Order.find({ userId: userId }).sort({
-        orderedDate: -1,
-      });
+      // const orders = await Order.find({ userId: userId }).sort({
+      //   orderedDate: -1,
+      // });
+
+      const orders = await Order.aggregate([
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { $sort: { "orderedDate": -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
+
+      const totalOrders = await Order.countDocuments({userId: userId});
+      const totalPages = Math.ceil(totalOrders / limit);
+
+      console.log(totalOrders, totalPages, "ppoopp");
 
       res.render("user/order", {
         orders,
+        totalPages: totalPages,
         isLogin: userId ? true : false,
         cartCount: userId ? req.session.cartCount : 0,
       });
@@ -1981,6 +2106,7 @@ const orderItemDetail = async (req, res) => {
       const oid = order.orderId;
 
       res.render("user/orderItemDetails", {
+        paymentMethod: order.paymentMethod, 
         orderId: orderId,
         orderShowId: order.orderId,
         itemId: itemId,
@@ -2135,8 +2261,6 @@ const placeOrder = async (req, res) => {
 
     const cart = await applyOfferForCart(userId);
 
-    console.log("aama12324", cart.items);
-
     for (let item of cart.items) {
       if (item.subVarientId.quantity == 0) {
         return res
@@ -2176,10 +2300,17 @@ const placeOrder = async (req, res) => {
 
     if (paymentMethod == "WALLET") {
       const wallet = await Wallet.findOne({ userId: userId });
-      if (wallet.balance < totalAmount.totalAmount) {
+      if (wallet && wallet.balance < totalAmount.totalAmount) {
         return res
           .status(409)
           .json({ message: "Insufficient Wallet Balance!" });
+      }
+      
+      if(!wallet){
+        return res
+        .status(409)
+        .json({ message: "Insufficient Wallet Balance!" });
+
       }
     }
 
@@ -2208,6 +2339,7 @@ const placeOrder = async (req, res) => {
 
       order.paymentMethod = paymentMethod;
       order.totalAmount = totalAmount.totalAmount;
+      order.discountAmount = totalAmount.couponDiscount ? totalAmount.couponDiscount : 0
 
       cart.items.forEach((item) => {
         order.orderedItems.push({
@@ -2226,7 +2358,7 @@ const placeOrder = async (req, res) => {
           color: item.varientId.colorName,
           size: item.subVarientId.size,
           image: item.varientId.images[0],
-          orderStatus: payment == "COD" || "WALLET" ? "Ordered" : "Pending",
+          orderStatus: payment=="COD" ? "Ordered" : "Pending",
         });
       });
 
@@ -2262,7 +2394,7 @@ const placeOrder = async (req, res) => {
           wallet.balance = wallet.balance - totalAmount.totalAmount;
           wallet.history.push({
             type: "debit",
-            amount: totalAmount.totalAmount / 100,
+            amount: totalAmount.totalAmount,
             description: "Payment for order purchase",
           });
           await wallet.save();
@@ -2375,11 +2507,13 @@ const cancelOrder = async (req, res) => {
       orderItem.cancelledDate = new Date();
       await order.save();
 
-      const subVarient = await Subvarient.findOne({ _id: orderItem.productId });
+      let product = await Product.findById(orderItem.productId)
+      let varient = product.varient.find((v) => v._id.toString() == orderItem.varientId)
+      let subVarient = varient.subVarient.find((sv) => sv._id.toString() == orderItem.subVarientId)
 
       if (subVarient) {
         subVarient.quantity += orderItem.quantity;
-        await subVarient.save();
+        await product.save();
       }
 
       if (order.paymentMethod != "COD") {
@@ -2392,7 +2526,7 @@ const cancelOrder = async (req, res) => {
         wallet.history.push({
           date: new Date(),
           type: "credit",
-          amount: orderItem.price,
+          amount: orderItem.price * orderItem.quantity,
           description: "Refund for order cancellation",
         });
         wallet.balance += orderItem.price;
@@ -2497,6 +2631,7 @@ const orderComplete = async (req, res) => {
         order.paymentMethod == "ONLINE_PAYMENT" ||
         order.paymentMethod == "WALLET"
       ) {
+
         // to update all the orderStatus and paymentStatus.
         await Order.updateOne(
           { _id: orderId },
@@ -2509,7 +2644,7 @@ const orderComplete = async (req, res) => {
         );
 
         order.paymentStatus = "Success";
-        order.orderStatus = "Ordered";
+        order.orderStatus = "Pending";
         await order.save();
       }
 
@@ -2522,6 +2657,26 @@ const orderComplete = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const trackOrder = async (req, res) => {
+  try{
+    console.log("ooiit");
+
+    const orderId = req.query.oid
+    const itemId = req.query.itid
+
+    console.log(orderId, itemId, "ooiit");
+
+    const order = await Order.findById(orderId)
+
+    let orderItem = order.orderedItems.find((oi) => oi._id.toString() == itemId)
+
+    res.status(200).json({order, orderItem})
+
+  }catch(error){
+    res.status(500).json({error: error.message})
+  }
+}
 
 module.exports = {
   home,
@@ -2576,4 +2731,6 @@ module.exports = {
   addMoneyToWallet,
 
   relatedProducts,
+
+  trackOrder
 };

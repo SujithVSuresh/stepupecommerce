@@ -69,6 +69,8 @@ router.get('/profile/order', auth.isLogin, userController.order)
 router.get('/profile/order/getOrderById', auth.isLogin, userController.getOrderById)
 router.get('/profile/order/orderDetail', auth.isLogin, userController.orderDetail)
 router.get('/profile/order/itemDetail', auth.isLogin, userController.orderItemDetail)
+router.get('/profile/order/itemDetail/trackOrder', auth.isLogin, userController.trackOrder)
+
 
 router.post('/profile/order/payNowOrder', auth.isLogin,  userController.createPayNowOrder)
 

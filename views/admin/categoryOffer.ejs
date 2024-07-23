@@ -162,6 +162,18 @@
                 </div>
 
 
+                <div class="d-flex justify-content-center">
+                    <nav aria-label="Page navigation example">
+                      <ul class="pagination">
+                        <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
+                        <% for(let i=1; i<= totalPages; i++){ %>
+                        <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+                        <% } %>
+            
+                        <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
+                      </ul>
+                    </nav>
+                </div>
 
             </div>
             <!-- content-wrapper ends -->
@@ -223,7 +235,7 @@
         <div class="modal-dialog">
             <div class="modal-content" style="padding: 15px">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="productModalLabel">ADD OFFER</h5>
+                    <h5 class="modal-title" id="productModalLabel">EDIT OFFER</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -269,7 +281,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/custom/js/admin/categoryOffer.js"></script>
-    <!-- <script src="/static/custom/js/admin/pagenation.js"></script> -->
-
+    <script src="/static/custom/js/admin/pagenation.js"></script>
 
   <%- include('./footer') %>

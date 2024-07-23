@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> / <span>Checkout</span>
+            <span><a href="/" style="color: #4f2f2d;">Home</a></span> / <span><a href="/shop/cart" style="color: #4f2f2d;">Cart</a></span> / <span>Checkout</span>
           </p>
         </div>
       </div>
@@ -35,7 +35,7 @@
       <div class="row">
         <div class="col-lg-8">
           <!--   -->
-          <div class="container cart-detail" style="background-color: #f0faff;">
+          <div class="container cart-detail">
             <h2>Delivery Address</h2>
 
             <div class="address-selection-checkout">
@@ -61,8 +61,8 @@
                       <h3 style="color: gray; text-align: center">No address found !</h3>
                       <% } %>
                         <button style="
-                        background-color: #66BCEE;
-                        color: white;
+                        background-color: #4f2f2d; 
+                        color: rgb(255, 255, 255);
                         border: none;
                         width: 25%;
                         border-radius: 10px;
@@ -76,7 +76,7 @@
         <div class="col-lg-4">
           <div class="row">
             <div class="col-md-12">
-              <div class="cart-detail" style="background-color: #f0faff;">
+              <div class="cart-detail">
                 <h2>Cart Total</h2>
                 <ul>
                   <li>
@@ -119,7 +119,7 @@
             <div class="w-100"></div>
 
             <div class="col-md-12">
-              <div class="cart-detail" style="background-color: #f0faff;">
+              <div class="cart-detail">
                 <h2>Payment Method</h2>
                 <div class="form-group">
                   <div class="col-md-12">
@@ -152,9 +152,9 @@
           <div class="row">
             <div class="col-md-12 text-center">
               <a style="
-              background-color: #66BCEE;
-              color: white;
-              border: none;
+               background-color: #4f2f2d; 
+               color: rgb(255, 255, 255);
+               border: none;
                 width: 100%;
                 border-radius: 10px;
                 height: 50px;
@@ -188,6 +188,7 @@
                     <div class="form-group">
                       <label for="fullName">Full Name</label>
                       <input type="text" id="fullName" class="form-control" placeholder="Full Name" />
+                      <span id="nameError" style="color: red; margin-left: 20px"></span>
                     </div>
                   </div>
 
@@ -197,6 +198,8 @@
                       <div class="form-field">
                         <i class="icon icon-arrow-down3"></i>
                         <select name="people" id="state" class="form-control"></select>
+                        <span id="stateError" style="color: red; margin-left: 20px"></span>
+
                       </div>
                     </div>
                   </div>
@@ -206,12 +209,15 @@
                       <label for="cityDistrictTown">City/District/Town</label>
                       <input type="text" id="cityDistrictTown" class="form-control"
                         placeholder="City / District / Town" />
+                      <span id="cityError" style="color: red; margin-left: 20px"></span>
+   
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="zipPostalCode">Zip/Postal Code</label>
                       <input type="text" id="zipPostalCode" class="form-control" placeholder="Zip / Postal" />
+                      <span id="pincodeError" style="color: red; margin-left: 20px"></span>
                     </div>
                   </div>
 
@@ -220,12 +226,15 @@
                       <label for="localityAreaStreet">Locality/Area/Street</label>
                       <input type="text" id="localityAreaStreet" class="form-control"
                         placeholder="Locality / Area / Street" />
+                      <span id="localityError" style="color: red; margin-left: 20px"></span>
+   
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="landmark">Landmark</label>
                       <input type="text" id="landmark" class="form-control" placeholder="Landmark" />
+                      <span id="landmarkError" style="color: red; margin-left: 20px"></span>
                     </div>
                   </div>
 
@@ -234,12 +243,14 @@
                       <label for="housenoBuildingApartment">House no/Building/Apartment</label>
                       <input type="text" id="housenoBuildingApartment" class="form-control"
                         placeholder="House no / Building / Apartment" />
-                    </div>
+                        <span id="houseError" style="color: red; margin-left: 20px"></span>
+                      </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="phone">Phone Number</label>
                       <input type="text" id="phone" class="form-control" placeholder="Phone Number" />
+                      <span id="phoneError" style="color: red; margin-left: 20px"></span>
                     </div>
                   </div>
                 </div>
@@ -446,6 +457,124 @@
           let phone = document.getElementById("phone");
           let landmark = document.getElementById("landmark");
 
+
+          let nameError = document.getElementById("nameError");
+      let stateError = document.getElementById("stateError");
+      let cityError = document.getElementById("cityError");
+      let pincodeError = document.getElementById("pincodeError");
+      let localityError = document.getElementById("localityError");
+      let landmarkError = document.getElementById("landmarkError");
+      let houseError = document.getElementById("houseError");
+      let phoneError = document.getElementById("phoneError");
+
+
+
+          let isValid = true;
+
+//Name validation
+if (!fullName.value.trim()) {
+  nameError.textContent = "Name is required";
+  isValid = false;
+} else if (fullName.value.trim().length < 2) {
+  nameError.textContent = "Name must be at least 2 characters long";
+  isValid = false;
+} else if (fullName.value.trim().length > 100) {
+  nameError.textContent = "Name must be less than 20 characters long";
+  isValid = false;
+} else if (!/^(?! )[A-Za-zÀ-ÖØ-öø-ÿ' ]*(?<! )$/.test(fullName.value)) {
+  nameError.textContent = "Enter a valid name";
+  isValid = false;
+}else {
+  nameError.textContent = "";
+}
+
+//state validation
+if (!state.value.trim()) {
+  stateError.textContent = "This field is required";
+  isValid = false;
+} else {
+  stateError.textContent = "";
+}
+
+//city validation
+if (!cityDistrictTown.value.trim()) {
+  cityError.textContent = "This field is required";
+  isValid = false;
+} else if (cityDistrictTown.value.trim().length > 30) {
+  cityError.textContent =
+    "City/District/Town must be less than 30 characters long";
+  isValid = false;
+} else if(!/^[a-zA-Z]+$/.test(cityDistrictTown.value)){
+  cityError.textContent =
+    "Enter a valid value";
+  isValid = false;
+
+} else {
+  cityError.textContent = "";
+}
+
+const postalCodePattern = /^\d{5,6}$/;
+//pincode validation
+if (!zipPostalCode.value.trim()) {
+  pincodeError.textContent = "This field is required";
+  isValid = false;
+} else if (!postalCodePattern.test(zipPostalCode.value)) {
+  pincodeError.textContent =
+    "Please enter a valid 5 or 6-digit postal code";
+  isValid = false;
+} else {
+  pincodeError.textContent = "";
+}
+
+if (!localityAreaStreet.value.trim()) {
+  localityError.textContent = "This field is required";
+  isValid = false;
+} else if (localityAreaStreet.value.trim().length > 30) {
+  localityError.textContent =
+    "Locality/Area/Street must be less than 30 characters long";
+  isValid = false;
+} else if(!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s]+$/.test(localityAreaStreet.value)){
+  localityError.textContent = "Enter a valid value";
+  isValid = false;
+}  else {
+  localityError.textContent = "";
+}
+
+//house validation
+if (!housenoBuildingApartment.value.trim()) {
+  houseError.textContent = "This field is required";
+  isValid = false;
+} else if(!/^[a-zA-Z0-9]+$/.test(housenoBuildingApartment.value)){
+  houseError.textContent = "Enter a valid value";
+  isValid = false;
+} else {
+  houseError.textContent = "";
+}
+
+//landmark validation
+if (!landmark.value.trim()) {
+  landmarkError.textContent = "This field is required";
+  isValid = false;
+} else if(!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s]+$/.test(landmark.value)){
+  landmarkError.textContent = "Enter a valid value";
+  isValid = false;
+} else {
+  landmarkError.textContent = "";
+}
+
+//Phone validation
+if (!phone.value.trim()) {
+  phoneError.textContent = "This field is required";
+  isValid = false;
+} else if (phone.value && !/^[789]\d{9}$/.test(phone.value)) {
+  phoneError.textContent = "Enter a valid phone number";
+  isValid = false;
+} else {
+  phoneError.textContent = "";
+}
+
+
+          if(isValid){
           const data = {
             fullName: fullName.value,
             state: state.value,
@@ -467,6 +596,8 @@
             .catch((error) => {
               console.log("error code");
             });
+
+          }   
         }
       });
     });

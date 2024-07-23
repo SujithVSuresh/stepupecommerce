@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const dotenv = require("dotenv");
 const adminRouter = require("./routes/adminRoute");
 const userRouter = require("./routes/userRoute");
 const db = require("./config/db");
@@ -14,7 +15,7 @@ const userController = require("./controller/userController");
 //passport
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const dotenv = require("dotenv");
+
 
 dotenv.config();
 
@@ -94,9 +95,13 @@ app.get("/auth/destroy-otp", (req, res) => {
 });
 
 app.get('*', (req, res) => {
-      res.render("user/forNotFor")
+
+    res.render("user/forNotFor")
+  
   });
 
-app.listen("3000", () => {
+const port = process.env.PORT  
+
+app.listen(port, () => {
   console.log("Server has started");
 });

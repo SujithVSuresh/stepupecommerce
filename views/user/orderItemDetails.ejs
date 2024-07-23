@@ -5,10 +5,8 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
-            <span>
-              <%= orderShowId %>
-            </span> /
+            <span><a href="/" style="color: #4f2f2d">Home</a></span> / <span><a href="/profile" style="color: #4f2f2d">Profile</a></span> /
+            <span><a href="/profile/order/orderDetail?oid=<%= orderId %>" style="color: #4f2f2d"><%= orderShowId %></a></span> /
             <span>Item</span>
           </p>
         </div>
@@ -43,7 +41,7 @@
 
               <div id="orderItemsContainer">
                 <div class="product-cart d-flex" id="cartItemContainer${item._id}"
-                  style="background-color: #f0faff; padding: 20px;">
+                  style="background-color: #f1f1f1; padding: 20px;">
                   <div class="one-forth">
                     <div class="product-img" style="
                       background-image: url('/static/images/<%= orderedItem.image %>');
@@ -104,7 +102,7 @@
                                 </div>
                                 <% } else if (orderedItem.orderStatus==="Returned" ) { %>
                                   <div id="orderedStatusShow">
-                                    <span class="price" style="color: red">
+                                    <span class="price" style="color: orange">
                                       <%= orderedItem.orderStatus %>
                                     </span><br />
                                     <span class="price">Your item has been returned</span>
@@ -126,15 +124,15 @@
                   </div>
                 </div>
               </div>
-
+              <% if ((orderedItem.orderStatus != "Pending" && paymentMethod == "COD" && orderedItem.paymentStatus != "Pending") || (orderedItem.orderStatus!="Pending" && paymentMethod != "COD" && orderedItem.paymentStatus != "Pending")) { %>
               <div id="orderItemsContainer">
-                <div class="product-cart d-flex" id="cartItemContainer${item._id}"
-                  style="background-color: #f0faff; padding: 20px;">
+                <div class="product-cart d-flex" style="background-color: #f1f1f1; padding: 20px;">
                   <div class="one-forth">
                     <div>
-                      <div class="display-tc" style="padding: 0">
-
-
+                      <div class="display-tc text-center d-flex flex-column justify-content-center align-items-center" style="padding: 0">
+                        
+                        <span>Track the order and keep up to date with the<br> status of your purchase.</span>
+                        <a id="trackOrder" order-id="<%= orderId %>" item-id="<%= itemId %>" style="background-color: white; color: black;" class="btn btn-primary btn-sm mt-2">Track order</a>
                       </div>
                     </div>
                   </div>
@@ -181,56 +179,14 @@
                 </div>
               </div>
 
+
+              <div id="orderTimeline" style="display: none;">
+  
+              </div>
+              <% } %>
+
             </div>
           </div>
-
-          <!-- <div class="row row-pb-lg">
-            <div class="container">
-              <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col">
-                  <div class="card card-stepper" style="border-radius: 10px;">
-                    <div class="card-body p-4">
-
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex flex-column">
-                          <span class="lead fw-normal">Your order has been delivered</span>
-                          <span class="text-muted small">by DHFL on 21 Jan, 2020</span>
-                        </div>
-                        <div>
-                          <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary"
-                            type="button">Track order details</button>
-                        </div>
-                      </div>
-                      <hr class="my-4">
-
-                      <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                        <span class="dot"></span>
-                        <hr class="flex-fill track-line"><span class="dot"></span>
-                        <hr class="flex-fill track-line"><span class="dot"></span>
-                        <hr class="flex-fill track-line"><span class="dot"></span>
-                        <hr class="flex-fill track-line"><span
-                          class="d-flex justify-content-center align-items-center big-dot dot">
-                          <i class="fa fa-check text-white"></i></span>
-                      </div>
-
-                      <div class="d-flex flex-row justify-content-between align-items-center">
-                        <div class="d-flex flex-column align-items-start"><span>15 Mar</span><span>Order placed</span>
-                        </div>
-                        <div class="d-flex flex-column justify-content-center"><span>15 Mar</span><span>Order
-                            placed</span></div>
-                        <div class="d-flex flex-column justify-content-center align-items-center"><span>15
-                            Mar</span><span>Order Dispatched</span></div>
-                        <div class="d-flex flex-column align-items-center"><span>15 Mar</span><span>Out for
-                            delivery</span></div>
-                        <div class="d-flex flex-column align-items-end"><span>15 Mar</span><span>Delivered</span></div>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
 
 
         </div>
@@ -284,112 +240,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-
-      document.addEventListener("click", (event) => {
-        const orderStatusContainer = document.getElementById(
-          "orderStatusContainer"
-        );
-
-        if (event.target && event.target.id == "cancelBtn") {
-          event.preventDefault();
-
-          const orderId = event.target.getAttribute("order-id");
-          const itemId = event.target.getAttribute("order-item-id");
-
-          let n = new Noty({
-            text: "Are you sure you want to cancel the order of this item?",
-            type: "confirm",
-            theme: "metroui",
-            layout: "center",
-            modal: true,
-            timeout: false,
-            progressBar: true,
-            animation: {
-              open: "animated bounceInLeft",
-              close: "animated bounceOutRight",
-            },
-            buttons: [
-              Noty.button("Yes", "btn btn-success btn-yes", function () {
-                axios
-                  .post(`/shop/cancelOrder`, {
-                    orderId: orderId,
-                    orderItemId: itemId,
-                  })
-                  .then((response) => {
-                    if (response.status == 200) {
-                      event.target.style.display = "none";
-                      document.getElementById('cancelQuestion').style.display = "none"
-
-                      orderStatusContainer.innerHTML = "";
-
-                      orderStatusContainer.innerHTML = `
-               <span class="price" style="color: red;">Cancelled</span><br>
-                <span class="price">Your order for this item has been cancelled</span>
-              
-              `;
-                      n.close();
-                    }
-                  })
-                  .catch((error) => {
-                    console.log("it is an error", error);
-                  });
-              }),
-              Noty.button("No", "btn btn-danger btn-no", function () {
-                // Handle the cancel action here
-                console.log("Delete canceled");
-                n.close();
-              }),
-            ],
-          }).show();
-        }
-
-
-
-        if (event.target.id == "returnRequestFormButton") {
-          console.log(event.target);
-
-          const reasonForReturnText = document.getElementById(
-            "reasonForReturnText"
-          ).value;
-
-          console.log("event.target", reasonForReturnText);
-
-          const orderId = event.target.getAttribute("order-id");
-          const orderItemId = event.target.getAttribute("order-item-id");
-
-          console.log("moi", orderId, orderItemId);
-
-          axios
-            .post("/shop/requestForReturn", {
-              orderId: orderId,
-              orderItemId: orderItemId,
-              reason: reasonForReturnText,
-            })
-            .then((response) => {
-              if (response.status == 200) {
-                document.querySelector("#orderReturnReasonModal .close").click();
-                orderStatusContainer.innerHTML = "";
-
-                orderStatusContainer.innerHTML = `
-
-                   <span class="price" style="color: rgb(255, 187, 0)">Return requested </span><br />
-                  <span class="price">Your item return request is in process</span>
-
-                     `;
-
-
-                document.getElementById('returnCancelBtnContainer').style.display = "none";
-              }
-            })
-            .catch((error) => {
-              console.log("it is an error", error);
-            });
-        }
-      });
-
-    })
-  </script>
+  <script src="/static/custom/js/user/orderItemDetail.js"></script>
 
   <%- include('./footer') %>

@@ -11,6 +11,8 @@ const Coupon = require("../models/couponModel");
 const Categoryoffer = require("../models/categoryOfferModel");
 const Productoffer = require("../models/productOfferModel");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
+
 
 const login = async (req, res) => {
   try {
@@ -69,7 +71,8 @@ const dashboard = async (req, res) => {
         $count: "salesCount",
       },
     ]);
-    console.log("jj", salesCount);
+
+    console.log(salesCount[0], userCount, orderCount, "kkkkkkk123");
 
     const pendingOrdersCount = await Order.find({
       orderStatus: "Pending",
@@ -169,9 +172,9 @@ const dashboard = async (req, res) => {
       topSellingBrands,
       topSellingCategories,
       topSellingProducts,
-      userCount,
-      orderCount,
-      salesCount: salesCount[0].salesCount,
+      userCount: userCount ? userCount : 0,
+      orderCount: orderCount ? orderCount : 0,
+      salesCount: salesCount[0] && salesCount[0].salesCount ? salesCount[0].salesCount : 0,
       isLogin: true,
       adminName: req.session.adminName,
     });
@@ -336,7 +339,6 @@ const dashboardSalesData = async (req, res) => {
       ]);
     }
 
-
     let d = [];
     let c = [];
 
@@ -352,9 +354,8 @@ const dashboardSalesData = async (req, res) => {
         }
       }
     } else if (filterType == "month") {
-
       for (let i = 0; i < months.length; i++) {
-        const month = i + 1; 
+        const month = i + 1;
         const salesForMonth = salesData.find((sale) => sale._id === month);
         d.push(months[i]);
         if (salesForMonth) {
@@ -366,23 +367,24 @@ const dashboardSalesData = async (req, res) => {
     } else {
       const currentYear = new Date().getFullYear();
       const lastFiveYears = [];
-      
+
       for (let i = 0; i < 5; i++) {
         lastFiveYears.push(currentYear - i);
       }
-      
+
       // Reverse the array to have years in ascending order
       lastFiveYears.reverse();
-      
-      lastFiveYears.forEach(year => {
-        const salesForYear = salesData.find(sale => sale._id === year);
+
+      lastFiveYears.forEach((year) => {
+        const salesForYear = salesData.find((sale) => sale._id === year);
         d.push(year);
         if (salesForYear) {
           c.push(salesForYear.count);
         } else {
           c.push(0);
         }
-      });      console.log(salesData, "dd");
+      });
+      console.log(salesData, "dd");
     }
 
     console.log("ggg", d, c);
@@ -426,8 +428,6 @@ const productData = async (req, res) => {
         { path: "category" },
         { path: "brand" },
       ]);
-
-      console.log(products);
 
       res.status(200).json({ products: products });
     }
@@ -593,15 +593,20 @@ const manageProductDeleteStatus = async (req, res) => {
 const users = async (req, res) => {
   try {
     let page = req.query.page || 1;
-    let limit = 5;
+    let search = req.query.search
+    let limit = 2;
     let skip = (page - 1) * limit;
 
-    let users = await User.find({})
+    const q = search ? {email: {$regex: new RegExp(search, "i")}} : {}
+
+    let users = await User.find(q)
       .sort({ dateJoined: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalOrders = await User.countDocuments({});
+
+    const totalOrders = await User.countDocuments(q)
+    
     const totalPages = Math.ceil(totalOrders / limit);
 
     res.render("admin/user", {
@@ -885,23 +890,24 @@ const addColorVarient = async (req, res) => {
 
 const editColorVarient = async (req, res) => {
   try {
-    const { colorName, colorCode, varientId } = req.body;
+    let { colorName, colorCode, varientId, productId } = req.body;
 
-    const colorVarient = await Varient.findOne({
-      _id: varientId,
-    });
+    colorCode = colorCode.toLowerCase();
 
-    let images = colorVarient.images;
+    const product = await Product.findById(productId);
+
+    const check = product.varient.find((v) => v._id != varientId && v.colorCode.toLocaleLowerCase() == colorCode)
+
+    if(check){
+      res.status(409).json({message: "Color already exist"})
+
+    }
+
+    const varient = product.varient.find((v) => v._id == varientId);
+
+    let images = varient.images;
 
     const files = req.files;
-
-    console.log(
-      files.productImgOne,
-      files.productImgTwo,
-      files.productImgThree,
-      files.productImgFour,
-      "files..."
-    );
 
     if (files.productImgOne) {
       images.splice(0, 1, files.productImgOne[0].filename);
@@ -916,12 +922,14 @@ const editColorVarient = async (req, res) => {
       images.splice(3, 1, files.productImgFour[0].filename);
     }
 
-    await Varient.updateOne(
-      { _id: varientId },
-      { $set: { images: images, colorName: colorName, colorCode: colorCode } }
-    );
+    varient.images = images;
+    varient.colorName = colorName;
+    varient.colorCode = colorCode;
 
-    console.log("updated successfully...");
+    await product.save();
+
+    // console.log("updated successfully...", productUpdate);
+
     res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
     console.error("Error in addColorVarient:", error);
@@ -931,17 +939,19 @@ const editColorVarient = async (req, res) => {
 
 const deleteColorVarient = async (req, res) => {
   try {
-    const { varientId } = req.body;
+    const { varientId, productId } = req.body;
 
     console.log(varientId, "colorVarientId");
 
-    const colorVariant = await Varient.findOne({ _id: varientId });
+    const colorVariant = await Product.findByIdAndUpdate(
+      productId,
+      { $pull: { varient: { _id: varientId } } },
+      { new: true }
+    );
 
     if (!colorVariant) {
       return res.status(409).json({ message: "No color varient found" });
     }
-
-    await Varient.findByIdAndDelete(colorVariant._id);
 
     return res
       .status(200)
@@ -961,13 +971,14 @@ const addSizeVarient = async (req, res) => {
       quantity,
       price,
     };
-    const product = await Product.findOne({
-      _id: productId,
-      "varient._id": varientId,
-      "varient.subVarient.size": size,
-    });
 
-    if (product) {
+    const product = await Product.findById(productId)
+    const checkvarient = product.varient.find((v) => v._id == varientId)
+    const checksubvarient = checkvarient.subVarient.find((sv) => sv.size == size)
+
+
+
+    if (checksubvarient) {
       return res
         .status(409)
         .json({ message: "Size with this value already exists." });
@@ -995,29 +1006,31 @@ const addSizeVarient = async (req, res) => {
 
 const editSizeVarient = async (req, res) => {
   try {
-    const { price, size, quantity, id, varientId } = req.body;
+    const { price, size, quantity, id, varientId, productId } = req.body;
 
-    let checkingSubVarient = await Subvarient.findOne({
-      size: size,
-      varient: varientId,
-      _id: { $ne: id },
-    });
+    const product = await Product.findById(productId);
+    const varient = product.varient.find((v) => v._id == varientId);
 
-    if (!checkingSubVarient) {
-      let subVarient = await Subvarient.findOne({ _id: id });
+    const check = varient.subVarient.find(
+      (sv) => sv._id != id && sv.size == size
+    );
 
-      subVarient.price = price;
-      subVarient.size = size;
-      subVarient.quantity = quantity;
-
-      await subVarient.save();
-
-      return res.status(200).json({ subVarient: subVarient });
-    } else {
+    if (check) {
       return res
         .status(409)
         .json({ message: "Size with this value already exists." });
     }
+
+    const subVarient = varient.subVarient.find((sv) => sv._id == id);
+
+    subVarient.price = price;
+    subVarient.size = size;
+    subVarient.quantity = quantity;
+
+    await product.save();
+
+    return res.status(200).json({ subVarient: subVarient });
+
   } catch (error) {
     console.error("Error in addColorVarient:", error);
     res.status(500).json({ error: error.message });
@@ -1026,13 +1039,20 @@ const editSizeVarient = async (req, res) => {
 
 const deleteSizeVarient = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, productId, varientId } = req.body;
 
-    const subVarient = await Subvarient.findByIdAndDelete(id);
-    if (subVarient) {
+    // const subVarient = await Subvarient.findByIdAndDelete(id);
+
+    const product = await Product.findOneAndUpdate(
+      { _id: productId, 'varient._id': varientId },
+      { $pull: { 'varient.$.subVarient': { _id: id } } },
+      { new: true }
+    );
+
+    if (product) {
       return res
         .status(200)
-        .json({ message: "Size deleted successfully", subVarient: subVarient });
+        .json({ message: "Size deleted successfully", subVarient: product });
     } else {
       return res.status(404).json({ error: "Size not found" });
     }
@@ -1099,16 +1119,21 @@ const singleProductData = async (req, res) => {
 const order = async (req, res) => {
   try {
     let page = req.query.page || 1;
+    let search = req.query.search
     let limit = 3;
     let skip = (page - 1) * limit;
 
-    let orders = await Order.find({})
+    const q = search ? {orderId: {$regex: new RegExp(search, "i")}} : {}
+
+    let orders = await Order.find(q)
       .populate("userId")
       .sort({ orderedDate: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalOrders = await Order.countDocuments({});
+    
+
+    const totalOrders = await Order.countDocuments(q);
     const totalPages = Math.ceil(totalOrders / limit);
 
     res.render("admin/order", {
@@ -1125,6 +1150,10 @@ const order = async (req, res) => {
 const orderItem = async (req, res) => {
   try {
     const orderId = req.query.oid;
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(404).render("admin/forNotFor");
+    }
 
     const order = await Order.findOne({ _id: orderId }).populate("userId");
 
@@ -1174,19 +1203,20 @@ const changeOrderStatus = async (req, res) => {
       if (status == "Cancelled" || status == "Returned") {
         // To update quantity
 
-        let subVartient = await Subvarient.findOne({
-          _id: orderItem.productId,
-        });
-        if (subVartient) {
-          subVartient.quantity += orderItem.quantity;
-          await subVartient.save();
+        let product = await Product.findById(orderItem.productId)
+        let varient = product.varient.find((v) => v._id.toString() == orderItem.varientId)
+        let subVarient = varient.subVarient.find((sv) => sv._id.toString() == orderItem.subVarientId)
+  
+        if (subVarient) {
+          subVarient.quantity += orderItem.quantity;
+          await subVarient.save();
         }
 
         if (status == "Returned") {
           if (order.paymentMethod == "COD") {
             orderItem.paymentStatus = "Refunded";
             await order.save();
-          } else if (order.paymentMethod == "ONLINE_PAYMENT") {
+          } else if (order.paymentMethod == "ONLINE_PAYMENT" && order.paymentStatus != "Pending") {
             let wallet = await Wallet.findOne({ userId: order.userId });
 
             if (!wallet) {
@@ -1513,12 +1543,20 @@ const salesReportData = async (req, res) => {
 const categoryOffer = async (req, res) => {
   try {
     if (req.method == "GET") {
-      const categoryOffers = await Categoryoffer.find({}).populate(
-        "categoryId"
-      );
+      let page = req.query.page || 1;
+      let limit = 1;
+      let skip = (page - 1) * limit;
 
+      const categoryOffers = await Categoryoffer.find({})
+          .populate("categoryId")
+          .skip(skip)
+          .limit(limit);
+
+      const totalOffers = await Categoryoffer.countDocuments({});
+      const totalPages = Math.ceil(totalOffers / limit);     
       res.render("admin/categoryOffer", {
         categoryOffers: categoryOffers,
+        totalPages: totalPages,
         isLogin: true,
         adminName: req.session.adminName,
       });
@@ -1566,15 +1604,15 @@ const editCategoryOffer = async (req, res) => {
       const { offerId, offerPercentage, expiryDate } = req.body.data;
 
       const offer = await Categoryoffer.findOneAndUpdate(
-        {_id: offerId},
+        { _id: offerId },
         {
           percentage: offerPercentage,
-          expiryDate: expiryDate
+          expiryDate: expiryDate,
         },
         {
-          new: true
+          new: true,
         }
-      )
+      );
 
       if (!offer) {
         return res
@@ -1617,10 +1655,22 @@ const productOffer = async (req, res) => {
     if (req.method == "GET") {
       const products = await Product.find({ isDelete: false });
 
-      const productOffer = await Productoffer.find({}).populate("productId");
+      let page = req.query.page || 1;
+      let limit = 10;
+      let skip = (page - 1) * limit;
+
+
+      const productOffer = await Productoffer.find({})
+          .populate("productId")
+          .skip(skip)
+          .limit(limit);
+
+      const totalOffers = await Productoffer.countDocuments({});
+      const totalPages = Math.ceil(totalOffers / limit);     
 
       res.render("admin/productOffer", {
         productOffer: productOffer,
+        totalPages: totalPages,
         products: products,
         isLogin: true,
         adminName: req.session.adminName,
@@ -1657,6 +1707,38 @@ const addProductOffer = async (req, res) => {
       res
         .status(200)
         .json({ offer: offer, message: "Offer created successfully" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+const editProductOffer = async (req, res) => {
+  try {
+    if (req.method == "POST") {
+      const { offerId, offerPercentage, expiryDate } = req.body.data;
+
+      const offer = await Productoffer.findOneAndUpdate(
+        { _id: offerId },
+        {
+          percentage: offerPercentage,
+          expiryDate: expiryDate,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!offer) {
+        return res
+          .status(400)
+          .json({ error: "Offer for this product does not exist" });
+      }
+
+      res
+        .status(200)
+        .json({ offer: offer, message: "Offer edited successfully" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1739,5 +1821,6 @@ module.exports = {
 
   productOffer,
   addProductOffer,
+  editProductOffer,
   deleteCategoryOffer,
 };

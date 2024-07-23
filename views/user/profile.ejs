@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> /
+            <span><a href="/" style="color: #4f2f2d;">Home</a></span> /
             <span>Profile</span>
           </p>
         </div>
@@ -36,7 +36,8 @@
       <% if(!gUser){ %>
         <a class="button" href="/profile/changePassword">Change Password</a>
         <% } %>
-          <div id="referral" referral-link="http://localhost:3000/signup?referralCode=<%= user.referral %>" class="button button-orange">Copy Referral Link</div>
+          <div id="referral" referral-link="http://localhost:3000/signup?referralCode=<%= user.referral %>"
+            class="button button-orange">Copy Referral Link</div>
 
     </div>
   </div>
@@ -59,12 +60,16 @@
                 <div class="form-group">
                   <label for="firstName">Full Name</label>
                   <input type="text" id="firstName" class="form-control" placeholder="First name" />
+                  <span id="firstNameError" style="color: red"></span>
+
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="lastName">Last Name</label>
                   <input type="text" id="lastName" class="form-control" placeholder="Last name" />
+                  <span id="lastNameError" style="color: red"></span>
+
                 </div>
               </div>
 
@@ -72,6 +77,8 @@
                 <div class="form-group">
                   <label for="phone">Phone Number</label>
                   <input type="text" id="phone" class="form-control" placeholder="Phone number" />
+                  <span id="phoneNumberError" style="color: red"></span>
+
                 </div>
               </div>
 
@@ -79,6 +86,8 @@
                 <div class="form-group">
                   <label for="email">Email address</label>
                   <input type="email" id="email" class="form-control" placeholder="Email address" disabled />
+                  <span id="emailError" style="color: red"></span>
+
                 </div>
               </div>
             </div>
@@ -116,28 +125,70 @@
       phoneNumber.value = pPhone.innerText
       emailAddress.value = pEmail.innerText
 
+      const firstNameError = document.getElementById('firstNameError')
+      const lastNameError = document.getElementById('lastNameError')
+      const phoneNumberError = document.getElementById('phoneNumberError')
+      const emailError = document.getElementById('emailError')
 
       const profileEditSaveBtn = document.getElementById('profileEditSaveBtn')
 
       profileEditSaveBtn.onclick = function (event) {
-        console.log("Hey hello", firstName.value, lastName.value);
 
-        axios
-          .post("/profile/editProfile", { firstName: firstName.value, lastName: lastName.value, phoneNumber: phoneNumber.value })
-          .then((response) => {
-            const data = response.data.data
-            console.log(response);
+        let isValid = true;
 
-            pFirstName.innerText = data.firstName
-            pLastName.innerText = data.lastName
-            pPhone.innerText = data.phone
 
-            document.querySelector('#profileEditModal .close').click();
+        //Name validation
+        if (!firstName.value.trim()) {
+          firstNameError.textContent = "This field is required";
+          isValid = false;
+        } else if (!/^(?! )[A-Za-zÀ-ÖØ-öø-ÿ' ]*(?<! )$/.test(firstName.value)) {
+          firstNameError.textContent = "Enter a valid firstname";
+          isValid = false;
+        } else {
+          firstNameError.textContent = "";
+        }
 
-          })
-          .catch((error) => {
-            console.log("it is an error", error);
-          });
+        if (!lastName.value.trim()) {
+          lastNameError.textContent = "This field is required";
+          isValid = false;
+        } else if (!/^(?! )[A-Za-zÀ-ÖØ-öø-ÿ' ]*(?<! )$/.test(lastName.value)) {
+          lastNameError.textContent = "Enter a valid lastname";
+          isValid = false;
+        } else {
+          lastNameError.textContent = "";
+        }
+
+        //Phone validation
+        if (!phoneNumber.value.trim()) {
+          phoneNumberError.textContent = "Phone number is required";
+          isValid = false;
+        } else if (
+          phoneNumber.value &&
+          !/^[789]\d{9}$/.test(phoneNumber.value)
+        ) {
+          phoneNumberError.textContent = "Enter a valid phone number";
+          isValid = false;
+        } else {
+          phoneNumberError.textContent = "";
+        }
+
+        if (isValid) {
+          axios
+            .post("/profile/editProfile", { firstName: firstName.value.trim(), lastName: lastName.value.trim(), phoneNumber: phoneNumber.value.trim() })
+            .then((response) => {
+              const data = response.data.data
+
+              pFirstName.innerText = data.firstName
+              pLastName.innerText = data.lastName
+              pPhone.innerText = data.phone
+
+              document.querySelector('#profileEditModal .close').click();
+
+            })
+            .catch((error) => {
+              console.log("it is an error", error);
+            });
+        }
       }
 
       const referral = document.getElementById('referral')
@@ -149,7 +200,7 @@
 
 
         navigator.clipboard.writeText(referralLink).then(function () {
-          referral.innerText = "Link Copied"          
+          referral.innerText = "Link Copied"
 
           setTimeout(() => {
             referral.innerText = "Copy Referral Link"

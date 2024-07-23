@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col">
           <p class="bread">
-            <span><a href="index.html">Home</a></span> / <span>Profile</span> /
+            <span><a href="/" style="color: #4f2f2d;">Home</a></span> / <span><a href="/profile" style="color: #4f2f2d;">Profile</a></span> /
             <span>Order</span>
           </p>
         </div>
@@ -28,11 +28,9 @@
                   <span>Amount</span>
                 </div>
                 <div class="one-eight text-center">
-                  <span>Payment</span>
+                  <span>Payment status</span>
                 </div>
-                <div class="one-eight text-center">
-                  <span>Status</span>
-                </div>
+        
                 <div class="one-eight text-center">
                   <span>Method</span>
                 </div>
@@ -41,8 +39,10 @@
                   <span></span>
                 </div>
               </div>
+   
 
               <div id="orderItemsContainer">
+                <% if(orders.length != 0){ %>
                 <% orders.forEach((order)=> { %>
 
                   <div class="product-cart d-flex" id="orderItemContainer<%= order._id %>">
@@ -71,43 +71,68 @@
                         <span class="price">₹ <%= order.totalAmount %></span>
                       </div>
                     </div>
+                    <% if(order.paymentStatus == "Success"){ %>
                     <div class="one-eight text-center">
                       <div class="display-tc">
-                        <span class="price" style="color: rgb(252, 134, 0);">
+                        <span class="price" style="color: green;">
                           <%= order.paymentStatus %>
                         </span>
                       </div>
                     </div>
-                    <div class="one-eight text-center">
-                      <div class="display-tc">
-                        <span class="price" style="color: rgb(252, 134, 0);">
-                          <%= order.orderStatus %>
-                        </span>
+                    <% } else if(order.paymentStatus == "Pending") { %>
+                      <div class="one-eight text-center">
+                        <div class="display-tc">
+                          <span class="price" style="color: rgb(217, 160, 28);">
+                            <%= order.paymentStatus %>
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                      <% } %>
+                   
                     <div class="one-eight text-center">
                       <div class="display-tc">
                         <span class="price" id="total${item._id}">
-                          <%= order.paymentMethod=="ONLINE_PAYMENT" ? "Online" : order.paymentMethod %>
+                          <%= order.paymentMethod=="ONLINE_PAYMENT" ? "Online" : order.paymentMethod=="WALLET" ? "Wallet" : order.paymentMethod %>
                         </span>
                       </div>
                     </div>
                     <div class="one-eight text-center">
                       <div class="display-tc">
-                        <!-- <a order-id="<%= order._id %>" id="viewMoreOrder" class="button editDltBtn" data-toggle="modal"
-                          data-target="#orderItemModal"
-                          style="border-color: black; padding: 5px; color: black; background-color: white;">View
-                          more</a> -->
-
-                          <a href="/profile/order/orderDetail?oid=<%= order._id %>" class="button editDltBtn" style="border-color: black; padding: 5px; color: black; background-color: white;">View more</a>  
+                        <a href="/profile/order/orderDetail?oid=<%= order._id %>" style="background-color: white; color: black;" class="btn btn-primary btn-sm">View More</a>
+                          <!-- <a href="/profile/order/orderDetail?oid=<%= order._id %>" class="button editDltBtn" style="border-color: black; padding: 5px; color: black; background-color: white;">View more</a>   -->
                       </div>
                     </div>
                   </div>
 
                   <% }) %>
+                  <% } else { %>
+                    <div class="text-center"> <img src="/static/user/images/empty.png" class="mt-5" width="250px" height="250px" alt="empty cart"> </div>
+
+                  <% } %>
               </div>
             </div>
           </div>
+
+
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <div class="block-27">
+                <ul>
+                  <li>
+                    <a href="" class="prevPageClass" id="prevBtn"><i class="ion-ios-arrow-back prevPageClass"></i></a>
+                  </li>
+    
+                  <% for(let i=1; i<= totalPages; i++){ %>
+                    <li class="active pagenationBtn" data-page-no="<%= i %>"><a id="pageNo"  style="background-color: #4f2f2d;"><%= i %></a></li>
+                    <% } %>
+    
+                  <li>
+                    <a href="" total-pages="<%= totalPages %>" class="nxtPageClass" id="nxtBtn"><i class="ion-ios-arrow-forward nxtPageClass"></i></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div> 
 
         </div>
       </div>
@@ -138,128 +163,63 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-
-  <script>
-
-
-    document.addEventListener('click', (event) => {
-      if (event.target.id == "viewMoreOrder") {
-        console.log(event.target)
-        let orderItemContainer = document.getElementById("orderItemContainer")
-        let showOrderId = document.getElementById("showOrderId")
-
-        const clickedBtn = event.target
-
-        const oid = clickedBtn.getAttribute('order-id')
-
-        orderItemContainer.innerHTML = ""
-
-        axios
-          .get(`/profile/order/getOrderById?oid=${oid}`)
-          .then((response) => {
-            if (response.status == 200) {
-
-               console.log(response.data);
-               showOrderId.innerText = response.data.order.orderId
-               response.data.order.orderedItems.map((item) => {
-                orderItemContainer.innerHTML += `
-                              <div class="product-cart d-flex" id="cartItemContainer${item._id}">
-            <div class="one-forth">
-              <div class="product-img" style="background-image: url('/static/images/${item.image}');">
-              </div>
-              <div class="display-tc">
-                <span style="margin-left: 30px; color: black">${item.modelName}</span><br>
-                <span style="margin-left: 30px;" class="price">Color: ${item.color}</span><br>
-                <span style="margin-left: 30px;" class="price">Size: ${item.size}</span><br>
-
-              </div>
-            </div>
-            <div class="one-forth text-center">
-              <div class="display-tc">
-                <span class="price">₹ ${item.price}</span>
-              </div>
-            </div>
-            <div class="one-eight text-center">
-              <div class="display-tc">
-                <span class="price" style="color: rgb(252, 134, 0);">${item.orderStatus == "REQUESTED_FOR_RETURN" ? "Return requested" : item.orderStatus}</span>
-
-              </div>
-            </div>
-            <div class="one-eight text-center">
-              <div class="display-tc">
-                <a address-id="" href="/profile/order/itemDetail?oid=${oid}&itid=${item._id}" class="button editDltBtn" style="border-color: black; padding: 5px; color: black; background-color: white;">View more</a>
-              </div>
-            </div>
-          </div> 
-                `
-               })
-
-            }
-          })
-          .catch((error) => {
-            console.log("it is an error", error);
-          });
-
+ <script>
+  document.addEventListener("DOMContentLoaded", (event) => {
+    let queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    let pgno = urlParams.get("page");
+  
+    let currentPath = window.location.pathname; 
+  
+    if(!pgno){
+    urlParams.set('page', 1);
+    window.history.replaceState({}, '', `${currentPath}?page=${1}`);
+    }
+  
+    document.addEventListener("click", (event) => {
+      queryString = window.location.search;
+      urlParams = new URLSearchParams(queryString);
+      pgno = urlParams.get("page");
+    
+      currentPath = window.location.pathname; 
+    
+      // Pagination number button
+      if (event.target && event.target.closest(".pagenationBtn")) {
+        let pageNo = event.target
+          .closest(".pagenationBtn")
+          .getAttribute("data-page-no");
+        console.log(pageNo);
+        if (pgno != pageNo) {
+        //   urlParams.set('page', pageNo);
+          window.location.href = `${currentPath}?page=${pageNo}`;
+        }
       }
+      // Next button
+      if (event.target && event.target.closest("#nxtBtn")) {
+        event.preventDefault();
+        const totalPages = event.target
+          .closest("#nxtBtn")
+          .getAttribute("total-pages");
+  
+        if (pgno < totalPages) {
+          let n = Number(pgno) + 1;
+        //   urlParams.set('page', n);
+          window.location.href = `${currentPath}?page=${n}`;
+        }
+      }
+      // Previous button
+      if (event.target && event.target.closest("#prevBtn")) {
+        event.preventDefault();
+        if (pgno > 1) {
+          let n = Number(pgno) - 1;
+        //   urlParams.set('page', n);
+          window.location.href = `${currentPath}?page=${n}`;
+        }
+      }
+    });
 
-      // if(event.target && event.target.id=="payAmountNow"){
-      //   const orderId = event.target.getAttribute('order-id')
-      
-      //   axios
-      //     .post(`/profile/order/payNowOrder`, {orderId: orderId})
-      //     .then((response) => {
-      //       if (response.status == 200) {
-      //           const data = response.data
-      //           var options = {
-      //             "key": "rzp_test_3v8uE4x50656nf",
-      //             "amount": data.razOrder.amount,
-      //             "currency": "INR",
-      //             "name": "STEPUP",
-      //             "order_id": data.razOrder.id,
-      //             "handler": function (response) {
-      //               // Payment success handler
-      //               window.location.href = `/shop/orderComplete?oid=${data.order._id}`
-
-      //             },
-      //             "theme": {
-      //               "color": "#66BCEE"
-      //             },
-      //             "modal": {
-      //               "ondismiss": function () {
-      //                 // Payment dismiss handler
-      //                 console.log("payment dismissed.")
-      //               }
-      //             }
-      //           };
-      //           var razorpayObject = new Razorpay(options);
-      //           razorpayObject.on('payment.failed', function (response) {
-      //             // Payment failure handler
-      //             new Noty({
-      //             type: 'error',
-      //             text: "Payment failed",
-      //             timeout: 3000,
-      //             layout: 'bottomCenter',
-      //             theme: 'metroui',
-      //           }).show();
-      //           });
-
-
-      //           razorpayObject.open();
-
-
-      //         }
-      //     })
-      //     .catch((error) => {
-      //       console.log("it is an error", error);
-      //     });
-        
-      // }
-    })
-
-
-
-
-  </script>
+})
+</script>
+  <script src="/static/custom/js/user/order.js"></script>
 
   <%- include('./footer') %>

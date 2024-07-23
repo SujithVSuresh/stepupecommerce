@@ -1,12 +1,19 @@
 document.addEventListener("DOMContentLoaded", (event) => {
 
+  document.getElementById('searchFormContainer').style.display = "block"
+
+
+  const url = new URL(window.location.href);
+  const searchValue = url.searchParams.get('search');
+
+  if(searchValue){
+  document.getElementById('search-input').value = searchValue
+  }
+
   document.addEventListener("click", (event) => {
-
-
 
   if (event.target && event.target.classList.contains("statusBtn")) {
     event.preventDefault();
-    console.log("kkoooppp");
 
     const userId = event.target.getAttribute("data-user-id");
 

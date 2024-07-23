@@ -16,16 +16,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
       pgno = urlParams.get("page");
     
       currentPath = window.location.pathname; 
+
+      const searchValue = urlParams.get("search")
+
+    
     
       // Pagination number button
       if (event.target && event.target.closest(".pagenationBtn")) {
         let pageNo = event.target
           .closest(".pagenationBtn")
           .getAttribute("data-page-no");
-        console.log(pageNo);
         if (pgno != pageNo) {
-        //   urlParams.set('page', pageNo);
-          window.location.href = `${currentPath}?page=${pageNo}`;
+          window.location.href = searchValue ? `${currentPath}?page=${pageNo}&search=${searchValue}` : `${currentPath}?page=${pageNo}`;
         }
       }
       // Next button
@@ -37,8 +39,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   
         if (pgno < totalPages) {
           let n = Number(pgno) + 1;
-        //   urlParams.set('page', n);
-          window.location.href = `${currentPath}?page=${n}`;
+          window.location.href = searchValue ? `${currentPath}?page=${n}&search=${searchValue}` : `${currentPath}?page=${n}`;
         }
       }
       // Previous button
@@ -46,8 +47,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         event.preventDefault();
         if (pgno > 1) {
           let n = Number(pgno) - 1;
-        //   urlParams.set('page', n);
-          window.location.href = `${currentPath}?page=${n}`;
+          window.location.href = searchValue ? `${currentPath}?page=${n}&search=${searchValue}` : `${currentPath}?page=${n}`;;
         }
       }
     });
