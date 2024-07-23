@@ -590,6 +590,7 @@ if (!phone.value.trim()) {
             .post("/address/addAddress", data)
             .then((response) => {
               if (response.status == 200) {
+                window.location.href = "/shop/checkout"
 
               }
             })

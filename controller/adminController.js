@@ -396,7 +396,7 @@ const dashboardSalesData = async (req, res) => {
 const products = async (req, res) => {
   try {
     let page = req.query.page || 1;
-    let limit = 2;
+    let limit = 10;
     let skip = (page - 1) * limit;
 
     const products = await Product.find({ isDelete: false })
@@ -592,7 +592,7 @@ const users = async (req, res) => {
   try {
     let page = req.query.page || 1;
     let search = req.query.search
-    let limit = 2;
+    let limit = 10;
     let skip = (page - 1) * limit;
 
     const q = search ? {email: {$regex: new RegExp(search, "i")}} : {}
@@ -712,11 +712,23 @@ const brandList = async (req, res) => {
 
 const category = async (req, res) => {
   try {
-    let categories = await Category.find({ isDelete: false });
 
-    console.log(category);
+    let page = req.query.page || 1;
+    let limit = 10;
+    let skip = (page - 1) * limit;
+
+
+  let categories = await Category.find({ isDelete: false })
+      .skip(skip)
+      .limit(limit)
+   
+
+    const totalCategories = await Category.countDocuments({ isDelete: false });
+    const totalPages = Math.ceil(totalCategories / limit);
+
     res.render("admin/category", {
       categories: categories,
+      totalPages: totalPages,
       isLogin: true,
       adminName: req.session.adminName,
     });
@@ -1118,7 +1130,7 @@ const order = async (req, res) => {
   try {
     let page = req.query.page || 1;
     let search = req.query.search
-    let limit = 3;
+    let limit = 10;
     let skip = (page - 1) * limit;
 
     const q = search ? {orderId: {$regex: new RegExp(search, "i")}} : {}
@@ -1575,7 +1587,7 @@ const categoryOffer = async (req, res) => {
   try {
     if (req.method == "GET") {
       let page = req.query.page || 1;
-      let limit = 1;
+      let limit = 10;
       let skip = (page - 1) * limit;
 
       const categoryOffers = await Categoryoffer.find({})

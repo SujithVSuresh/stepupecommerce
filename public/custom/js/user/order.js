@@ -56,6 +56,5 @@ document.addEventListener('click', (event) => {
         .catch((error) => {
           console.log("it is an error", error);
         });
-
     }
   })

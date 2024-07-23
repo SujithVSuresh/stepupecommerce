@@ -73,11 +73,6 @@ Swal.fire({
                         <td>${product.outerMaterial}</td>
                         <td>${product.soleMaterial}</td>
 
-                        <td>${
-                          product.isActive
-                            ? `<span class="text-success">ACTIVE</span>`
-                            : `<span class="text-danger">INACTIVE</span>`
-                        }</td>
                        <td><button data-product-id="${product._id}" id="relist${
                 product._id
               }" type="button" class="productRelistBtn btn btn-outline-dark btn-sm statusBtn">Relist</button></td>

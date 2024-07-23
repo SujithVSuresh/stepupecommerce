@@ -998,10 +998,8 @@ const items = async (req, res) => {
 
       const productsWithOffers = await Product.aggregate(pipeline);
 
-      console.log("ll", productsWithOffers);
-
       const page = parseInt(req.query.page) || 1;
-      const limit = 2;
+      const limit = 9;
 
       const skip = (page - 1) * limit;
 

@@ -91,6 +91,7 @@
         </li>
 
 
+    
         <li class="nav-item">
           <a class="nav-link" data-toggle="collapse" href="#ui-offers" aria-expanded="false" aria-controls="ui-basic">
             <span class="menu-title">OFFERS</span>
@@ -159,6 +160,19 @@
               </div>
             </div>
             <% }); %>
+        </div>
+
+        <div class="d-flex justify-content-center" style="margin-top: 250px;">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
+              <% for(let i=1; i<= totalPages; i++){ %>
+              <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
+              <% } %>
+  
+              <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
+            </ul>
+          </nav>
         </div>
 
         <!-- Start of add modal -->
@@ -236,4 +250,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
   <script src="/static/custom/js/admin/category.js"></script>
+
+  <script src="/static/custom/js/admin/pagenation.js"></script>
+
     <%- include('./footer') %>
