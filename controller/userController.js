@@ -999,7 +999,7 @@ const items = async (req, res) => {
       const productsWithOffers = await Product.aggregate(pipeline);
 
       const page = parseInt(req.query.page) || 1;
-      const limit = 9;
+      const limit = 12;
 
       const skip = (page - 1) * limit;
 
