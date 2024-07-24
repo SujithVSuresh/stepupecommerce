@@ -999,7 +999,7 @@ const items = async (req, res) => {
       const productsWithOffers = await Product.aggregate(pipeline);
 
       const page = parseInt(req.query.page) || 1;
-      const limit = 12;
+      const limit = 9;
 
       const skip = (page - 1) * limit;
 
@@ -1015,8 +1015,6 @@ const items = async (req, res) => {
       });
 
       const productsWithOffers2 = await Product.aggregate(pipeline);
-
-      console.log("ll", productsWithOffers2);
 
       res.status(200).json({
         products: productsWithOffers2,
@@ -2338,6 +2336,7 @@ const placeOrder = async (req, res) => {
       order.paymentMethod = paymentMethod;
       order.totalAmount = totalAmount.totalAmount;
       order.discountAmount = totalAmount.couponDiscount ? totalAmount.couponDiscount : 0
+      order.deliveryCharge = totalAmount.shippingPrice ? totalAmount.shippingPrice : 0
 
       cart.items.forEach((item) => {
         order.orderedItems.push({

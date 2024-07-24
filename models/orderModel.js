@@ -170,6 +170,10 @@ const orderSchema = mongoose.Schema({
     type: Number,
     required: false,
   },
+  deliveryCharge:{
+    type: Number,
+    required: false
+  },
   paymentMethod: {
     type: String,
     required: true,
