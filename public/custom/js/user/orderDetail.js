@@ -30,7 +30,7 @@ document.addEventListener('click', (event) => {
 
         // doc.text("Total price: 4352", 150, 200);
         doc.text(`Discount: ${discountAmount}`, 150, 210);
-        doc.text(`Delivery charge: ${deliveryCharge}`, 150, 220); 
+        doc.text(`Delivery charge: ${deliveryCharge ? deliveryCharge : 0}`, 150, 220); 
         doc.text(`Total amount: Rs ${totalAmount}`, 150, 230); 
 
 
