@@ -867,6 +867,7 @@ const items = async (req, res) => {
       const pipeline = [
         {
           $match: {
+           isDelete: false,
             $expr: {
               $and: [
                 { $gt: [{ $size: "$varient" }, 0] },
