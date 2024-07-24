@@ -2330,8 +2330,7 @@ const placeOrder = async (req, res) => {
       order.address.state = address.address[0].state;
       order.address.cityDistrictTown = address.address[0].cityDistrictTown;
       order.address.localityAreaStreet = address.address[0].localityAreaStreet;
-      order.address.housenoBuildingApartment =
-        address.address[0].housenoBuildingApartment;
+      order.address.housenoBuildingApartment = address.address[0].housenoBuildingApartment;
 
       order.paymentMethod = paymentMethod;
       order.totalAmount = totalAmount.totalAmount;

@@ -128,9 +128,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }
 
     if (event.target && event.target.id == "trackOrder") {
-      console.log(event.target, "rr");
       const orderId = event.target.getAttribute("order-id");
       const orderItemId = event.target.getAttribute("item-id");
+
+      function addDays(date, days) {
+        const result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
 
       axios
         .get(
@@ -165,7 +170,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                         </div>
        
     
-                        <div class="d-flex flex-column align-items-end"><span>15 Mar</span><span>Delivery expected</span></div>
+                        <div class="d-flex flex-column align-items-end"><span>${dateFormatter(addDays(orderItem.orderedDate, 4))}</span>Delivery expected</span></div>
                       </div>
 
                 </div>
@@ -224,7 +229,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 <div class="d-flex flex-column justify-content-center align-items-center"><span>${dateFormatter(orderItem.shippedDate)}</span><span>Order Shipped</span></div>
                        
 
-                <div class="d-flex flex-column align-items-end"><span>15 March</span><span>Delivery expected</span></div>
+                <div class="d-flex flex-column align-items-end"><span>${dateFormatter(addDays(orderItem.orderedDate, 4))}</span><span>Delivery expected</span></div>
               </div>
 
         </div>

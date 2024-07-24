@@ -124,7 +124,7 @@
                   </div>
                 </div>
               </div>
-              <% if ((orderedItem.orderStatus != "Pending" && paymentMethod == "COD" && orderedItem.paymentStatus != "Pending") || (orderedItem.orderStatus!="Pending" && paymentMethod != "COD" && orderedItem.paymentStatus != "Pending")) { %>
+              <% if ((orderedItem.orderStatus != "Pending" && paymentMethod == "COD" && orderedItem.paymentStatus == "Pending") || (orderedItem.orderStatus!="Pending" && paymentMethod != "COD" && orderedItem.paymentStatus != "Pending")) { %>
               <div id="orderItemsContainer">
                 <div class="product-cart d-flex" style="background-color: #f1f1f1; padding: 20px;">
                   <div class="one-forth">

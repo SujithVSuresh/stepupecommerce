@@ -172,6 +172,7 @@ const orderSchema = mongoose.Schema({
   },
   deliveryCharge:{
     type: Number,
+    default: 0,
     required: false
   },
   paymentMethod: {
