@@ -7,12 +7,10 @@ loginForm.addEventListener('submit', (event) => {
 
     let email = document.getElementById("email").value
     let password = document.getElementById("password").value
-    console.log("kkk")
 
     let isValid = true;
 
-                //Email validation
-                if (!email.trim()) {
+   if (!email.trim()) {
   emailError.textContent = "Email is required";
   isValid = false;
 } else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

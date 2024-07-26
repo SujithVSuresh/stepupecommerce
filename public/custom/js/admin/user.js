@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
           .post("/admin/users/data/status", { userId: userId })
           .then((response) => {
             if (response.status == 200) {
-              console.log(response.data.isBlocked, "Uioo");
               if (response.data.isBlocked == false) {
                 let statusBtn = document.getElementById(response.data._id);
                 let label = document.getElementById(

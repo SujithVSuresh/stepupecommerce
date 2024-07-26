@@ -220,7 +220,6 @@
       let pageNo = event.target
         .closest(".pagenationBtn")
         .getAttribute("data-page-no");
-      console.log(pageNo);
       if (pgno != pageNo) {
       //   urlParams.set('page', pageNo);
         window.location.href = `${currentPath}?page=${pageNo}`;
@@ -325,7 +324,6 @@ function walletPaymentSuccess(amount) {
       }
     })
     .catch((error) => {
-      console.log("it is an error123", error)
       if (error.response.status == 404) {
 
         new Noty({
@@ -407,7 +405,6 @@ addAmountToWalletBtn.addEventListener('click', (event) => {
         }
       })
       .catch((error) => {
-        console.log("it is an error123", error)
         if (error.response.status == 409) {
           new Noty({
             type: 'error',

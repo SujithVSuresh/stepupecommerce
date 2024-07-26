@@ -101,7 +101,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     }
                 })
                 .catch((error) => {
-                    console.log("it is an error", error);
                     if (error.response.status == 409) {
                         new Noty({
                             type: 'warning',

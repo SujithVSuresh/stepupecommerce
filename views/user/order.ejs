@@ -188,7 +188,6 @@
         let pageNo = event.target
           .closest(".pagenationBtn")
           .getAttribute("data-page-no");
-        console.log(pageNo);
         if (pgno != pageNo) {
         //   urlParams.set('page', pageNo);
           window.location.href = `${currentPath}?page=${pageNo}`;

@@ -126,13 +126,11 @@
     axios
       .post("/signup/otp/verify", { otpVal: otpVal.value })
       .then((response) => {
-        console.log(response);
         if (response.status == 200) {
           window.location.href = "/signin";
         }
       })
       .catch((error) => {
-        console.log("it is an error", error);
         if (error.response.status == 400) {
           new Noty({
             type: "error",

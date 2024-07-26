@@ -8,11 +8,9 @@ const auth = require("../middleware/adminAuth")
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      // Define the destination where uploaded files will be stored
       cb(null, path.join(__dirname, "../public/images"));
     },
     filename: function (req, file, cb) {
-      // Define the filename for uploaded files
       cb(null, Date.now() + "-" + file.originalname);
     },
   });

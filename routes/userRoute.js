@@ -52,13 +52,10 @@ router.post('/shop/requestForReturn', auth.isLogin,  userController.requestForRe
 
 router.get('/shop/orderComplete', auth.isLogin,  userController.orderComplete)
 
-
-//router.get('/shop/product/details', userController.fetchProductDetails)
 router.get('/address', auth.isLogin, userController.address)
 router.post('/address/addAddress', auth.isLogin, userController.createAddress)
 router.post('/address/deleteAddress', auth.isLogin, userController.deleteAddress)
 router.post('/address/editAddress', auth.isLogin, userController.editAddress)
-// router.get('/address/showAddress', userController.showAddress)
 
 router.get('/profile', auth.isLogin, userController.profile)
 router.post('/profile/editProfile', auth.isLogin, userController.editProfile)
@@ -102,10 +99,6 @@ router.get('/signup/otp', auth.isLogout,  userController.otp)
 router.post('/signup/otp/email',  auth.isLogout, userController.otpMailSender)
 
 router.post('/signup/otp/verify', userController.verifyOtp)
-
-// router.get('*', (req, res) => {
-//     res.render("user/forNotFor")
-// });
 
 
 

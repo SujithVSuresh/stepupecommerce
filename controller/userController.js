@@ -249,7 +249,6 @@ let googleSuccess = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.user.emails[0].value });
 
-    console.log("green", req.user);
     if (!user) {
       user = new User({
         firstName: req.user.name.givenName,
@@ -283,7 +282,6 @@ let googleSuccess = async (req, res) => {
 const signup = async (req, res) => {
   try {
     if (req.method == "GET") {
-      console.log("12345", req.query.referralCode)
       
       res.render("user/signup", { isLogin: false, referralCode: req.query.referralCode ? req.query.referralCode : ""  });
     }
@@ -340,7 +338,6 @@ const signin = async (req, res) => {
 
     if (req.method == "POST") {
       const { email, password } = req.body;
-      console.log(email, password);
 
       const user = await User.findOne({
         email: email,
@@ -513,7 +510,6 @@ const verifyOtp = async (req, res) => {
 
       if(req.session.referralCode){
         const referral = req.session.referralCode
-        console.log("haveelss", referral);
 
         const user = await User.findOne({referral: referral})
 
@@ -590,269 +586,6 @@ const shop = async (req, res) => {
   }
 };
 
-// const items = async (req, res) => {
-//     try{
-//     if(req.method === "GET"){
-//         let varients = await Varient.find({}).populate("product");
-
-//         let products = await Product.find({}).populate("category");
-
-//         let subVarients = await Subvarient.find({})
-
-//         res.status(200).json({varients: varients, products: products, subVarients: subVarients})
-
-//     }
-// } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// }
-
-// const items = async (req, res) => {
-//   try {
-//     if (req.method === "GET") {
-//       const sort = req.query.sort;
-
-//       const search = req.query.search.toLowerCase();
-//       const categories = req.query.category.split(",");
-//       const brands = req.query.brand.split(",");
-//       const gender = req.query.gender.split(",");
-//       const color = req.query.color.split(",");
-//       const size = req.query.size.split(",");
-//       const price = req.query.price.split(",");
-
-//       let products = await Product.find({ isDelete: false })
-//         .populate("category")
-//         .populate("brand");
-
-//       let varients = await Varient.find({}).populate("product");
-//       let subVarients = await Subvarient.find({});
-
-//       const categoryOffers = await Categoryoffer.find({});
-//       const productOffers = await Productoffer.find({});
-
-//       const findingProductWithVarient = await Promise.all(
-//         products.map(async (item) => {
-//           const sub = await Subvarient.findOne({ product: item._id });
-//           return sub ? item : null;
-//         })
-//       );
-
-//       const productsWithVarients = findingProductWithVarient.filter(
-//         (item) => item !== null
-//       );
-
-//       let mappedProduct = productsWithVarients.map((product) => {
-
-//         let categoryOffer = checkCategoryOffer(categoryOffers, product);
-//         let productOffer = checkProductOffer(productOffers, product);
-
-//         let offer = selectOffer(categoryOffer, productOffer);
-
-//         let filteredVarients = varients
-//           .filter(
-//             (varient) =>
-//               varient.product._id.toString() === product._id.toString()
-//           )
-//           .map((varient) => {
-//             let filteredSubvarients = subVarients.filter(
-//               (subVarient) =>
-//                 subVarient.varient.toString() === varient._id.toString()
-//             );
-//             let finalSubVarient = filteredSubvarients.map((item) => {
-//               let offerAmount = offer ? calculateOffer(item, offer) : 0;
-
-//               return { ...item._doc, offerAmount: offerAmount };
-//             });
-//             return { ...varient._doc, subVarients: finalSubVarient };
-//           });
-
-//         return {
-//           ...product._doc,
-//           varients: filteredVarients,
-//           offerPercentage: offer ? offer : 0,
-//         };
-//       });
-
-//       let filteredProducts = mappedProduct;
-
-//       if (categories[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           if (categories.includes(product.category.categoryName)) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (brands[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           if (brands.includes(product.brand.name)) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (gender[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           if (gender.includes(product.gender)) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (color[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           let filterVarients = product.varients.filter((varient) => {
-//             if (color.includes(varient.colorName.toLowerCase())) {
-//               return varient;
-//             }
-//           });
-
-//           if (filterVarients.length != 0) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (size[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           let count = 0;
-
-//           product.varients.forEach((varient) => {
-//             let filterSubVarients = varient.subVarients.filter((item) => {
-//               if (size.includes(item.size)) {
-//                 return item;
-//               }
-//             });
-
-//             if (filterSubVarients.length != 0) {
-//               count++;
-//             }
-//           });
-
-//           if (count > 0) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (price[0] != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           let count = 0;
-
-//           product.varients.forEach((varient) => {
-//             let filterSubVarients = varient.subVarients.filter((item) => {
-//               if (price.includes("0-500")) {
-//                 if (item.price >= 1 && item.price <= 500) {
-//                   return item;
-//                 }
-//               } else if (price.includes("501-1000")) {
-//                 if (item.price >= 501 && item.price <= 1000) {
-//                   return item;
-//                 }
-//               } else if (price.includes("1001-1500")) {
-//                 if (item.price >= 1001 && item.price <= 1500) {
-//                   return item;
-//                 }
-//               } else if (price.includes("1501-2000")) {
-//                 if (item.price >= 1501 && item.price <= 2000) {
-//                   return item;
-//                 }
-//               } else if (price.includes("2001-2500")) {
-//                 if (item.price >= 2001 && item.price <= 2500) {
-//                   return item;
-//                 }
-//               } else if (price.includes("2501-3000")) {
-//                 if (item.price >= 2501 && item.price <= 3000) {
-//                   return item;
-//                 }
-//               } else if (price.includes("3001-10000")) {
-//                 if (item.price >= 3001) {
-//                   return item;
-//                 }
-//               }
-//             });
-
-//             if (filterSubVarients.length != 0) {
-//               count++;
-//             }
-//           });
-
-//           if (count > 0) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (search != "") {
-//         filteredProducts = filteredProducts.filter((product) => {
-//           if (product.modelName.toLowerCase().includes(search)) {
-//             return product;
-//           }
-//         });
-//       }
-
-//       if (sort == "name-atoz") {
-//         console.log("sort,", sort);
-//         filteredProducts.sort((a, b) => {
-//           if (a.modelName < b.modelName) {
-//             return -1;
-//           }
-//           if (a.modelName > b.modelName) {
-//             return 1;
-//           }
-//           return 0;
-//         });
-//       } else if (sort == "name-ztoa") {
-//         console.log("sort123,", sort, filteredProducts);
-//         filteredProducts.sort((a, b) => {
-//           if (a.modelName > b.modelName) {
-//             return -1;
-//           }
-//           if (a.modelName < b.modelName) {
-//             return 1;
-//           }
-//           return 0;
-//         });
-//       } else if (sort == "price-asc") {
-//         console.log(filteredProducts);
-//         filteredProducts.sort(
-//           (a, b) =>
-//             a.varients[0].subVarients[0].price -
-//             b.varients[0].subVarients[0].price
-//         );
-//       } else if (sort == "price-desc") {
-//         console.log(filteredProducts);
-//         filteredProducts.sort(
-//           (a, b) =>
-//             b.varients[0].subVarients[0].price -
-//             a.varients[0].subVarients[0].price
-//         );
-//       } else {
-//         filteredProducts.sort((a, b) => b.date - a.date);
-//       }
-
-//       // Pagenation
-
-//       const page = parseInt(req.query.page) || 1;
-//       const limit = 9;
-
-//       const skip = (page - 1) * limit;
-
-//       const totalProducts = filteredProducts.length;
-//       const totalPages = Math.ceil(totalProducts / limit);
-
-//       const paginatedProducts = filteredProducts.slice(skip, skip + limit);
-
-//       res.status(200).json({
-//         products: paginatedProducts,
-//         totalPages: totalPages,
-//         currentPage: page,
-//       });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 
 const items = async (req, res) => {
   try {
@@ -1032,7 +765,6 @@ const relatedProducts = async (req, res) => {
   try {
     if (req.method == "GET") {
       let productId = req.query.pid;
-      console.log("givennnn");
 
       const product = await Product.findOne({ _id: productId }, {category: 1});
 
@@ -1089,7 +821,6 @@ const productDetailsPage = async (req, res) => {
         return res.status(404).render("user/forNotFor");
       }
 
-      console.log("productId", productId);
 
       // let subVarient = await Subvarient.findOne({
       //   product: productId,
@@ -1490,34 +1221,7 @@ const addToCart = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     if (req.method == "POST") {
-      // const { itemId } = req.body;
-      // const userId = req.session.userId;
 
-      // let wishlist = await Wishlist.findOne({ userId });
-
-      // if (!wishlist) {
-      //   return res.status(404).json({ message: "Wishlist not found." });
-      // }
-
-      // const productIndex = wishlist.items.findIndex((item) =>
-      //   item._id.equals(itemId)
-      // );
-
-      // if (productIndex > -1) {
-      //   let wishlistItem = await Wishlist.findOneAndUpdate(
-      //     { userId: userId },
-      //     { $pull: { items: { _id: itemId } } },
-      //     { new: true }
-      //   );
-      //   console.log("wishlistItem...", wishlistItem);
-      //   return res
-      //     .status(200)
-      //     .json({ message: "Product removed from wishlist." });
-      // } else {
-      //   return res
-      //     .status(404)
-      //     .json({ message: "Product does not exist in wishlist." });
-      // }
       const { itemId } = req.body;
       const userId = req.session.userId;
 
@@ -1551,8 +1255,6 @@ const addToWishlist = async (req, res) => {
   try {
     if (req.method == "POST") {
       const { productId, varientId, subVarientId } = req.body;
-
-      console.log(productId, varientId, subVarientId, "sssss131313");
       const userId = req.session.userId;
 
       let wishlist = await Wishlist.findOne({ userId });
@@ -1571,7 +1273,6 @@ const addToWishlist = async (req, res) => {
           .status(409)
           .json({ message: "Product already exist in wishlist." });
       } else {
-        console.log(productId, varientId, subVarientId, "jjj");
         wishlist.items.push({
           
            productId: productId, 
@@ -1597,15 +1298,12 @@ const removeFromCart = async (req, res) => {
       const userId = req.session.userId;
       const coupon = req.session.coupon;
 
-      console.log(itemId, userId, coupon, "blalala");
-
       const cart = await Cart.findOneAndUpdate(
         { userId: userId },
         { $pull: { items: { _id: itemId } } },
         { new: true }
       ).populate("items.productId");
 
-      console.log(cart, "cccc");
 
       if (cart) {
         if (req.session.cartCount) {
@@ -1774,7 +1472,6 @@ const editProfile = async (req, res) => {
       const userId = req.session.userId;
       const { firstName, lastName, phoneNumber } = req.body;
 
-      console.log(firstName, lastName, phoneNumber, "hooi");
       const user = await User.findOne({ _id: userId });
 
       if (user) {
@@ -1899,8 +1596,6 @@ const wallet = async (req, res) => {
               },
             },
           ]);
-
-      console.log(wallet, "wallet935890425");    
 
       const totalTransactions = await Wallet.aggregate([
         { $match: { userId: new mongoose.Types.ObjectId(userId) } },
@@ -2027,8 +1722,6 @@ const order = async (req, res) => {
       const totalOrders = await Order.countDocuments({userId: userId});
       const totalPages = Math.ceil(totalOrders / limit);
 
-      console.log(totalOrders, totalPages, "ppoopp");
-
       res.render("user/order", {
         orders,
         totalPages: totalPages,
@@ -2067,7 +1760,6 @@ const orderDetail = async (req, res) => {
       }
 
       const order = await Order.findOne({ _id: oid });
-      console.log(order);
 
       res.render("user/orderDetail", {
         order: order,
@@ -2452,7 +2144,6 @@ const createPayNowOrder = async (req, res) => {
       let order = await Order.findOne({ _id: orderId });
 
       if (order.totalAmount && order.paymentStatus == "Pending") {
-        console.log("Insitialise payment");
         const currency = "INR";
         const receipt = uuidv4();
 
@@ -2657,12 +2348,9 @@ const orderComplete = async (req, res) => {
 
 const trackOrder = async (req, res) => {
   try{
-    console.log("ooiit");
 
     const orderId = req.query.oid
     const itemId = req.query.itid
-
-    console.log(orderId, itemId, "ooiit");
 
     const order = await Order.findById(orderId)
 

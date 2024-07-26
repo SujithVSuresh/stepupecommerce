@@ -19,7 +19,6 @@ const isLogin = async (req, res, next) => {
       res.redirect("/signin");
     }
   } else {
-    console.log("hey redirect response", req.originalUrl)
     req.session.redirectTo = req.originalUrl;
     res.redirect("/signin");
   }

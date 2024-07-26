@@ -377,7 +377,6 @@
                       "image": "https://media.geeksforgeeks.org/wp-content/uploads/20210806114908/dummy-200x200.png",
                       "order_id": data.razOrder.id,
                       "handler": function (response) {
-                        //  console.log(response, "thaiii", data.razOrder.amount)
                         //  alert("This step of Payment Succeeded");
                         window.location.href = `/shop/orderComplete?oid=${data.order._id}`
 
@@ -419,7 +418,6 @@
                 }
               })
               .catch((error) => {
-                console.log("it is an error", error);
                 if (error.response.status == 409) {
                   new Noty({
                     type: "error",
@@ -432,7 +430,6 @@
               });
 
           } else {
-            console.log("choose a payment method");
             new Noty({
               type: "error",
               text: "Choose a payment method",

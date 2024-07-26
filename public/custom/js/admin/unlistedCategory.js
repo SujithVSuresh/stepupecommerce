@@ -24,13 +24,11 @@ document.addEventListener("click", (event) => {
               id: categoryId,
             })
             .then((response) => {
-              console.log(response, "affffff");
 
               if (response.status == 200) {
                 let categoryElement = document.getElementById(
                   `card${categoryId}`
                 );
-                console.log("99999", categoryElement);
                 if (categoryElement) {
                   categoryElement.remove();
 
@@ -45,8 +43,6 @@ document.addEventListener("click", (event) => {
               }
             })
             .catch((error) => {
-              console.log(error.response.status)
-
               if(error.response.status){
 
               Swal.fire(

@@ -22,7 +22,6 @@ const login = async (req, res) => {
       const { email, password } = req.body;
 
       const admin = await Admin.findOne({ email: email });
-      //console.log(admin.password);
 
       if (admin && (await bcrypt.compare(password, admin.password))) {
         req.session.adminId = admin._id;
@@ -69,8 +68,6 @@ const dashboard = async (req, res) => {
         $count: "salesCount",
       },
     ]);
-
-    console.log(salesCount[0], userCount, orderCount, "kkkkkkk123");
 
     const pendingOrdersCount = await Order.find({
       orderStatus: "Pending",
@@ -382,10 +379,8 @@ const dashboardSalesData = async (req, res) => {
           c.push(0);
         }
       });
-      console.log(salesData, "dd");
     }
 
-    console.log("ggg", d, c);
 
     res.status(200).json({ dates: d, counts: c });
   } catch (error) {
@@ -553,7 +548,6 @@ const editProduct = async (req, res) => {
           .populate("brand")
           .populate("category");
 
-        console.log(":product updated", updatedProduct);
         return res.status(200).json({
           message: "Product edited successfully.",
           product: updatedProduct,
@@ -655,9 +649,7 @@ const userStatus = async (req, res) => {
 //BRAND
 const brands = async (req, res) => {
   try {
-    //let categories = await Category.find({isDelete: false});
 
-    //console.log(category);
     res.render("admin/brand", {
       isLogin: true,
       adminName: req.session.adminName,
@@ -673,10 +665,7 @@ const addBrand = async (req, res) => {
       try {
         const { brandValue } = req.body;
 
-        console.log("lll", req.file.filename, brandValue);
-
         let brand = await Brand.findOne({ name: brandValue });
-        // console.log(category, "lllll")
 
         if (!brand) {
           const newBrand = new Brand({
@@ -938,7 +927,6 @@ const editColorVarient = async (req, res) => {
 
     await product.save();
 
-    // console.log("updated successfully...", productUpdate);
 
     res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
@@ -951,7 +939,6 @@ const deleteColorVarient = async (req, res) => {
   try {
     const { varientId, productId } = req.body;
 
-    console.log(varientId, "colorVarientId");
 
     const colorVariant = await Product.findByIdAndUpdate(
       productId,
@@ -1304,7 +1291,6 @@ const coupon = async (req, res) => {
       const totalOrders = await Coupon.countDocuments({});
       const totalPages = Math.ceil(totalOrders / limit);
 
-      console.log(totalPages, totalOrders / limit, "nmopp");
 
       res.render("admin/coupon", {
         coupons: coupons,
@@ -1458,8 +1444,6 @@ const salesReportData = async (req, res) => {
       gte = startOfWeek;
       lte = endOfWeek;
 
-      console.log("Start of the Week: ", gte);
-      console.log("End of the Week: ", lte);
     }
 
     if (filterType == "month") {

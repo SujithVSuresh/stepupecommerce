@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
       let isValid = true
 
       if (!amount.trim()) {
-        console.log(amount)
         amountError.textContent = "This field is required";
         isValid = false;
       } else if (!/^(?!0\d)\d+(\.\d+)?$/.test(amount)) {
@@ -156,7 +155,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
           })
           .catch((error) => {
-            console.log("it is an error123", error)
             if (error.response.status == 409) {
               new Noty({
                 type: 'error',

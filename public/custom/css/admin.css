@@ -32,15 +32,16 @@
   }
 
 
-  .modal-dialog-custom {
-    width: 50%;
-    max-width: 50%;
+.modal-dialog-custom {
+    width: 100%;
+    max-width: 100%;
 }
 
-@media (max-width: 768px) {
-    .modal-dialog-custom {
-        width: 90%;
-    }
+@media (min-width: 775px) { /* Change the breakpoint as needed */
+  .modal-dialog-custom {
+      width: 50%;
+      max-width: 50%;
+  }
 }
 
 .color-varient-modal-dialog-custom{

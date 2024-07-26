@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
           totalSales.innerText = data.totalSales[0].count;
 
           data.orders.forEach((order) => {
-            console.log("ll");
             order.items.forEach((item) => {
               tableContainer.innerHTML += `
                   <tr>
@@ -125,7 +124,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     minDate: "2024-01-01",
     dateFormat: "Y-m-d",
     onChange: function (selectedDates, dateStr, instance) {
-      console.log(dateStr, instance, "lop");
       dateFilter.value = "";
 
       if (selectedDates.length === 2) {
@@ -149,12 +147,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
   document.addEventListener("click", (event) => {
     if (event.target && event.target.id == "filterBtn") {
-      console.log(dateFilter.value);
 
       if (dateFilter.value) {
         fetchSalesData(dateFilter.value);
       } else {
-        console.log(fromStrDate, toStrDate, "llop");
         fetchSalesData("date", fromStrDate, toStrDate);
       }
     }

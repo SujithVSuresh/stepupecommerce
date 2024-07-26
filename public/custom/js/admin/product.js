@@ -136,7 +136,6 @@ document.addEventListener("click", (event) => {
           })
           .then((response) => {
             if (response.status == 200) {
-              console.log(response.data);
               let sizeElement = document.getElementById(`tr${sizeVarientId}`);
               if (sizeElement) {
                 sizeElement.remove();
@@ -1711,37 +1710,3 @@ productForm.addEventListener("submit", (event) => {
   }
 });
 
-//GET PRODUCTS DATA
-// document.addEventListener("DOMContentLoaded", (event) => {
-//   let tableContainer = document.getElementById("product-table-container");
-//   tableContainer.innerHTML = "";
-
-//   axios
-//     .get("/admin/products/data")
-//     .then((response) => {
-//       console.log(response.data.products);
-//       if (response.status == 200) {
-//         if (response.data.products.length !== 0) {
-//           response.data.products.forEach((product) => {
-//             tableContainer.innerHTML += `
-//                     <tr id="row${product._id}">
-//                   <td>${product.modelName}</td>
-//                   <td>${product.brand.name}</td>
-//                   <td>${product.category.categoryName}</td>
-//                   <td>${product.gender == "men" ? "Men" : product.gender == "women" ? "Women" : "Men & Women"}</td>
-//                   <td>${product.outerMaterial}</td>
-//                   <td>${product.soleMaterial}</td>
-
-//                   <td><button data-product-id="${product._id}" id="varient${product._id}" data-toggle="modal" data-target="#varientModal" type="button" class="productVarientBtn varientBtnClr btn btn-gradient-info btn-rounded btn-sm statusBtn">Varient</button></td>
-//                   <td><button data-product-id="${product._id}" id="edit${product._id}" data-toggle="modal" data-target="#productEditModal" type="button" class="productEditBtn btn-sm btn btn-outline-dark statusBtn">Edit</button></td>
-//                  <td><button data-product-id="${product._id}" id="delete${product._id}" type="button" class="productUnlistBtn btn btn-outline-danger btn-sm statusBtn">Unlist</button></td>
-//                 </tr>
-//                     `;
-//           });
-//         }
-//       }
-//     })
-//     .catch((error) => {
-//       console.log("it is an error", error);
-//     });
-// });
