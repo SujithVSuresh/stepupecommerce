@@ -701,23 +701,11 @@ const brandList = async (req, res) => {
 
 const category = async (req, res) => {
   try {
-
-    let page = req.query.page || 1;
-    let limit = 10;
-    let skip = (page - 1) * limit;
-
-
   let categories = await Category.find({ isDelete: false })
-      .skip(skip)
-      .limit(limit)
    
-
-    const totalCategories = await Category.countDocuments({ isDelete: false });
-    const totalPages = Math.ceil(totalCategories / limit);
 
     res.render("admin/category", {
       categories: categories,
-      totalPages: totalPages,
       isLogin: true,
       adminName: req.session.adminName,
     });

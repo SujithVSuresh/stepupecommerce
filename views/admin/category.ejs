@@ -4,20 +4,7 @@
     <!-- partial:partials/_sidebar.html -->
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
       <ul class="nav">
-        <!-- <li class="nav-item nav-profile">
-        <a href="#" class="nav-link">
-          <div class="nav-profile-image">
-            <img src="assets/images/faces/face1.jpg" alt="profile">
-            <span class="login-status online"></span>
 
-          </div>
-          <div class="nav-profile-text d-flex flex-column">
-            <span class="font-weight-bold mb-2">David Grey. H</span>
-            <span class="text-secondary text-small">Project Manager</span>
-          </div> 
-          <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
-        </a>
-      </li> -->
         <li class="nav-item">
           <a class="nav-link" href="/admin/dashboard">
             <span class="menu-title">DASHBOARD</span>
@@ -162,18 +149,6 @@
             <% }); %>
         </div>
 
-        <div class="d-flex justify-content-center" style="margin-top: 250px;">
-          <nav aria-label="Page navigation example">
-            <ul class="pagination">
-              <li class="page-item" id="prevBtn"><a class="page-link text-black" href="#">Previous</a></li>
-              <% for(let i=1; i<= totalPages; i++){ %>
-              <li class="page-item pagenationBtn" data-page-no="<%= i %>"><a class="page-link text-black"><%= i %></a></li>
-              <% } %>
-  
-              <li class="page-item" total-pages="<%= totalPages %>" id="nxtBtn"><a class="page-link text-black" href="#">Next</a></li>
-            </ul>
-          </nav>
-        </div>
 
         <!-- Start of add modal -->
 
@@ -250,7 +225,5 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
   <script src="/static/custom/js/admin/category.js"></script>
-
-  <script src="/static/custom/js/admin/pagenation.js"></script>
 
     <%- include('./footer') %>
