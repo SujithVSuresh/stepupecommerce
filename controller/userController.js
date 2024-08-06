@@ -1,7 +1,5 @@
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
-const Subvarient = require("../models/subVarientModel");
-const Varient = require("../models/varientModel");
 const Cart = require("../models/cartModel");
 const Address = require("../models/addressModel");
 const Order = require("../models/orderModel");
@@ -235,8 +233,8 @@ const home = async (req, res) => {
 
   try {
     res.render("user/home", {
-      newArrivals: products,
-      categoryOffers: categoryOffers,
+      newArrivals: products ? products : [],
+      categoryOffers: categoryOffers ? categoryOffers : [],
       isLogin: req.session.userId || req.session.gUser ? true : false,
       cartCount: req.session.userId ? req.session.cartCount : 0,
     });

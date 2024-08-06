@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const mailSender = async (email, title, body) => {
     try {
@@ -9,7 +10,7 @@ const mailSender = async (email, title, body) => {
         secure: false,
         auth: {
           user: 'sujithforcoding@gmail.com',
-          pass: 'mvez hlfq buqi dhcn',
+          pass: process.env.GOOGLE_PASS_KEY,
         }
       });
       // Send emails to users
