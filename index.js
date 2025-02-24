@@ -100,8 +100,17 @@ app.get('*', (req, res) => {
   
   });
 
-const port = process.env.PORT  
+// const port = process.env.PORT  
 
-app.listen(port, () => {
-  console.log("Server has started");
-});
+// app.listen(5000, () => {
+//   console.log("Server has started");
+// });
+
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+module.exports = app;
